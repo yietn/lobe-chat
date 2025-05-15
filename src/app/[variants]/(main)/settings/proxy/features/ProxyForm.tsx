@@ -64,17 +64,17 @@ const ProxyForm = () => {
       </Form.Item>
       <Form.Item
         dependencies={['proxyRequireAuth', 'enableProxy']}
+        hidden={!form.getFieldValue('proxyRequireAuth') || !form.getFieldValue('enableProxy')}
         label={t('proxy.username')}
         name="proxyUsername"
-        hidden={!form.getFieldValue('proxyRequireAuth') || !form.getFieldValue('enableProxy')}
       >
         <Input placeholder={t('proxy.username_placeholder')} />
       </Form.Item>
       <Form.Item
         dependencies={['proxyRequireAuth', 'enableProxy']}
+        hidden={!form.getFieldValue('proxyRequireAuth') || !form.getFieldValue('enableProxy')}
         label={t('proxy.password')}
         name="proxyPassword"
-        hidden={!form.getFieldValue('proxyRequireAuth') || !form.getFieldValue('enableProxy')}
       >
         <Input.Password placeholder={t('proxy.password_placeholder')} />
       </Form.Item>
