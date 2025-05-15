@@ -1,7 +1,7 @@
 'use client';
 
 import { NetworkProxySettings } from '@lobechat/electron-client-ipc';
-import { Button, Form, Input, Radio, Space, Switch, message } from 'antd';
+import { Button, Form, Input, Radio, Skeleton, Space, Switch, message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -30,14 +30,10 @@ const ProxyForm = () => {
     setProxySettings(changedValues);
   }, []);
 
+  if (isLoading) return <Skeleton />;
+
   return (
-    <Form
-      disabled={isLoading}
-      form={form}
-      initialValues={proxySettings}
-      layout="vertical"
-      onValuesChange={handleValuesChange}
-    >
+    <Form disabled={isLoading} form={form} layout="vertical" onValuesChange={handleValuesChange}>
       <Form.Item label={t('proxy.enable')} name="enableProxy" valuePropName="checked">
         <Switch />
       </Form.Item>
@@ -78,12 +74,12 @@ const ProxyForm = () => {
       >
         <Input.Password placeholder={t('proxy.password_placeholder')} />
       </Form.Item>
-      <Form.Item dependencies={['enableProxy']} label={t('proxy.bypass')} name="proxyBypass">
-        <Input.TextArea
-          disabled={!form.getFieldValue('enableProxy')}
-          placeholder="localhost, 127.0.0.1, ::1"
-        />
-      </Form.Item>
+      {/*<Form.Item dependencies={['enableProxy']} label={t('proxy.bypass')} name="proxyBypass">*/}
+      {/*  <Input.TextArea*/}
+      {/*    disabled={!form.getFieldValue('enableProxy')}*/}
+      {/*    placeholder="localhost, 127.0.0.1, ::1"*/}
+      {/*  />*/}
+      {/*</Form.Item>*/}
 
       <Form.Item label={t('proxy.testUrl')}>
         <Space.Compact style={{ width: '100%' }}>

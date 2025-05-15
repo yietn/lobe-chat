@@ -1,7 +1,7 @@
 import { NetworkProxySettings } from '@lobechat/electron-client-ipc';
 import { merge } from 'lodash';
 import { isEqual } from 'lodash-es';
-import { ProxyAgent, setGlobalDispatcher } from 'undici';
+import { ProxyAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 
 import { createLogger } from '@/utils/logger';
 
@@ -40,7 +40,7 @@ export default class SettingsCtr extends ControllerModule {
       this.app.storeManager.set('networkProxy', newConfig);
 
       // Apply network proxy settings
-      this.applyProxySettings(newConfig);
+      await this.applyProxySettings(newConfig);
 
       logger.info('Network proxy settings updated');
     } catch (error) {
@@ -54,7 +54,7 @@ export default class SettingsCtr extends ControllerModule {
    * @param url The URL to test with
    */
   @ipcClientEvent('testProxyConnection')
-  async testProxyConnection(url: string): Promise<{ success: boolean; message?: string }> {
+  async testProxyConnection(url: string): Promise<{ message?: string; success: boolean }> {
     try {
       logger.info(`Testing proxy connection with URL: ${url}`);
 
@@ -84,7 +84,7 @@ export default class SettingsCtr extends ControllerModule {
         'networkProxy',
         defaultProxySettings,
       ) as NetworkProxySettings;
-      this.applyProxySettings(networkProxy);
+      await this.applyProxySettings(networkProxy);
 
       logger.info('Initial proxy settings applied');
     } catch (error) {
@@ -97,11 +97,12 @@ export default class SettingsCtr extends ControllerModule {
    * Use undici's ProxyAgent to set global request proxy
    * @param config Proxy configuration
    */
-  private applyProxySettings = (config: NetworkProxySettings) => {
+  private applyProxySettings = async (config: NetworkProxySettings) => {
     try {
       if (!config.enableProxy) {
         // Disable proxy, reset global dispatcher
-        setGlobalDispatcher(new ProxyAgent({ uri: '' }));
+        const dispatcher = getGlobalDispatcher();
+        await dispatcher.destroy();
         logger.debug('Proxy disabled, reset to direct connection mode');
         return;
       }
