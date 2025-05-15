@@ -4,6 +4,7 @@ import {
   Brain,
   Cloudy,
   Database,
+  EthernetPort,
   Info,
   KeyboardIcon,
   Mic2,
@@ -116,6 +117,15 @@ export const useCategory = () => {
         },
         {
           type: 'divider',
+        },
+        {
+          icon: <Icon icon={EthernetPort} />,
+          key: SettingsTabs.Proxy,
+          label: (
+            <Link href={'/settings/proxy'} onClick={(e) => e.preventDefault()}>
+              {t('tab.proxy')}
+            </Link>
+          ),
         },
         {
           icon: <Icon icon={Database} />,
