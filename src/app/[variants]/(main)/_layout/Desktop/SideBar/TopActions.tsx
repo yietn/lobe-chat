@@ -74,9 +74,9 @@ const TopActions = memo<TopActionProps>(({ tab, isPinned }) => {
         <ActionIcon
           active={tab === SidebarTabKey.AiImage}
           icon={Image}
-          placement={'right'}
-          size="large"
+          size={ICON_SIZE}
           title={t('tab.aiImage')}
+          tooltipProps={{ placement: 'right' }}
         />
       </Link>
     </Flexbox>
