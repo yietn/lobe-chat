@@ -180,14 +180,16 @@ export interface AIEmbeddingModelCard extends AIBaseModelCard {
 }
 
 export interface AIText2ImageModelCard extends AIBaseModelCard {
+  // [resolution: string]: number;
+  parameters?: Record<string, any>;
   pricing?: {
     /**
      * the currency of the pricing
      * @default USD
      */
     currency?: ModelPriceCurrency;
-  } & Record<string, number>; // [resolution: string]: number;
-  resolutions: string[];
+  } & Record<string, number>;
+  resolutions?: string[];
   type: 'image';
 }
 
