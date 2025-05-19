@@ -1,4 +1,4 @@
-import { Input, InputProps } from 'antd';
+import { Input, type InputProps } from '@lobehub/ui';
 import { memo } from 'react';
 
 interface ArgsInputProps extends Omit<InputProps, 'value' | 'onChange'> {
@@ -12,7 +12,7 @@ const ArgsInput = memo<ArgsInputProps>(({ value, onChange, ...res }) => {
       onChange={(e) => {
         onChange?.([e.target.value]);
       }}
-      value={value?.[0]}
+      value={value?.join(' ')}
       {...res}
     />
   );
