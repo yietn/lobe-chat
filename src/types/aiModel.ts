@@ -179,7 +179,7 @@ export interface AIEmbeddingModelCard extends AIBaseModelCard {
   type: 'embedding';
 }
 
-export interface AIText2ImageModelCard extends AIBaseModelCard {
+export interface AIImageModelCard extends AIBaseModelCard {
   // [resolution: string]: number;
   parameters?: Record<string, any>;
   pricing?: {

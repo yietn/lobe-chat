@@ -1,8 +1,8 @@
-import { AIText2ImageModelCard } from '@/types/aiModel';
+import { AIImageModelCard } from '@/types/aiModel';
 
 import FluxSchnellParamsSchema from '../paramsSchemas/fal/flux-schnell.json';
 
-const googleChatModels: AIText2ImageModelCard[] = [
+const googleChatModels: AIImageModelCard[] = [
   {
     description:
       'FLUX.1 [schnell] 是一个拥有120亿参数的流式转换器模型，能够在1到4步内从文本生成高质量图像，适合个人和商业用途。',
