@@ -10,6 +10,7 @@ const Fal: ModelProviderCard = {
   id: 'fal',
   name: 'Fal',
   settings: {
+    disableBrowserRequest: true,
     showAddNewModel: false,
     showChecker: false,
     showModelFetcher: false,
