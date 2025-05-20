@@ -337,7 +337,7 @@ midjourney 它的生成和其它生成不一样，webhook 回调返回得是一�
 
 ## AI Image 参数标准化
 
-不同的 ai image provider 的模型参数名称，case 都不一样，例如 [fal](https://fal.ai/models/fal-ai/flux/dev) 的 cfg 参数是 guidance_scale，但是 [runWare](https://my.runware.ai/playground?modelAIR=runware%3A100%401&modelArchitecture=flux1s) 的参数又是 CFGScale。
+不同的 ai image provider 的模型参数名称，case 都不一样，例如 [fal](https://fal.ai/models/fal-ai/flux/dev) 的 cfg 参数是 guidance\_scale，但是 [runWare](https://my.runware.ai/playground?modelAIR=runware%3A100%401\&modelArchitecture=flux1s) 的参数又是 CFGScale。
 需要定制一套统一的标准化的参数名称。
 
 好处:
@@ -350,8 +350,61 @@ midjourney 它的生成和其它生成不一样，webhook 回调返回得是一�
 - prompt: string
 - width/height: integer
 - ratio: string
-- cfgScale: number
+- cfg: number
 - steps: number
 - seed: number
 
-考虑可以借鉴 comfyUI 官方节点的参数名称
+考虑可以借鉴 comfyUI 官方节点的参数名称：
+
+<img width="1103" alt="image" src="https://github.com/user-attachments/assets/2b23698f-c438-47c4-bbc0-cafed477b3f0" />
+
+### 模型参数示例
+
+新增一个模型支持需要到对应的文件夹新增 json 文件，例如 fal 新增 flux-schnell 支持需要新增 `src/config/paramsSchemas/fal/flux-schnell.json`：
+
+```json
+{
+  "properties": {
+    "prompt": {},
+    "width": {
+      "minimum": 512,
+      "maximum": 1536,
+      "step": 1,
+      "default": 1024
+    },
+    "height": {
+      "minimum": 512,
+      "maximum": 1536,
+      "step": 1,
+      "default": 1024
+    },
+    "steps": {
+      "minimum": 1,
+      "maximum": 12,
+      "default": 4
+    },
+    "seed": {
+    }
+  },
+  "required": ["prompt"],
+  "type": "object"
+}
+```
+
+然后在 `src/config/aiModels/fal.ts` 中使用：
+
+```typescript
+import FluxSchnellParamsSchema from '../paramsSchemas/fal/flux-schnell.json';
+
+const googleChatModels: AIImageModelCard[] = [
+  {
+    description: '...',
+    displayName: 'FLUX.1 [schnell]',
+    enabled: true,
+    id: 'flux/schnell',
+    parameters: FluxSchnellParamsSchema,
+    releasedAt: '2024-08-01',
+    type: 'image',
+  },
+];
+```

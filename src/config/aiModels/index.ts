@@ -139,6 +139,7 @@ export { default as bedrock } from './bedrock';
 export { default as cloudflare } from './cloudflare';
 export { default as cohere } from './cohere';
 export { default as deepseek } from './deepseek';
+export { default as fal } from './fal';
 export { default as fireworksai } from './fireworksai';
 export { default as giteeai } from './giteeai';
 export { default as github } from './github';
