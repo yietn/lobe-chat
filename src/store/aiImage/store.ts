@@ -8,6 +8,7 @@ import {
   GenerationConfigAction,
   createGenerationConfigSlice,
 } from './slices/generationConfig/action';
+import { createGenerationTopicSlice } from './slices/generationTopic/action';
 
 //  ===============  aggregate createStoreFn ============ //
 
@@ -16,6 +17,7 @@ export interface AiImageStore extends GenerationConfigAction, AiImageStoreState 
 const createStore: StateCreator<AiImageStore, [['zustand/devtools', never]]> = (...parameters) => ({
   ...initialState,
   ...createGenerationConfigSlice(...parameters),
+  ...createGenerationTopicSlice(...parameters),
 });
 
 //  ===============  implement useStore ============ //

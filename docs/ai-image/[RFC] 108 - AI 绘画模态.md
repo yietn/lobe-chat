@@ -293,7 +293,7 @@ export const asyncTasks = pgTable('async_tasks', {
 - 点开 topic 显示的 generationBatch 缩略图不需要生成，直接用 generationBatch 的第一张图的缩略图
 
 ```typescript
-export const generationTopics = pgTable(
+const generationTopics = pgTable(
   'generation_topics',
   {
     id: varchar('id', { length: 64 }).notNull(),
@@ -303,6 +303,8 @@ export const generationTopics = pgTable(
     // 简要描述主题内容, LLM 生成，复用 chat 的 topic title 生成
     title: text('title').notNull(),
     imageUrl: text('image_url'),
+    model: text('model'),
+    provider: text('provider'),
     ...timestamps,
   },
   (table) => [primaryKey({ columns: [table.id, table.userId] })],
@@ -337,7 +339,7 @@ midjourney 它的生成和其它生成不一样，webhook 回调返回得是一�
 
 ## AI Image 参数标准化
 
-不同的 ai image provider 的模型参数名称，case 都不一样，例如 [fal](https://fal.ai/models/fal-ai/flux/dev) 的 cfg 参数是 guidance\_scale，但是 [runWare](https://my.runware.ai/playground?modelAIR=runware%3A100%401\&modelArchitecture=flux1s) 的参数又是 CFGScale。
+不同的 ai image provider 的模型参数名称，case 都不一样，例如 [fal](https://fal.ai/models/fal-ai/flux/dev) 的 cfg 参数是 guidance_scale，但是 [runWare](https://my.runware.ai/playground?modelAIR=runware%3A100%401&modelArchitecture=flux1s) 的参数又是 CFGScale。
 需要定制一套统一的标准化的参数名称。
 
 好处:
@@ -383,8 +385,7 @@ midjourney 它的生成和其它生成不一样，webhook 回调返回得是一�
       "maximum": 12,
       "default": 4
     },
-    "seed": {
-    }
+    "seed": {}
   },
   "required": ["prompt"],
   "type": "object"
