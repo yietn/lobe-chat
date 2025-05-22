@@ -18,30 +18,16 @@ import { aiProviderSelectors } from '@/store/aiInfra/slices/aiProvider/selectors
 import { featureFlagsSelectors, useServerConfigStore } from '@/store/serverConfig';
 import { EnabledProviderWithModels } from '@/types/aiProvider';
 
-const useStyles = createStyles(({ css, prefixCls, token }) => ({
+const useStyles = createStyles(({ css, token }) => ({
   menu: css`
-    .${prefixCls}-dropdown-menu-item {
-      display: flex;
-      gap: 8px;
-    }
-    .${prefixCls}-dropdown-menu {
-      &-item-group-title {
-        padding-inline: 8px;
-      }
-
-      &-item-group-list {
-        margin: 0 !important;
-      }
-    }
-
-    max-height: 500px;
     overflow-y: scroll;
+    max-height: 500px;
   `,
   modelSelect: css`
     cursor: pointer;
-    padding: 8px;
+    padding: ${token.paddingSM}px;
+    border: 1px solid ${token.colorBorder};
     border-radius: ${token.borderRadius}px;
-    border: 1px solid ${token.colorBorderSecondary};
 
     &:hover {
       background-color: ${token.colorFillTertiary};
@@ -151,6 +137,7 @@ const ModelSelect = memo(() => {
       placement={'bottom'}
       trigger={['click']}
     >
+      {/* FIXME: 不包一层没法触发 dropdown展开 */}
       <Flexbox align="center" className={styles.modelSelect} horizontal justify="space-between">
         <ModelItemRender displayName={currentModel} id={currentModel} showInfoTag={false} />
       </Flexbox>

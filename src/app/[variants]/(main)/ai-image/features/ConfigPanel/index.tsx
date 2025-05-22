@@ -10,20 +10,14 @@ import ModelSelect from './ModelSelect';
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`
-    height: 100%;
-    width: 260px;
     overflow-y: auto;
+
+    width: 260px;
+    height: 100%;
     padding: 16px;
-    border-left: 1px solid ${token.colorBorderSecondary};
+    border-inline-start: 1px solid ${token.colorBorderSecondary};
   `,
 }));
-
-const wrapperCol = {
-  style: {
-    maxWidth: '100%',
-    width: '100%',
-  },
-};
 
 const ConfigPanel = memo(() => {
   const { styles } = useStyles();
@@ -37,13 +31,14 @@ const ConfigPanel = memo(() => {
             children: [
               {
                 children: <ModelSelect />,
-                label: t('config.models', 'Models'),
+                label: t('config.models'),
                 layout: 'vertical',
-                wrapperCol,
               },
             ],
+            title: t('config.title'),
           },
         ]}
+        itemsType={'group'}
         variant={'borderless'}
         {...FORM_STYLE}
       />

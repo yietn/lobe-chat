@@ -1,5 +1,6 @@
 export const aiImage = {
   config: {
-    models: 'Models',
+    models: '模型',
+    title: 'AI 绘画',
   },
 } as const;

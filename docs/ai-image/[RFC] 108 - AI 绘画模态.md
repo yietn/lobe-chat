@@ -1,6 +1,7 @@
 ## 背景
 
 - <https://github.com/lobehub/lobe-chat/discussions/4741>
+- progress: <https://github.com/lobehub/lobe-chat/pull/7920>
 
 ## 一期目标
 
