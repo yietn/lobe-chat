@@ -10,7 +10,6 @@ AI 绘画场景下基本的生图功能：根据用户的输入和配置生成�
 
 - 支持多 providers 和 models，率先支持 fal.ai 和 openai gpt4o-image
 - 可扩展通用的异步任务架构，已有可参考的是文件分块和向量化
-- 图片语义化搜索，如果一期不做，后面再做的时候对之前生成的图片做向量化就比较麻烦，所以最好一期一起做了
 
 后续计划：
 
@@ -22,6 +21,9 @@ AI 绘画场景下基本的生图功能：根据用户的输入和配置生成�
 - prompt translate/enhance
 - 绘画模态下实现 LLM 辅助生图
 - 对比多个模型生成
+- 图片语义化搜索
+  - 一期不支持，主要考虑到图片向量化需要自部署 [clip](https://huggingface.co/openai/clip-vit-large-patch14) 模型或者引入[第三方模型服务](https://replicate.com/andreasjansson/clip-features)，但感觉基于 prompt 的搜索好像满足了大多数场景。简单来说就是成本比较高，但是需求感觉不强烈
+  - 但需要了解的是，后序如果要支持，数据迁移是个问题
 
 ## 界面
 

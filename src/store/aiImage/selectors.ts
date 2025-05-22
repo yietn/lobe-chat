@@ -1,1 +1,1 @@
-// export { agentChatConfigSelectors, agentSelectors } from './slices/generationConfig/selectors';
+export * from './slices/generationTopic/selectors';
