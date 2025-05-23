@@ -3,22 +3,104 @@
 - <https://github.com/lobehub/lobe-chat/discussions/4741>
 - progress: <https://github.com/lobehub/lobe-chat/pull/7920>
 
-## 一期目标
+## 目标
 
-AI 绘画场景下基本的生图功能：根据用户的输入和配置生成图片。
+针对 AI 绘画场景的创作工具。
 
-同时：
+## 开发计划
 
-- 支持多 providers 和 models，率先支持 fal.ai 和 openai gpt4o-image
-- 可扩展通用的异步任务架构，已有可参考的是文件分块和向量化
+### 一期目标
 
-后续计划：
+AI 绘画场景下基本的生图功能。
 
-- 绘图模型 pricing 显示
-- 移动端界面
-- 支持更多 provider
-  - midjourney discord/TTAPI
-  - etc
+同时，为了系统的扩展性和未来其它需求做铺垫需要设计实现下面这些架构。
+
+#### 多 providers 架构
+
+就是说可以使用不同 provider 提供的image 模型，例如 openai provider 的 gpt4o-image, dalle3, google provider 的 imagen4, fal 的上百种 ai 模型。
+
+常见的 provider 还有 replicate, runware, ttapi, together.ai, kling, seedream 等。
+
+一期将率先支持 fal.i, openai gpt4o-image, google imagen4。
+
+#### 请求方式支持阻塞式请求和 webhook 两种方式
+
+- 阻塞式请求：几乎所有的 AI 生图 provider 都支持阻塞式请求，也就是说发了一个请求生图的 AI 后，会一直 await 到生图结束
+
+  - 优点：
+    1. 兼容性好：几乎所有 AI 生图 provider 都支持阻塞式请求。而且很多平台只支持阻塞式请求，例如 gpt4o-image, imagen4 等。
+    2. 实现简单，不需要服务端提供 webhook 回调接口
+    3. 可以支持客户端请求模式
+  - 缺点：
+    1. serverless 不友好：很多 serverless 平台（例如 vercel）对接口响应时间有限制，例如 vercel 免费版限制 router handler 必须在 [60s](https://vercel.com/docs/functions/configuring-functions/duration) 内返回 response。而有些模型生图耗时比较长例如 gpt4o-image，可能长达 1 分钟以上，不过根据我的经验来说大多数 ai image 模型 60s 内都能生成。
+    2. 请求的稳定性：服务端请求的情况下，服务器重启后，导致请求失败（存疑，感觉 serverless 平台会等待到空闲的时候才重启？）；在客户端请求模式下，发送生图请求后，如果断网或者网页刷新后，那和之前的请求就断开连接了，就没法拿到之前的请求结果了
+
+- webhook 请求：
+  - 优点：
+    1. serverless 平台友好：因为发送完一个 task 请求就可以直接响应了，很快就能响应，不会有超时问题，然后客户端轮训 task 状态就好了
+    2. 稳定性更好：即便是服务端重启，webhook 回调一般会有重试机制
+    3. 对于异步请求任务可以做优先级队列等
+  - 缺点：
+    1. 实现相对复杂：需要服务端提供 webhook 回调接口
+    2. 客户端请求模式因为没法提供 webhook 回调接口，所以没法支持
+
+#### 多模态
+
+虽然这一期只做 AI 生图，但是也需要在设计层面为 AI 视频，AI 音乐 等更多模态做好准备。
+
+其中最最重要的两块是：数据库设计和全局状态设计。前期没设计好后面迁移起来贼麻烦。
+
+举例说明一下数据库怎么设计对多模态比较友好：无论是 AI 生图还是视频，我们预计可能都会支持收藏，发布，软删除，功能。那这些功能其实是多模态公共的能力。如果针对每个模态定义对应的表去存储这些状态，也就是
+
+```typescript
+const imageGenerations = pgTable('image_generations', {
+  isPublished: boolean().default(false).notNull(),
+  isFavorite: boolean().default(false).notNull(),
+  // image config
+  prompt: text().notNull(),
+});
+
+const videoGenerations = pgTable('video_generations', {
+  isPublished: boolean().default(false).notNull(),
+  isFavorite: boolean().default(false).notNull(),
+  // video config
+  prompt: text().notNull(),
+  startFrame: integer().notNull(),
+});
+```
+
+那这样我们在实现收藏功能的时候就需要实现多个接口，或者针对不同的模态去访问对应的表，n 个模态逻辑就是 n。
+
+但是如果我们抽取公共的 generation 表：
+
+```typescript
+const generations = pgTable('generations', {
+  isPublished: boolean().default(false).notNull(),
+  isFavorite: boolean().default(false).notNull(),
+  configId: varchar('config_id', { length: 64 }).notNull(),
+});
+
+const imageConfigs = pgTable('image_configs', {
+  generationId: varchar('generation_id', { length: 64 }).notNull(),
+  prompt: text().notNull(),
+});
+
+const videoConfigs = pgTable('video_configs', {
+  generationId: varchar('generation_id', { length: 64 }).notNull(),
+  prompt: text().notNull(),
+  startFrame: integer().notNull(),
+});
+```
+
+那我们实现收藏功能的时候其实只需要针对 generation 表做更新就好了，不需要针对 image 和 video 表做更新。
+
+这么设计还有一个好处就是如果我们要做 gallery，其中既要展示图片，又要展示视频，那我们只需要针对 generation 表做查询就好了，不需要针对 image 和 video 表做查询
+
+### 后续计划
+
+- web 移动端
+- 绘图模型 pricing 显示和 cloud 版本计费
+- 支持更多 provider，例如 midjourney discord/TTAPI, replicate/runware/kling/seedream 等
 - prompt translate/enhance
 - 绘画模态下实现 LLM 辅助生图
 - 对比多个模型生成
