@@ -17,40 +17,42 @@ AI 绘画场景下基本的生图功能。
 
 #### 多 providers 架构
 
-就是说可以使用不同 provider 提供的image 模型，例如 openai provider 的 gpt4o-image, dalle3, google provider 的 imagen4, fal 的上百种 ai 模型。
+这本身就是 lobe chat 的核心优势之一，把 chat 的多 provider 功能延续到其它模态。
 
-常见的 provider 还有 replicate, runware, ttapi, together.ai, kling, seedream 等。
+就是说可以使用不同 provider 提供的 image 模型，例如 openai provider 的 gpt-4o-image, dalle3, google provider 的 imagen-4, fal 的上百种 ai 模型。
 
-一期将率先支持 fal.i, openai gpt4o-image, google imagen4。
+常见的 provider 还有 replicate, runware, together.ai, stablity.ai, ttapi, kling, seedream 等。
+
+一期将率先支持 fal.ai, openai, google。
 
 #### 请求方式支持阻塞式请求和 webhook 两种方式
 
 - 阻塞式请求：几乎所有的 AI 生图 provider 都支持阻塞式请求，也就是说发了一个请求生图的 AI 后，会一直 await 到生图结束
 
   - 优点：
-    1. 兼容性好：几乎所有 AI 生图 provider 都支持阻塞式请求。而且很多平台只支持阻塞式请求，例如 gpt4o-image, imagen4 等。
+    1. 兼容性好：几乎所有 AI 生图 provider 都支持阻塞式请求。而且很多平台只支持阻塞式请求，例如 gpt-4o-image, imagen-4 等。想支持 webhook 还得自己封装。
     2. 实现简单，不需要服务端提供 webhook 回调接口
     3. 可以支持客户端请求模式
   - 缺点：
-    1. serverless 不友好：很多 serverless 平台（例如 vercel）对接口响应时间有限制，例如 vercel 免费版限制 router handler 必须在 [60s](https://vercel.com/docs/functions/configuring-functions/duration) 内返回 response。而有些模型生图耗时比较长例如 gpt4o-image，可能长达 1 分钟以上，不过根据我的经验来说大多数 ai image 模型 60s 内都能生成。
-    2. 请求的稳定性：服务端请求的情况下，服务器重启后，导致请求失败（存疑，感觉 serverless 平台会等待到空闲的时候才重启？）；在客户端请求模式下，发送生图请求后，如果断网或者网页刷新后，那和之前的请求就断开连接了，就没法拿到之前的请求结果了
+    1. serverless 不友好：很多 serverless 平台（例如 vercel）对接口响应时间有限制，例如 vercel 免费版限制 router handler 必须在 [60s](https://vercel.com/docs/functions/configuring-functions/duration) 内返回 response。而有些模型生图耗时比较长例如 gpt-4o-image，可能长达 1 分钟以上，不过根据我的经验来说大多数 ai image 模型 60s 内都能生成。
+    2. 请求中断不能恢复：发送生图请求后，如果断网或者网页刷新后，那和之前的请求就断开连接了，就没法拿到之前的请求结果了
 
 - webhook 请求：
   - 优点：
-    1. serverless 平台友好：因为发送完一个 task 请求就可以直接响应了，很快就能响应，不会有超时问题，然后客户端轮训 task 状态就好了
+    1. serverless 平台友好：因为发送完一个 task 请求就可以直接响应了，很快就能响应，不会有超时问题，然后客户端轮询 task 状态就好了
     2. 稳定性更好：即便是服务端重启，webhook 回调一般会有重试机制
     3. 对于异步请求任务可以做优先级队列等
   - 缺点：
     1. 实现相对复杂：需要服务端提供 webhook 回调接口
-    2. 客户端请求模式因为没法提供 webhook 回调接口，所以没法支持
+    2. 不支持客户端请求模式：因为没法提供 webhook 回调接口，所以没法支持
 
 #### 多模态
 
-虽然这一期只做 AI 生图，但是也需要在设计层面为 AI 视频，AI 音乐 等更多模态做好准备。
+虽然这一期只做 AI 生图，但是也需要在设计层面为 `AI 视频`，`AI 音乐` 等更多模态做好准备。
 
-其中最最重要的两块是：数据库设计和全局状态设计。前期没设计好后面迁移起来贼麻烦。
+其中最最重要的两块是：数据库设计和全局状态设计，前期没设计好后面迁移起来贼麻烦。
 
-举例说明一下数据库怎么设计对多模态比较友好：无论是 AI 生图还是视频，我们预计可能都会支持收藏，发布，软删除，功能。那这些功能其实是多模态公共的能力。如果针对每个模态定义对应的表去存储这些状态，也就是
+举例说明一下数据库怎么设计对多模态比较友好：无论是 AI 生图还是视频，我们预计可能都会支持收藏，发布，软删除等功能。那这些功能其实是多模态公共的能力。如果针对每个模态定义对应的表去存储这些状态，也就是
 
 ```typescript
 const imageGenerations = pgTable('image_generations', {
@@ -69,9 +71,9 @@ const videoGenerations = pgTable('video_generations', {
 });
 ```
 
-那这样我们在实现收藏功能的时候就需要实现多个接口，或者针对不同的模态去访问对应的表，n 个模态逻辑就是 n。
+那这样我们在实现收藏功能的时候就需要实现多个接口，或者针对不同的模态去访问对应的表，n 个模态逻辑复杂度就是 n。
 
-但是如果我们抽取公共的 generation 表：
+但是如果我们抽取公共的 generation 表，把公共业务逻辑数据放在 generation 表上，例如收藏，发布：
 
 ```typescript
 const generations = pgTable('generations', {
@@ -92,9 +94,9 @@ const videoConfigs = pgTable('video_configs', {
 });
 ```
 
-那我们实现收藏功能的时候其实只需要针对 generation 表做更新就好了，不需要针对 image 和 video 表做更新。
+那我们实现收藏功能的时候其实只需要针对 generation 表做更新就好了，不需要针对 imageConfigs 和 videoConfigs 表做更新, n 个模态逻辑复杂度也还是 1。
 
-这么设计还有一个好处就是如果我们要做 gallery，其中既要展示图片，又要展示视频，那我们只需要针对 generation 表做查询就好了，不需要针对 image 和 video 表做查询
+如果我们要做 gallery（渲染 published 状态的 generation），其中既要展示图片，又要展示视频，那我们只需要针对 generation 表做查询就好了，不需要针对 imageConfigs 和 videoConfigs 表做查询。
 
 ### 后续计划
 
@@ -112,11 +114,11 @@ const videoConfigs = pgTable('video_configs', {
 
 ### 桌面端
 
-示意界面如下：\[[v0](https://v0.dev/chat/ai-painting-interface-3h7HmcJkb25)]\(<https://v0.dev/chat/ai-painting-interface-3h7HmcJkb25>)
+示意界面如下：[v0](https://v0.dev/chat/ai-painting-interface-3h7HmcJkb25)
 
 <img width="1898" alt="image-20250416153219752" src="https://github.com/user-attachments/assets/376458fe-651a-4ec2-8f52-85c79d279b10" />
 
-一期配置面板目标就是能用，后续可以做的更易用，图形化一些， 参考 <https://shots.so/。>
+一期配置面板目标就是能用，后续可以做得更易用，图形化一些，参考 <https://shots.so/>。
 
 - 左边是配置面板，包括模型选择，生成配置参数。provider 设置直接在现有的 LLM provider 配置那新增 fal.ai 等
 - 中间主体是生成列表
@@ -127,7 +129,9 @@ const videoConfigs = pgTable('video_configs', {
 
 ### 移动端
 
-参考了即梦 app 的设计：
+桌面端和移动端实现可以独立拆分，考虑到工作量问题，放二期实现。
+
+参考了即梦 app 的设计，简单示例：
 
 <img width="814" alt="image" src="https://github.com/user-attachments/assets/c3bc1f71-d1ee-4ef6-a119-19f0d14752b8" />
 
@@ -168,7 +172,7 @@ export const aiProviders = pgTable(
     keyVaults: text('key_vaults'),
     source: varchar('source', { enum: ['builtin', 'custom'], length: 20 }),
     // 1. 扩充 AiProviderSettings 字段
-    // 2. baseSettings + type 字段 + 新类型，例如 AiLLMProviderSettings | AiImageProiderSettings
+    // 2. baseSettings + type 字段 + 新类型，例如 AiLLMProviderSettings | AiImageProviderSettings
     settings: jsonb('settings')
       .$defaultFn(() => ({}))
       .$type<AiProviderSettings>(),
@@ -231,21 +235,21 @@ export const aiModels = pgTable(
 ```
 
 - 目前看下来一期也不需要调整 schema，现有的字段够用
-- aiModel 的 type 字段现在只有 chat 这一个值，引入 ai 绘画针对 ai 绘画场景应该是 image， 更好的做法可能是使用 pg 枚举，考虑到这个字段可能会持续变化和迁移成本，还是决定使用 varchar
-- parameters 我看目前其它 ai 模型都是没有用到这个字段， 对于 ai 绘画就很重要了，它是生成左侧配置面板的依据，目前是希望存储 JSON Schema，这样可以充分描述侧边栏支持的配置项，给用户提供更好的交互。例如对于 cfgScale，可以描述 step/min/max，使用 slider 渲染 cfgScale 参数就很有用
+- aiModel 的 type 字段现在只有 chat 这一个值，引入 ai 绘画针对 ai 绘画场景应该是 image
+- parameters 我看目前其它 ai 模型没有用到这个字段， 对于 ai 绘画就很重要了，它是生成左侧配置面板的依据。目前是希望存储 JSON Schema，这样可以充分描述侧边栏支持的配置项，给用户提供更好的交互。例如对于 cfgScale，可以描述 step/min/max，使用 slider 渲染 cfgScale 参数就很有用
 - pricing：目前 LLM 是一个对象，对 AI 绘画场景已有的字段都不适用，
-  - 对于 LLM 原生支持出图的模型，例如 dalle, \[[gpt4o-image](https://platform.openai.com/docs/pricing#image-generation)]\(<https://platform.openai.com/docs/pricing#image-generation>) 这类是按 token 计算的，dalle 输入 text 和 image 不算 cost，gpt4o-image 输入 text 和 image 也参数 cost 计算。不同的尺寸也不是严格按像素大小算差价的，例如同样 low quality, 1024 x 1024 是 $0.011 $/1M token, 而 1024 x 1536 不是 0.011 x (1536 / 1024) 得到的 0.0165，而是 0.016，相对于折扣掉第三位小数后的价格。
-  - 对于大多数类 diffusion 架构的模型，一般是按张数算钱的，但是根据配置的不同单张的价格可能，不同例如 <https://fal.ai/models/fal-ai/recraft-v3/playground，recraft> 模型 style 选择 vector 类的和别的价格不一样
+  - 对于 LLM 原生支持出图的模型，例如 dalle, [gpt-4o-image](https://platform.openai.com/docs/pricing#image-generation) 这类是按 token 计算的。dalle 输入 text 和 image 不算 cost，gpt-4o-image 输入 text 和 image 却参于 cost 计算。不同的尺寸也不是严格按像素大小算差价的，例如同样 low quality, 1024 x 1024 是 $0.011 $/1M token, 而 1024 x 1536 不是 0.011 x (1536 / 1024) 得到的 0.0165，而是 0.016，相对于折扣掉第三位小数后的价格。简单来说比 chat llm 单纯按 token 计算复杂的多。
+  - 对于大多数 diffusion 架构的模型，一般是按张数算钱的，但是根据配置的不同单张的价格可能不同，例如 <https://fal.ai/models/fal-ai/recraft-v3/playground> recraft 模型 style 选择 vector 类的和别的价格不一样
   - 结论：
     - 可能还是得在 agentRuntime 暴露一个方法让用户根据生成参数计算当前 cost
     - 这个不影响用户使用，放二期实现
 
 ### 生成系统
 
-其实就是中间这个生成列表的数据库设计。
+其实就是中间这个生成列表的数据库设计。概述下各个表之间的关系：
 
 - 一个 generationTopic 下有多个 generationBatch
-- 一个 generationBatch 下有多个 generation
+- 一个 generationBatch 下有多个 generation，generationBatch 会存储这一个批次多张图共同使用的配置。
 - 每个 generation 有它的 asset
   - generation 需要保存它自己推理相关的信息，例如用于 webhook 识别任务的 inferenceId，当前生成状态是 pending 还是 failed
   - generation 需要保存用户各种操作相关字段，例如收藏，发布状态
@@ -253,6 +257,44 @@ export const aiModels = pgTable(
     - 前端渲染图片时需要考虑 oss 加密场景下怎么获取完整 url
     - 因为不是所有 oss 都支持 url 参数 resize，需要自己实现生成缩略图
       - 生成缩略图策略：有一边超过 512，就裁到 512 x 512 范围内，并且转成 webp
+
+```mermaid
+graph TD
+    A[GenerationTopic<br/>生成主题] --> B[GenerationBatch<br/>生成批次]
+    A --> C[GenerationBatch<br/>生成批次]
+    A --> D[GenerationBatch<br/>生成批次]
+
+    B --> E[Generation<br/>单张图生成]
+    B --> F[Generation<br/>单张图生成]
+    B --> G[Generation<br/>单张图生成]
+    B --> H[Generation<br/>单张图生成]
+
+    E --> I[Asset<br/>文件资源]
+    F --> J[Asset<br/>文件资源]
+    G --> K[Asset<br/>文件资源]
+    H --> L[Asset<br/>文件资源]
+
+    subgraph "GenerationTopic 内容"
+        AT[title: 主题标题<br/>imageUrl: 主题封面<br/>model/provider: 模型信息]
+    end
+
+    subgraph "GenerationBatch 内容"
+        BT[prompt: 提示词<br/>model/provider: 模型配置<br/>width/height: 尺寸<br/>config: 公共配置]
+    end
+
+    subgraph "Generation 内容"
+        GT[inferenceId: 推理ID<br/>favorite: 收藏状态<br/>published: 发布状态<br/>seed: 随机种子<br/>asyncTaskId: 异步任务]
+    end
+
+    subgraph "Asset 内容"
+        LT[originImageUrl: 原始CDN地址<br/>imageUrl: OSS地址<br/>thumbnailUrl: 缩略图<br/>width/height: 图片尺寸]
+    end
+
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style E fill:#e8f5e8
+    style I fill:#fff3e0
+```
 
 #### GenerationBatch
 
@@ -274,28 +316,27 @@ export const generationBatches = pgTable(
     // category: pgEnum('generation_type', ['textToImage', 'imageToImage',]).notNull(),
 
     // 下面这些也是模型配置，考虑到用户搜索过滤需求，放顶层字段方便加索引
-    provider: text().notNull()
-    model: text().notNull();
-    prompt: text().notNull();
+    provider: text().notNull(),
+    model: text().notNull(),
+    prompt: text().notNull(),
     // 一期先不做 prompt 翻译
     // translatedPrompt: text();
-    width: integer();
-    height: integer()；
-    ratio: varchar64()
+    width: integer(),
+    height: integer(),
+    ratio: varchar('ratio', { length: 64 }),
 
-    // 存储这个生成批次的配置，大多数情况下，一个批次内所有生成的配置都是一样的
+    // 存储这个生成批次的配置，存放不需要建议索引的公共配置
     config: jsonb('config'),
     ...timestamps,
   },
   (table) => [primaryKey({ columns: [table.id, table.userId] })],
 );
-
 ```
 
 图片的语义化搜索：
 
 - elastic search 不考虑，自部署太麻烦
-- postgress 自带的向量搜索
+- postgres 自带的向量搜索
   - generation 增加一个 imageEmbedding 字段，vector 类型，图片生成之后生成向量（需要使用一个合适的图片转向量工具）
 
 #### Generation
@@ -311,46 +352,41 @@ export const generationBatches = pgTable(
 
 - prompt: 用户输入的 prompt
 - translatedPrompt: 用户输英语以外的语言，翻译成英文的 prompt, 一个批次四张图都一样，存到 generationBatch 上
-- enhancedPrompt: 一个批次四张图，每张图都要走 LLM enhance 一次，每次 enhance 结果不一样，存到 genration 上
+- enhancedPrompt: 一个批次四张图，每张图都要走 LLM enhance 一次，每次 enhance 结果不一样，存到 generation 上
 - negativePrompt
 
 ```typescript
-export const generations = pgTable(
-  'generations',
-  {
-    id: varchar('id', { length: 64 }).notNull(),
-    userId: text('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
-      .notNull(),
-    generationBatchId: varchar('generation_batch_id', { length: 64 }).notNull(),
+export const generations = pgTable('generations', {
+  id: varchar('id', { length: 64 }).notNull(),
+  userId: text('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+  generationBatchId: varchar('generation_batch_id', { length: 64 }).notNull(),
 
-    // inference related
-    // 复用已有的 async_tasks 表
-    asyncTaskId: text('async_task_id')
-      .references(() => asyncTasks.id, { onDelete: 'cascade' })
-      .notNull(),
+  // inference related
+  // 复用已有的 async_tasks 表
+  asyncTaskId: text('async_task_id').references(() => asyncTasks.id, { onDelete: 'cascade' }),
 
-    // user actions
-    // 收藏
-    favorite: boolean().default(false).notNull(),
-    // 发布到 gallery
-    published: boolean().default(false).notNull(),
+  // user actions
+  // 收藏
+  favorite: boolean().default(false).notNull(),
+  // 发布到 gallery
+  published: boolean().default(false).notNull(),
 
-    // 每个 generation 独有的配置，比较少，暂时直接放顶层
-    seed: text();
-    // 后期做这个功能时再加
-    // ehancedPrompt: text();
+  // 每个 generation 独有的配置，比较少，暂时直接放顶层
+  seed: text(),
+  // 后期做这个功能时再加
+  // enhancedPrompt: text();
 
-    // 直接对图片的 upscale 可以考虑把升级后的地址放 asset
-    asset: jsonb('asset'),
-      // { imageUrl: '', thumbnailUrl: '', image2x: '', width: 1024, height: 1024 }
+  // 直接对图片的 upscale 可以考虑把升级后的地址放 asset
+  asset: jsonb('asset'),
+  // { imageUrl: '', thumbnailUrl: '', image2x: '', width: 1024, height: 1024 }
 
-		imageEmbedding: vector();
-    ...timestamps,
-  },
-);
+  imageEmbedding: vector(1536),
+  ...timestamps,
+});
 
-
+// 也是之前就有的表
 export const asyncTasks = pgTable('async_tasks', {
   id: uuid('id').defaultRandom().primaryKey(),
   type: text('type'),
@@ -396,6 +432,18 @@ const generationTopics = pgTable(
 );
 ```
 
+#### 多模态相关的思考
+
+按照目前的设计，从命名也可以看出来，generationTopic/generationBatch/generation 是多模态通用的。
+
+这意味着：
+
+1. 除了图片，视频，音乐也支持一次性生成多个。市面上大约一半的平台不支持一次性生成多张视频。例如 krea, runway, pika, 也有一些事支持的，例如 kling, vidu, seaart。
+2. 对于不同模态差异部分
+   - 核心差异主要是两部分：生成配置（config）和生成输出（asset）
+   - 解决方案是：扩充顶层字段和使用 json 类型字段
+   - 拿 generationBatch 存储的生成配置来说，对于查询速度要求高的字段例如 prompt, 直接放顶层，对于查询速度要求不高的字段放 config 字段中。不同模态的差异体现在顶层字段的扩充和 config 的多态（指的是字段不一样）
+
 ## Midjourney
 
 目前调用 provider 的时候预期调用方式是 4 张图调用 4 次推理请求，webhook 回调的时候回调 4 次，绝大多数 AI 绘画 provider 都可以实现。
@@ -429,7 +477,7 @@ midjourney 它的生成和其它生成不一样，webhook 回调返回得是一�
 
 好处:
 
-- 希望给用户呈现在不同 provider 的不同 models 下能有一致的 UI，例如：选 fal 的 flux 和 runware 的 flux 对应 cfg 参数名都是 cfgScale，配置面板渲染配置 UI 的时候读到 cfgScale 参数显示的 label 就统一都是：Prompt Adherence (CFG）。如若不然，那就是根据 params schema 的 description 去渲染 label，description 不同，对应 label 就不同。用户就会有不一致的交互
+- 希望给用户呈现在不同 provider 的不同 models 下能有一致的 UI，例如：选 fal 的 flux 和 runware 的 flux 对应 cfg 参数名都是 cfgScale，配置面板渲染配置 UI 的时候读到 cfgScale 参数显示的 label 就统一都是：Prompt Adherence (CFG)。如若不然，那就是根据 params schema 的 description 去渲染 label，description 不同，对应 label 就不同。用户就会有不一致的交互
 - 前端可以针对标准化参数做 UI 优化，后端数据库针对参数建索引
 
 一期支持的参数:

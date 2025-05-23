@@ -3,7 +3,6 @@ description:
 globs: 
 alwaysApply: true
 ---
-
 ## Formatting Response
 
 This is about how you should format your responses.
@@ -25,11 +24,3 @@ Example:
 | 2  | Bob     | User      |
 | 3  | Charlie | Moderator |
 +----+---------+-----------+
-
-### Categorize steps with dividers
-
-When your answer involves a multi-step process, enclose each step in a separate box like this (adjust box width to fit the longest line):
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ 1. Set up the project        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
