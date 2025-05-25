@@ -1,21 +1,24 @@
 import { NetworkProxySettings } from '@lobechat/electron-client-ipc';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { merge } from 'lodash';
 import { isEqual } from 'lodash-es';
-import { ProxyAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
+import { SocksProxyAgent } from 'socks-proxy-agent';
+import { getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 
+import { defaultProxySettings } from '@/const/store';
 import { createLogger } from '@/utils/logger';
 
-import { defaultProxySettings } from '../const/store';
 import { ControllerModule, ipcClientEvent } from './index';
 
 // Create logger
-const logger = createLogger('controllers:SettingsCtr');
+const logger = createLogger('controllers:NetworkProxyCtr');
 
 /**
  * Settings Controller
  * Handles desktop settings-related functionality, including network proxy settings
  */
-export default class SettingsCtr extends ControllerModule {
+export default class NetworkProxyCtr extends ControllerModule {
   /**
    * Get desktop settings
    * Including network proxy settings
@@ -99,10 +102,11 @@ export default class SettingsCtr extends ControllerModule {
    */
   private applyProxySettings = async (config: NetworkProxySettings) => {
     try {
+      const currentDispatcher = getGlobalDispatcher();
+      // 关闭代理，恢复 undici 默认 dispatcher
       if (!config.enableProxy) {
-        // Disable proxy, reset global dispatcher
-        const dispatcher = getGlobalDispatcher();
-        await dispatcher.destroy();
+        await currentDispatcher.destroy();
+        setGlobalDispatcher(undefined); // 恢复为默认直连
         logger.debug('Proxy disabled, reset to direct connection mode');
         return;
       }
@@ -110,22 +114,52 @@ export default class SettingsCtr extends ControllerModule {
       const { proxyType, proxyServer, proxyPort, proxyRequireAuth, proxyUsername, proxyPassword } =
         config;
 
-      // Validate required fields
+      // 只支持 http、https、socks5 代理
+      const supportedTypes = ['http', 'https', 'socks5'];
+      if (!supportedTypes.includes(proxyType)) {
+        logger.warn(
+          `Proxy type ${proxyType} is not supported. Supported types: ${supportedTypes.join(', ')}`,
+        );
+        return;
+      }
+
+      // 校验必填项
       if (!proxyServer || !proxyPort) {
         logger.warn('Proxy server or port not set, cannot apply proxy');
         return;
       }
 
-      // Build proxy URL
+      // 构建代理 URL
       let proxyUrl = `${proxyType}://${proxyServer}:${proxyPort}`;
-
-      // Add authentication if needed
       if (proxyRequireAuth && proxyUsername && proxyPassword) {
         proxyUrl = `${proxyType}://${encodeURIComponent(proxyUsername)}:${encodeURIComponent(proxyPassword)}@${proxyServer}:${proxyPort}`;
       }
 
-      // Set global request proxy
-      setGlobalDispatcher(new ProxyAgent({ uri: proxyUrl }));
+      // 切换代理前销毁旧 dispatcher
+      await currentDispatcher.destroy();
+      let agent;
+      switch (proxyType) {
+        case 'http': {
+          agent = new HttpProxyAgent(proxyUrl);
+
+          break;
+        }
+        case 'https': {
+          agent = new HttpsProxyAgent(proxyUrl);
+
+          break;
+        }
+        case 'socks5': {
+          agent = new SocksProxyAgent(proxyUrl);
+
+          break;
+        }
+        default: {
+          logger.warn(`Proxy type ${proxyType} is not supported.`);
+          return;
+        }
+      }
+      setGlobalDispatcher(agent);
 
       logger.info(`Proxy settings applied: ${proxyType}://${proxyServer}:${proxyPort}`);
       logger.debug(

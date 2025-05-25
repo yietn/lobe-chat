@@ -25,7 +25,6 @@ describe('desktopStateSelectors', () => {
           storageMode: 'local',
         },
         isInitRemoteServerConfig: false,
-        isAppStateInit: false,
         proxySettings: defaultProxySettings,
       };
 
@@ -49,7 +48,6 @@ describe('desktopStateSelectors', () => {
           storageMode: 'local',
         },
         isInitRemoteServerConfig: false,
-        isAppStateInit: false,
         proxySettings: defaultProxySettings,
       };
 
