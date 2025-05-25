@@ -7,6 +7,7 @@ import { Flexbox } from 'react-layout-kit';
 import { FORM_STYLE } from '@/const/layoutTokens';
 
 import ModelSelect from './ModelSelect';
+import WidthSliderInput from './WidthSliderInput';
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`
@@ -32,6 +33,11 @@ const ConfigPanel = memo(() => {
               {
                 children: <ModelSelect />,
                 label: t('config.models'),
+                layout: 'vertical',
+              },
+              {
+                children: <WidthSliderInput />,
+                label: 'width',
                 layout: 'vertical',
               },
             ],

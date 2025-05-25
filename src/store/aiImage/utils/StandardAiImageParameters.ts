@@ -1,6 +1,8 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix, typescript-sort-keys/interface */
 import { z } from 'zod';
 
+export const MAX_SEED = 2 ** 31 - 1;
+
 export const AiImageParamsSchemaZodSchema = z.object({
   type: z.literal('object'),
   required: z.array(z.string()),
@@ -16,7 +18,7 @@ export const AiImageParamsSchemaZodSchema = z.object({
         default: z.number(),
         minimum: z.number(),
         maximum: z.number(),
-        step: z.number(),
+        step: z.number().optional().default(1),
         description: z.string().optional(),
       })
       .optional(),
@@ -26,7 +28,7 @@ export const AiImageParamsSchemaZodSchema = z.object({
         default: z.number(),
         minimum: z.number(),
         maximum: z.number(),
-        step: z.number(),
+        step: z.number().optional().default(1),
         description: z.string().optional(),
       })
       .optional(),
@@ -34,8 +36,8 @@ export const AiImageParamsSchemaZodSchema = z.object({
       .object({
         type: z.tuple([z.literal('number'), z.literal('null')]).optional(),
         default: z.number().nullable().optional().default(null),
-        minimum: z.number(),
-        maximum: z.number(),
+        minimum: z.number().optional().default(0),
+        maximum: z.number().optional().default(MAX_SEED),
         description: z.string().optional(),
       })
       .optional(),
@@ -45,7 +47,7 @@ export const AiImageParamsSchemaZodSchema = z.object({
         default: z.number(),
         minimum: z.number(),
         maximum: z.number(),
-        step: z.number(),
+        step: z.number().optional().default(1),
         description: z.string().optional(),
       })
       .optional(),

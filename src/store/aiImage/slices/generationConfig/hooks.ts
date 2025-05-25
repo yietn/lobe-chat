@@ -1,7 +1,10 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useAiImageStore } from '../../store';
-import { StandardAiImageParametersKeys } from '../../utils/StandardAiImageParameters';
+import {
+  StandardAiImageParameters,
+  StandardAiImageParametersKeys,
+} from '../../utils/StandardAiImageParameters';
 import { parametersSelector, paramsPropertiesSelector } from './selectors';
 
 export function useGenerationConfigParam<N extends StandardAiImageParametersKeys>(paramName: N) {
@@ -9,8 +12,15 @@ export function useGenerationConfigParam<N extends StandardAiImageParametersKeys
   const paramsProperties = useAiImageStore(paramsPropertiesSelector);
 
   const paramValue = parameters?.[paramName];
-  const paramSchema = paramsProperties?.[paramName];
+  const setParamsValue = useAiImageStore((s) => s.setParamOnInput<N>);
+  const setValue = useCallback(
+    (value: StandardAiImageParameters[N]) => {
+      setParamsValue(paramName, value);
+    },
+    [paramName, setParamsValue],
+  );
 
+  const paramSchema = paramsProperties?.[paramName];
   const { min, max, step, description } = useMemo(() => {
     const min = paramSchema && 'minimum' in paramSchema ? paramSchema.minimum : undefined;
     const max = paramSchema && 'maximum' in paramSchema ? paramSchema.maximum : undefined;
@@ -30,6 +40,7 @@ export function useGenerationConfigParam<N extends StandardAiImageParametersKeys
     description,
     max,
     min,
+    setValue,
     step,
     value: paramValue,
   };
