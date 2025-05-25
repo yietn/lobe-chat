@@ -8,13 +8,15 @@ import {
 import { parametersSelector, paramsPropertiesSelector } from './selectors';
 
 export function useGenerationConfigParam<N extends StandardAiImageParametersKeys>(paramName: N) {
+  type ValueType = StandardAiImageParameters[N];
+
   const parameters = useAiImageStore(parametersSelector);
   const paramsProperties = useAiImageStore(paramsPropertiesSelector);
 
-  const paramValue = parameters?.[paramName];
+  const paramValue = parameters?.[paramName] as ValueType;
   const setParamsValue = useAiImageStore((s) => s.setParamOnInput<N>);
   const setValue = useCallback(
-    (value: StandardAiImageParameters[N]) => {
+    (value: ValueType) => {
       setParamsValue(paramName, value);
     },
     [paramName, setParamsValue],

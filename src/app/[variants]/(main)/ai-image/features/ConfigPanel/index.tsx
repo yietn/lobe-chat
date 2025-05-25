@@ -9,7 +9,9 @@ import { isSupportParamSelectorCreator } from '@/store/aiImage/slices/generation
 import { useAiImageStore } from '@/store/aiImage/store';
 
 import ModelSelect from './ModelSelect';
+import SeedNumberInput from './SeedNumberInput';
 import SizeSliderInput from './SizeSliderInput';
+import StepsSliderInput from './StepsSliderInput';
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`
@@ -27,6 +29,8 @@ const ConfigPanel = memo(() => {
   const { t } = useTranslation('aiImage');
   const isSupportWidth = useAiImageStore(isSupportParamSelectorCreator('width'));
   const isSupportHeight = useAiImageStore(isSupportParamSelectorCreator('height'));
+  const isSupportSeed = useAiImageStore(isSupportParamSelectorCreator('seed'));
+  const isSupportSteps = useAiImageStore(isSupportParamSelectorCreator('steps'));
 
   const configs = (
     [
@@ -41,6 +45,14 @@ const ConfigPanel = memo(() => {
       isSupportHeight && {
         label: t('config.height.label'),
         children: <SizeSliderInput paramName="height" />,
+      },
+      isSupportSteps && {
+        label: t('config.steps.label'),
+        children: <StepsSliderInput />,
+      },
+      isSupportSeed && {
+        label: t('config.seed.label'),
+        children: <SeedNumberInput />,
       },
     ] satisfies Array<Partial<FormItemProps> | boolean>
   )
