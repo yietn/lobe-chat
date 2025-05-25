@@ -3,9 +3,13 @@ import { memo } from 'react';
 
 import { useGenerationConfigParam } from '@/store/aiImage/slices/generationConfig/hooks';
 
-const WidthSliderInput = memo(() => {
-  const { value, setValue, min, max } = useGenerationConfigParam('width');
+interface SizeSliderInputProps {
+  paramName: 'width' | 'height';
+}
+
+const SizeSliderInput = memo(({ paramName }: SizeSliderInputProps) => {
+  const { value, setValue, min, max } = useGenerationConfigParam(paramName);
   return <SliderWithInput max={max} min={min} onChange={setValue} value={value} />;
 });
 
-export default WidthSliderInput;
+export default SizeSliderInput;

@@ -1,13 +1,15 @@
-import { Form } from '@lobehub/ui';
+import { Form, FormItemProps } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
 import { FORM_STYLE } from '@/const/layoutTokens';
+import { isSupportParamSelectorCreator } from '@/store/aiImage/slices/generationConfig/selectors';
+import { useAiImageStore } from '@/store/aiImage/store';
 
 import ModelSelect from './ModelSelect';
-import WidthSliderInput from './WidthSliderInput';
+import SizeSliderInput from './SizeSliderInput';
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`
@@ -23,24 +25,34 @@ const useStyles = createStyles(({ css, token }) => ({
 const ConfigPanel = memo(() => {
   const { styles } = useStyles();
   const { t } = useTranslation('aiImage');
+  const isSupportWidth = useAiImageStore(isSupportParamSelectorCreator('width'));
+  const isSupportHeight = useAiImageStore(isSupportParamSelectorCreator('height'));
+
+  const configs = (
+    [
+      {
+        label: t('config.model.label'),
+        children: <ModelSelect />,
+      },
+      isSupportWidth && {
+        label: t('config.width.label'),
+        children: <SizeSliderInput paramName="width" />,
+      },
+      isSupportHeight && {
+        label: t('config.height.label'),
+        children: <SizeSliderInput paramName="height" />,
+      },
+    ] satisfies Array<Partial<FormItemProps> | boolean>
+  )
+    .filter(Boolean)
+    .map((item) => ({ ...item, layout: 'vertical' as const }));
 
   return (
     <Flexbox className={styles.container} gap={16}>
       <Form
         items={[
           {
-            children: [
-              {
-                children: <ModelSelect />,
-                label: t('config.models'),
-                layout: 'vertical',
-              },
-              {
-                children: <WidthSliderInput />,
-                label: 'width',
-                layout: 'vertical',
-              },
-            ],
+            children: configs,
             title: t('config.title'),
           },
         ]}
