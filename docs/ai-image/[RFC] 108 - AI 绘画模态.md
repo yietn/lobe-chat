@@ -11,7 +11,7 @@
 
 ### 一期目标
 
-AI 绘画场景下基本的生图功能。
+AI 绘画场景下基本的文生图功能。
 
 同时，为了系统的扩展性和未来其它需求做铺垫需要设计实现下面这些架构。
 
@@ -100,9 +100,10 @@ const videoConfigs = pgTable('video_configs', {
 
 ### 后续计划
 
+- 图生图
+- 支持更多 provider，例如 midjourney discord/TTAPI, replicate/runware/kling/seedream 等
 - web 移动端
 - 绘图模型 pricing 显示和 cloud 版本计费
-- 支持更多 provider，例如 midjourney discord/TTAPI, replicate/runware/kling/seedream 等
 - prompt translate/enhance
 - 绘画模态下实现 LLM 辅助生图
 - 对比多个模型生成
@@ -235,7 +236,7 @@ export const aiModels = pgTable(
 ```
 
 - 目前看下来一期也不需要调整 schema，现有的字段够用
-- aiModel 的 type 字段现在只有 chat 这一个值，引入 ai 绘画针对 ai 绘画场景应该是 image
+- aiModel 的 type 字段现在只有 chat 这一个值，引入 ai 绘画后，针对 ai 绘画场景应该是 image
 - parameters 我看目前其它 ai 模型没有用到这个字段， 对于 ai 绘画就很重要了，它是生成左侧配置面板的依据。目前是希望存储 JSON Schema，这样可以充分描述侧边栏支持的配置项，给用户提供更好的交互。例如对于 cfgScale，可以描述 step/min/max，使用 slider 渲染 cfgScale 参数就很有用
 - pricing：目前 LLM 是一个对象，对 AI 绘画场景已有的字段都不适用，
   - 对于 LLM 原生支持出图的模型，例如 dalle, [gpt-4o-image](https://platform.openai.com/docs/pricing#image-generation) 这类是按 token 计算的。dalle 输入 text 和 image 不算 cost，gpt-4o-image 输入 text 和 image 却参于 cost 计算。不同的尺寸也不是严格按像素大小算差价的，例如同样 low quality, 1024 x 1024 是 $0.011 $/1M token, 而 1024 x 1536 不是 0.011 x (1536 / 1024) 得到的 0.0165，而是 0.016，相对于折扣掉第三位小数后的价格。简单来说比 chat llm 单纯按 token 计算复杂的多。
