@@ -1,38 +1,36 @@
 import { useMemo } from 'react';
 
 import { useAiImageStore } from '../../store';
-import { StandardAiImageParameters } from '../../utils/StandardAiImageParameters';
-import { parameters, parametersProperties } from './selectors';
+import { StandardAiImageParametersKeys } from '../../utils/StandardAiImageParameters';
+import { parametersSelector, paramsPropertiesSelector } from './selectors';
 
-export function useImageGenerationParam<N extends keyof StandardAiImageParameters>(paramName: N) {
-  const params = useAiImageStore(parameters);
-  const paramsProperties = useAiImageStore(parametersProperties);
+export function useGenerationConfigParam<N extends StandardAiImageParametersKeys>(paramName: N) {
+  const parameters = useAiImageStore(parametersSelector);
+  const paramsProperties = useAiImageStore(paramsPropertiesSelector);
 
-  const { value, min, max, step, description } = useMemo(() => {
-    const paramValue = params?.[paramName];
-    const paramSchema = paramsProperties?.[paramName];
+  const paramValue = parameters?.[paramName];
+  const paramSchema = paramsProperties?.[paramName];
 
-    // Extract properties safely using optional chaining and type checks
-    const minVal = paramSchema && 'minimum' in paramSchema ? paramSchema.minimum : undefined;
-    const maxVal = paramSchema && 'maximum' in paramSchema ? paramSchema.maximum : undefined;
-    const stepVal = paramSchema && 'step' in paramSchema ? paramSchema.step : undefined;
-    const descriptionVal =
+  const { min, max, step, description } = useMemo(() => {
+    const min = paramSchema && 'minimum' in paramSchema ? paramSchema.minimum : undefined;
+    const max = paramSchema && 'maximum' in paramSchema ? paramSchema.maximum : undefined;
+    const step = paramSchema && 'step' in paramSchema ? paramSchema.step : undefined;
+    const description =
       paramSchema && 'description' in paramSchema ? paramSchema.description : undefined;
 
     return {
-      description: descriptionVal,
-      max: maxVal,
-      min: minVal,
-      step: stepVal,
-      value: paramValue,
+      description,
+      max,
+      min,
+      step,
     };
-  }, [params, paramsProperties, paramName]);
+  }, [paramSchema]);
 
   return {
     description,
     max,
     min,
     step,
-    value,
+    value: paramValue,
   };
 }

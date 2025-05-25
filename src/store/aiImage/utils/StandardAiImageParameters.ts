@@ -1,14 +1,14 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix, typescript-sort-keys/interface */
 import { z } from 'zod';
 
-export const paramsSchemaSchema = z.object({
+export const AiImageParamsSchemaZodSchema = z.object({
   type: z.literal('object'),
   required: z.array(z.string()),
   properties: z.object({
     prompt: z.object({
       type: z.literal('string').optional(),
       description: z.string().optional(),
-      default: z.string().optional(),
+      default: z.string().optional().default(''),
     }),
     width: z
       .object({
@@ -33,7 +33,7 @@ export const paramsSchemaSchema = z.object({
     seed: z
       .object({
         type: z.tuple([z.literal('number'), z.literal('null')]).optional(),
-        default: z.number().nullable(),
+        default: z.number().nullable().optional().default(null),
         minimum: z.number(),
         maximum: z.number(),
         description: z.string().optional(),
@@ -62,7 +62,8 @@ export const paramsSchemaSchema = z.object({
   }),
 });
 
-type SchemaProperties = Required<z.infer<typeof paramsSchemaSchema>['properties']>;
+// -------------------------- compute type StandardAiImageParameters from zod schema ----------------------------------
+type SchemaProperties = Required<z.infer<typeof AiImageParamsSchemaZodSchema>['properties']>;
 type TypeMapping<T> = T extends 'string'
   ? string
   : T extends 'number'
@@ -80,7 +81,6 @@ type _StandardAiImageParameters<P extends keyof SchemaProperties = keyof SchemaP
 
 export type StandardAiImageParameters = _StandardAiImageParameters;
 export type StandardAiImageParametersKeys = keyof StandardAiImageParameters;
-
 // like:
 /*
 type StandardAiImageParameters = {

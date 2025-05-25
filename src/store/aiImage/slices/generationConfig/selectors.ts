@@ -1,11 +1,11 @@
 import { parseParamsSchema } from '../../utils/parseParamsSchema';
 import { GenerationConfigState } from './initialState';
 
-const parameters = (s: GenerationConfigState) => s.parameters;
-const paramsSchema = (s: GenerationConfigState) => s.parameterSchema;
-const parametersProperties = (s: GenerationConfigState) => {
-  const _paramsSchema = paramsSchema(s);
-  return _paramsSchema ? parseParamsSchema(_paramsSchema).parametersProperties : undefined;
+const parametersSelector = (s: GenerationConfigState) => s.parameters;
+const paramsSchemaSelector = (s: GenerationConfigState) => s.parameterSchema;
+const paramsPropertiesSelector = (s: GenerationConfigState) => {
+  const _paramsSchema = paramsSchemaSelector(s);
+  return _paramsSchema ? parseParamsSchema(_paramsSchema).properties : undefined;
 };
 
-export { parameters, parametersProperties, paramsSchema };
+export { parametersSelector, paramsPropertiesSelector, paramsSchemaSelector };

@@ -1,17 +1,19 @@
-import { StandardAiImageParameters, paramsSchemaSchema } from './StandardAiImageParameters';
+import {
+  AiImageParamsSchemaZodSchema,
+  StandardAiImageParameters,
+} from './StandardAiImageParameters';
 
 export function parseParamsSchema(schema: Record<string, any>) {
-  const paramsSchema = paramsSchemaSchema.parse(schema);
+  const paramsSchema = AiImageParamsSchemaZodSchema.parse(schema);
   const properties = paramsSchema.properties;
-
-  const parameters = Object.fromEntries(
+  const defaultValues = Object.fromEntries(
     Object.entries(properties).map(([key, value]) => {
       return [key, value.default];
     }),
   ) as Partial<StandardAiImageParameters>;
 
   return {
-    parametersProperties: properties,
-    parametersValues: parameters,
+    defaultValues,
+    properties,
   };
 }
