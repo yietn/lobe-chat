@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
 import { FORM_STYLE } from '@/const/layoutTokens';
-import { isSupportParamSelectorCreator } from '@/store/aiImage/slices/generationConfig/selectors';
+import { aiImageGenerationConfigSelectors } from '@/store/aiImage/slices/generationConfig/selectors';
 import { useAiImageStore } from '@/store/aiImage/store';
 
 import ModelSelect from './ModelSelect';
@@ -23,14 +23,15 @@ const useStyles = createStyles(({ css, token }) => ({
     border-inline-start: 1px solid ${token.colorBorderSecondary};
   `,
 }));
+const isSupportParamSelector = aiImageGenerationConfigSelectors.isSupportParam;
 
 const ConfigPanel = memo(() => {
   const { styles } = useStyles();
   const { t } = useTranslation('aiImage');
-  const isSupportWidth = useAiImageStore(isSupportParamSelectorCreator('width'));
-  const isSupportHeight = useAiImageStore(isSupportParamSelectorCreator('height'));
-  const isSupportSeed = useAiImageStore(isSupportParamSelectorCreator('seed'));
-  const isSupportSteps = useAiImageStore(isSupportParamSelectorCreator('steps'));
+  const isSupportWidth = useAiImageStore(isSupportParamSelector('width'));
+  const isSupportHeight = useAiImageStore(isSupportParamSelector('height'));
+  const isSupportSeed = useAiImageStore(isSupportParamSelector('seed'));
+  const isSupportSteps = useAiImageStore(isSupportParamSelector('steps'));
 
   const configs = (
     [

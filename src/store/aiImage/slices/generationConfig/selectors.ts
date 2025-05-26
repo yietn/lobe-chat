@@ -2,22 +2,22 @@ import { StandardAiImageParametersKeys } from '../../utils/StandardAiImageParame
 import { parseParamsSchema } from '../../utils/parseParamsSchema';
 import { GenerationConfigState } from './initialState';
 
-const parametersSelector = (s: GenerationConfigState) => s.parameters;
-const paramsSchemaSelector = (s: GenerationConfigState) => s.parameterSchema;
-const paramsPropertiesSelector = (s: GenerationConfigState) => {
-  const _paramsSchema = paramsSchemaSelector(s);
+const parameters = (s: GenerationConfigState) => s.parameters;
+const paramsSchema = (s: GenerationConfigState) => s.parameterSchema;
+const paramsProperties = (s: GenerationConfigState) => {
+  const _paramsSchema = paramsSchema(s);
   return _paramsSchema ? parseParamsSchema(_paramsSchema).properties : undefined;
 };
-const isSupportParamSelectorCreator = (paramName: StandardAiImageParametersKeys) => {
+const isSupportParam = (paramName: StandardAiImageParametersKeys) => {
   return (s: GenerationConfigState) => {
-    const paramsProperties = paramsPropertiesSelector(s);
-    return Boolean(paramsProperties && paramName in paramsProperties);
+    const _paramsProperties = paramsProperties(s);
+    return Boolean(_paramsProperties && paramName in _paramsProperties);
   };
 };
 
-export {
-  isSupportParamSelectorCreator,
-  parametersSelector,
-  paramsPropertiesSelector,
-  paramsSchemaSelector,
+export const aiImageGenerationConfigSelectors = {
+  isSupportParam,
+  parameters,
+  paramsProperties,
+  paramsSchema,
 };
