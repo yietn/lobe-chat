@@ -10,7 +10,7 @@ This document outlines the conventions and best practices for defining PostgreSQ
 ## Configuration
 
 - Drizzle configuration is managed in [drizzle.config.ts](mdc:drizzle.config.ts)
-- Schema files are located in the [src/database/schemas/](mdc:src/database/schemas) directory
+- Schema files are located in the src/database/schemas/ directory
 - Migration files are output to `src/database/migrations/`
 - The project uses `postgresql` dialect with `strict: true`
 
