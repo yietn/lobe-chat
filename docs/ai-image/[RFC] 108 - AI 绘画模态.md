@@ -307,11 +307,13 @@ graph TD
 export const generationBatches = pgTable(
   'generation_batches',
   {
-    id: varchar('id', { length: 64 }).notNull(),
+    id: text('id')
+      .$defaultFn(() => idGenerator('sessions'))
+      .notNull(),
     userId: text('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    generationTopicId: varchar('generation_topic_id', { length: 64 }).notNull(),
+    generationTopicId: text('generation_topic_id').notNull(),
     // 一期只做文生图这俩字段到需要用到的时候再加不迟
     // type: pgEnum('generation_type', ['image', 'video', 'upscale']).notNull(),
     // category: pgEnum('generation_type', ['textToImage', 'imageToImage',]).notNull(),
@@ -334,11 +336,12 @@ export const generationBatches = pgTable(
 );
 ```
 
-图片的语义化搜索：
+图片的语义化搜索（后续功能）：
 
 - elastic search 不考虑，自部署太麻烦
 - postgres 自带的向量搜索
   - generation 增加一个 imageEmbedding 字段，vector 类型，图片生成之后生成向量（需要使用一个合适的图片转向量工具）
+  - 一期不实现此功能，主要考虑成本和需求优先级
 
 #### Generation
 
@@ -358,21 +361,23 @@ export const generationBatches = pgTable(
 
 ```typescript
 export const generations = pgTable('generations', {
-  id: varchar('id', { length: 64 }).notNull(),
+  id: text('id')
+    .$defaultFn(() => idGenerator('messages'))
+    .primaryKey(),
   userId: text('user_id')
     .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
-  generationBatchId: varchar('generation_batch_id', { length: 64 }).notNull(),
+  generationBatchId: text('generation_batch_id').notNull(),
 
   // inference related
   // 复用已有的 async_tasks 表
   asyncTaskId: text('async_task_id').references(() => asyncTasks.id, { onDelete: 'cascade' }),
 
-  // user actions
-  // 收藏
-  favorite: boolean().default(false).notNull(),
-  // 发布到 gallery
-  published: boolean().default(false).notNull(),
+  // user actions - 后续实现
+  // 收藏功能，用于用户标记喜欢的生成结果
+  // favorite: boolean().default(false).notNull(),
+  // 发布到 gallery 功能，用于分享优秀作品到公共画廊
+  // published: boolean().default(false).notNull(),
 
   // 每个 generation 独有的配置，比较少，暂时直接放顶层
   seed: text(),
@@ -383,7 +388,8 @@ export const generations = pgTable('generations', {
   asset: jsonb('asset'),
   // { imageUrl: '', thumbnailUrl: '', image2x: '', width: 1024, height: 1024 }
 
-  imageEmbedding: vector(1536),
+  // 图片语义化搜索功能 - 后续实现
+  // imageEmbedding: vector(1536),
   ...timestamps,
 });
 
@@ -415,10 +421,12 @@ export const asyncTasks = pgTable('async_tasks', {
 - 点开 topic 显示的 generationBatch 缩略图不需要生成，直接用 generationBatch 的第一张图的缩略图
 
 ```typescript
-const generationTopics = pgTable(
+export const generationTopics = pgTable(
   'generation_topics',
   {
-    id: varchar('id', { length: 64 }).notNull(),
+    id: text('id')
+      .$defaultFn(() => idGenerator('topics'))
+      .notNull(),
     userId: text('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),

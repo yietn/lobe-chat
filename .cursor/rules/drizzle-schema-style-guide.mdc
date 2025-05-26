@@ -30,7 +30,9 @@ Commonly used column definitions, especially for timestamps, are centralized in 
 
 ### Primary Keys (PKs)
 - Typically `text('id')` (or `varchar('id')` for some OIDC tables)
-- Often use `.$defaultFn(() => idGenerator('table_name'))` for automatic ID generation
+- Often use `.$defaultFn(() => idGenerator('table_name'))` for automatic ID generation with meaningful prefixes
+- **ID Prefix Purpose**: Makes it easy for users and developers to distinguish different entity types at a glance
+- For internal/system tables that users don't need to see, can use `uuid` or auto-increment keys
 - Composite PKs are defined using `primaryKey({ columns: [t.colA, t.colB] })`
 
 ### Foreign Keys (FKs)
@@ -93,10 +95,10 @@ export const agents = pgTable(
     chatConfig: jsonb('chat_config').$type<LobeAgentChatConfig>(),
     ...timestamps,
   },
-  // return array instead of object, the object style is depracted
-  (t) => ([
-    clientIdUnique: uniqueIndex('client_id_user_id_unique').on(t.clientId, t.userId),
-  }],
+  // return array instead of object, the object style is deprecated
+  (t) => [
+    uniqueIndex('client_id_user_id_unique').on(t.clientId, t.userId),
+  ],
 );
 
 export const insertAgentSchema = createInsertSchema(agents);
@@ -106,11 +108,11 @@ export type AgentItem = typeof agents.$inferSelect;
 
 ## Common Patterns
 
-### 1. userId + clientId Pattern
-Most tables include both fields for different purposes:
+### 1. userId + clientId Pattern (Legacy)
+Some existing tables include both fields for different purposes:
 
 ```typescript
-// Example from agents table
+// Example from agents table (legacy pattern)
 userId: text('user_id')
   .references(() => users.id, { onDelete: 'cascade' })
   .notNull(),
@@ -121,8 +123,9 @@ clientIdUnique: uniqueIndex('agents_client_id_user_id_unique').on(t.clientId, t.
 ```
 
 - **`userId`**: Server-side user association, ensures data belongs to specific user
-- **`clientId`**: Client-side tracking ID, allows offline-first operations and sync
-- **Purpose**: Supports both server-side data integrity and client-side optimistic updates
+- **`clientId`**: Unique key for import/export operations, supports data migration between instances
+- **Current Status**: New tables should NOT include `clientId` unless specifically needed for import/export functionality
+- **Note**: This pattern is being phased out for new features to simplify the schema
 
 ### 2. Junction Tables (Many-to-Many Relationships)
 Use composite primary keys for relationship tables:
@@ -138,9 +141,9 @@ export const agentsKnowledgeBases = pgTable(
     enabled: boolean('enabled').default(true),
     ...timestamps,
   },
-  (t) => ([
-    pk: primaryKey({ columns: [t.agentId, t.knowledgeBaseId] }),
-  ]),
+  (t) => [
+    primaryKey({ columns: [t.agentId, t.knowledgeBaseId] }),
+  ],
 );
 ```
 
