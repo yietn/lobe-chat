@@ -93,9 +93,10 @@ export const agents = pgTable(
     chatConfig: jsonb('chat_config').$type<LobeAgentChatConfig>(),
     ...timestamps,
   },
-  (t) => ({
+  // return array instead of object, the object style is depracted
+  (t) => ([
     clientIdUnique: uniqueIndex('client_id_user_id_unique').on(t.clientId, t.userId),
-  }),
+  }],
 );
 
 export const insertAgentSchema = createInsertSchema(agents);
@@ -137,9 +138,9 @@ export const agentsKnowledgeBases = pgTable(
     enabled: boolean('enabled').default(true),
     ...timestamps,
   },
-  (t) => ({
+  (t) => ([
     pk: primaryKey({ columns: [t.agentId, t.knowledgeBaseId] }),
-  }),
+  ]),
 );
 ```
 

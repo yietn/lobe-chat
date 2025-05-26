@@ -14,12 +14,10 @@ import { users } from './user';
 export const generationTopics = pgTable(
   'generation_topics',
   {
-    /** 主题 ID */
     id: text('id')
       .$defaultFn(() => idGenerator('topics'))
       .notNull(),
 
-    /** 用户 ID */
     userId: text('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
@@ -38,9 +36,7 @@ export const generationTopics = pgTable(
 
     ...timestamps,
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.id, table.userId] }),
-  }),
+  (table) => [primaryKey({ columns: [table.id, table.userId] })],
 );
 
 export const insertGenerationTopicSchema = createInsertSchema(generationTopics);
@@ -90,9 +86,7 @@ export const generationBatches = pgTable(
 
     ...timestamps,
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.id, table.userId] }),
-  }),
+  (table) => [primaryKey({ columns: [table.id, table.userId] })],
 );
 
 export const insertGenerationBatchSchema = createInsertSchema(generationBatches);
@@ -101,15 +95,13 @@ export type NewGenerationBatch = typeof generationBatches.$inferInsert;
 export type GenerationBatchItem = typeof generationBatches.$inferSelect;
 
 /**
- * 生成结果表 - 存储单个生成结果的信息
+ *  存储单个 AI 生成信息
  */
 export const generations = pgTable('generations', {
-  /** 生成结果 ID */
   id: text('id')
     .$defaultFn(() => idGenerator('messages'))
     .primaryKey(),
 
-  /** 用户 ID */
   userId: text('user_id')
     .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
