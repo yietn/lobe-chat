@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
 import { FORM_STYLE } from '@/const/layoutTokens';
+import { useUpdateActiveModelEffect } from '@/store/aiImage/slices/generationConfig/hooks';
 import { aiImageGenerationConfigSelectors } from '@/store/aiImage/slices/generationConfig/selectors';
 import { useAiImageStore } from '@/store/aiImage/store';
 
@@ -28,6 +29,9 @@ const isSupportParamSelector = aiImageGenerationConfigSelectors.isSupportParam;
 const ConfigPanel = memo(() => {
   const { styles } = useStyles();
   const { t } = useTranslation('aiImage');
+
+  useUpdateActiveModelEffect();
+
   const isSupportWidth = useAiImageStore(isSupportParamSelector('width'));
   const isSupportHeight = useAiImageStore(isSupportParamSelector('height'));
   const isSupportSeed = useAiImageStore(isSupportParamSelector('seed'));

@@ -12,7 +12,7 @@ import { ModelItemRender, ProviderItemRender } from '@/components/ModelSelect';
 import { isDeprecatedEdition } from '@/const/version';
 import ActionDropdown from '@/features/ChatInput/ActionBar/components/ActionDropdown';
 import { useAiImageStore } from '@/store/aiImage';
-import { generationTopicSelectors } from '@/store/aiImage/slices/generationTopic/selectors';
+import { aiImageGenerationConfigSelectors } from '@/store/aiImage/slices/generationConfig/selectors';
 import { useAiInfraStore } from '@/store/aiInfra';
 import { aiProviderSelectors } from '@/store/aiInfra/slices/aiProvider/selectors';
 import { featureFlagsSelectors, useServerConfigStore } from '@/store/serverConfig';
@@ -44,11 +44,12 @@ const ModelSelect = memo(() => {
   const router = useRouter();
 
   const [currentModel, currentProvider] = useAiImageStore((s) => [
-    generationTopicSelectors.currentGenerationTopicModel(s),
-    generationTopicSelectors.currentGenerationTopicProvider(s),
+    aiImageGenerationConfigSelectors.model(s),
+    aiImageGenerationConfigSelectors.provider(s),
   ]);
+  const setModelAndProviderOnSelect = useAiImageStore((s) => s.setModelAndProviderOnSelect);
 
-  const enabledList = useAiInfraStore(aiProviderSelectors.enabledImageModelList);
+  const enabledImageModelList = useAiInfraStore(aiProviderSelectors.enabledImageModelList);
 
   const items = useMemo<ItemType[]>(() => {
     const getModelItems = (provider: EnabledProviderWithModels) => {
@@ -56,7 +57,9 @@ const ModelSelect = memo(() => {
         key: menuKey(provider.id, model.id),
         label: <ModelItemRender {...model} {...model.abilities} />,
         onClick: async () => {
-          // TODO: ...
+          if (model.id !== currentModel || provider.id !== currentProvider) {
+            setModelAndProviderOnSelect(model.id, provider.id);
+          }
         },
       }));
 
@@ -82,7 +85,7 @@ const ModelSelect = memo(() => {
       return items;
     };
 
-    if (enabledList.length === 0)
+    if (enabledImageModelList.length === 0)
       return [
         {
           key: `no-provider`,
@@ -99,7 +102,7 @@ const ModelSelect = memo(() => {
       ];
 
     // otherwise show with provider group
-    return enabledList.map((provider) => ({
+    return enabledImageModelList.map((provider) => ({
       children: getModelItems(provider),
       key: provider.id,
       label: (
@@ -125,7 +128,7 @@ const ModelSelect = memo(() => {
       ),
       type: 'group',
     }));
-  }, [enabledList, router, t, theme.colorTextTertiary]);
+  }, [enabledImageModelList, router, t, theme.colorTextTertiary]);
 
   return (
     <ActionDropdown

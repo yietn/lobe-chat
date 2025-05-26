@@ -28,12 +28,6 @@ export const generationTopics = pgTable(
     /** 主题封面图片 URL */
     imageUrl: text('image_url'),
 
-    /** 使用的模型 */
-    model: text('model'),
-
-    /** model 的服务商 */
-    provider: text('provider'),
-
     ...timestamps,
   },
   (table) => [primaryKey({ columns: [table.id, table.userId] })],

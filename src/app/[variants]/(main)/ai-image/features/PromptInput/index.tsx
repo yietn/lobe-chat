@@ -4,6 +4,8 @@ import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
+import { useGenerationConfigParam } from '@/store/aiImage/slices/generationConfig/hooks';
+
 const handleGenerate = () => {
   // TODO: Implement generation logic
   console.log('Generate button clicked');
@@ -12,6 +14,7 @@ const handleGenerate = () => {
 const PromptInput = () => {
   const theme = useTheme();
   const { t } = useTranslation('aiImage');
+  const { value, setValue } = useGenerationConfigParam('prompt');
 
   return (
     <Flexbox
@@ -29,9 +32,11 @@ const PromptInput = () => {
       width="100%"
     >
       <TextArea
+        onChange={(e) => setValue(e.target.value)}
         placeholder={t('config.prompt.placeholder')}
         rows={3}
         style={{ flex: 1, border: 'none', boxShadow: 'none', borderRadius: 0 }}
+        value={value}
       />
       <ActionIcon
         icon={Sparkles}

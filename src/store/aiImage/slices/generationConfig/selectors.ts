@@ -2,6 +2,9 @@ import { StandardAiImageParametersKeys } from '../../utils/StandardAiImageParame
 import { parseParamsSchema } from '../../utils/parseParamsSchema';
 import { GenerationConfigState } from './initialState';
 
+export const model = (s: GenerationConfigState) => s.model;
+export const provider = (s: GenerationConfigState) => s.provider;
+
 const parameters = (s: GenerationConfigState) => s.parameters;
 const paramsSchema = (s: GenerationConfigState) => s.parameterSchema;
 const paramsProperties = (s: GenerationConfigState) => {
@@ -16,6 +19,8 @@ const isSupportParam = (paramName: StandardAiImageParametersKeys) => {
 };
 
 export const aiImageGenerationConfigSelectors = {
+  model,
+  provider,
   isSupportParam,
   parameters,
   paramsProperties,

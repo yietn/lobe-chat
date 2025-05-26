@@ -7,7 +7,7 @@ import { isDeprecatedEdition, isDesktop, isUsePgliteDB } from '@/const/version';
 import { useClientDataSWR } from '@/libs/swr';
 import { aiProviderService } from '@/services/aiProvider';
 import { AiInfraStore } from '@/store/aiInfra/store';
-import { ModelAbilities } from '@/types/aiModel';
+import { AIImageModelCard, ModelAbilities } from '@/types/aiModel';
 import {
   AiProviderDetailItem,
   AiProviderListItem,
@@ -196,6 +196,9 @@ export const createAiProviderSlice: StateCreator<
                 contextWindowTokens: model.contextWindowTokens,
                 displayName: model.displayName ?? '',
                 id: model.id,
+                ...(model.type === 'image' && {
+                  parameters: (model as AIImageModelCard).parameters,
+                }),
               }));
 
             return uniqBy(models, 'id');

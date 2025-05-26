@@ -1,4 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
+
+import { useAiInfraStore } from '@/store/aiInfra';
+import { aiProviderSelectors } from '@/store/aiInfra/slices/aiProvider/selectors';
+import { AIImageModelCard } from '@/types/aiModel';
 
 import { useAiImageStore } from '../../store';
 import {
@@ -46,4 +50,21 @@ export function useGenerationConfigParam<N extends StandardAiImageParametersKeys
     max,
     step,
   };
+}
+
+export function useUpdateActiveModelEffect() {
+  const modelId = useAiImageStore(aiImageGenerationConfigSelectors.model);
+  const providerId = useAiImageStore(aiImageGenerationConfigSelectors.provider);
+  const enabledImageModelList = useAiInfraStore(aiProviderSelectors.enabledImageModelList);
+  const updateParamsWhenModelChange = useAiImageStore((s) => s.updateParamsWhenModelChange);
+
+  useEffect(() => {
+    const activeModel = enabledImageModelList
+      .find((provider) => provider.id === providerId)
+      ?.children.find((model) => model.id === modelId) as unknown as AIImageModelCard | undefined;
+
+    if (activeModel) {
+      updateParamsWhenModelChange(activeModel);
+    }
+  }, [modelId, providerId, enabledImageModelList]);
 }

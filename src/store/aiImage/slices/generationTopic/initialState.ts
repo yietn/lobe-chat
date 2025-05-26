@@ -9,8 +9,6 @@ export const DEFAULT_AI_IMAGE_MODEL = 'flux/schnell';
 
 const DEFAULT_GENERATION_TOPIC_ID: Partial<AiImageGenerationTopic> = {
   id: BLANK_GENERATION_TOPIC_ID,
-  model: DEFAULT_AI_IMAGE_MODEL,
-  provider: ModelProvider.Fal,
 };
 
 export interface GenerationTopicState {
