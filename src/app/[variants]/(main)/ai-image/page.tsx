@@ -1,7 +1,7 @@
 'use client';
 
 import { Divider } from 'antd';
-import { Flexbox } from 'react-layout-kit';
+import { Center, Flexbox } from 'react-layout-kit';
 
 import ConfigPanel from '@/app/[variants]/(main)/ai-image/features/ConfigPanel';
 import GenerationFeed from '@/app/[variants]/(main)/ai-image/features/GenerationFeed';
@@ -31,12 +31,10 @@ export default function AiImage() {
           <GenerationFeed />
         </Flexbox>
 
-        <Divider style={{ margin: 0 }} />
-
         {/* 底部输入框 */}
-        <Flexbox padding="16px 24px">
+        <Center style={{ marginBottom: 64 }}>
           <PromptInput />
-        </Flexbox>
+        </Center>
       </Flexbox>
 
       <Divider style={{ height: '100%', margin: 0 }} type="vertical" />
