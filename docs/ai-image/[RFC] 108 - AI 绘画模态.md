@@ -102,6 +102,7 @@ const videoConfigs = pgTable('video_configs', {
 
 - 图生图
 - 支持更多 provider，例如 midjourney discord/TTAPI, replicate/runware/kling/seedream 等
+- 访问特定 generationTopic 恢复 topic 状态
 - web 移动端
 - 绘图模型 pricing 显示和 cloud 版本计费
 - prompt translate/enhance
@@ -419,6 +420,7 @@ export const asyncTasks = pgTable('async_tasks', {
 
 - 图片是根据用户已经生成的图片（例如第一张）裁剪到 128 x 128 的，不复用 generation 的，因为 generation 可能被删除
 - 点开 topic 显示的 generationBatch 缩略图不需要生成，直接用 generationBatch 的第一张图的缩略图
+- 直接访问某个 topic时，需要恢复 topic 状态，例如 model, prompt, 配置项等，这个放二期再做，先上 reuse 功能平替一下。
 
 ```typescript
 export const generationTopics = pgTable(
@@ -433,8 +435,6 @@ export const generationTopics = pgTable(
     // 简要描述主题内容, LLM 生成，复用 chat 的 topic title 生成
     title: text('title').notNull(),
     imageUrl: text('image_url'),
-    model: text('model'),
-    provider: text('provider'),
     ...timestamps,
   },
   (table) => [primaryKey({ columns: [table.id, table.userId] })],
