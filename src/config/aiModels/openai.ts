@@ -1,3 +1,4 @@
+import GptImage1ParamsSchema from '@/config/paramsSchemas/openai/gpt-image-1.json';
 import {
   AIChatModelCard,
   AIEmbeddingModelCard,
@@ -478,8 +479,7 @@ export const openaiChatModels: AIChatModelCard[] = [
   },
   {
     contextWindowTokens: 4096,
-    description:
-      'GPT 3.5 Turbo，适用于各种文本生成和理解任务，对指令遵循的优化',
+    description: 'GPT 3.5 Turbo，适用于各种文本生成和理解任务，对指令遵循的优化',
     displayName: 'GPT-3.5 Turbo Instruct',
     id: 'gpt-3.5-turbo-instruct',
     pricing: {
@@ -586,6 +586,14 @@ export const openaiImageModels: AIImageModelCard[] = [
       input: 0.02, // $0.020 per image (1024×1024)
     },
     resolutions: ['256x256', '512x512', '1024x1024'],
+    type: 'image',
+  },
+  {
+    enabled: true,
+    description: 'ChatGPT 原生多模态图片生成模型',
+    displayName: 'gpt-image-1',
+    id: 'gpt-image-1',
+    parameters: GptImage1ParamsSchema,
     type: 'image',
   },
 ];

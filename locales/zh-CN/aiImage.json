@@ -4,6 +4,9 @@
     "model": {
       "label": "模型"
     },
+    "prompt": {
+      "placeholder": "描述你想要生成的内容"
+    },
     "width": {
       "label": "宽度"
     },
