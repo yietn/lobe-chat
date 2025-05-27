@@ -128,7 +128,7 @@ const ModelSelect = memo(() => {
       ),
       type: 'group',
     }));
-  }, [enabledImageModelList, router, t, theme.colorTextTertiary]);
+  }, [enabledImageModelList, router, t, theme.colorTextTertiary, currentModel, currentProvider]);
 
   return (
     <ActionDropdown
