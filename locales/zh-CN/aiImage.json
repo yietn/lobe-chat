@@ -16,6 +16,9 @@
     "size": {
       "label": "尺寸"
     },
+    "aspectRatio": {
+      "label": "比例"
+    },
     "steps": {
       "label": "步数"
     },

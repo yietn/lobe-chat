@@ -1,6 +1,7 @@
 import { AIImageModelCard } from '@/types/aiModel';
 
 import FluxSchnellParamsSchema from '../paramsSchemas/fal/flux-schnell.json';
+import Imagen4ParamsSchema from '../paramsSchemas/fal/imagen4.json';
 
 const googleChatModels: AIImageModelCard[] = [
   {
@@ -12,6 +13,16 @@ const googleChatModels: AIImageModelCard[] = [
     parameters: FluxSchnellParamsSchema,
     releasedAt: '2024-08-01',
     type: 'image',
+  },
+  {
+    description: 'Google 最高质量的图像生成模型',
+    displayName: 'Imagen 4',
+    enabled: true,
+    id: 'imagen4/preview',
+    parameters: Imagen4ParamsSchema,
+    releasedAt: '2025-05-21',
+    type: 'image',
+    organization: 'Deepmind',
   },
 ];
 

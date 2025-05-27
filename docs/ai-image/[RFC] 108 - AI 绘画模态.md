@@ -23,7 +23,7 @@ AI 绘画场景下基本的文生图功能。
 
 常见的 provider 还有 replicate, runware, together.ai, stablity.ai, ttapi, kling, seedream 等。
 
-一期将率先支持 fal.ai, openai, google。
+一期将率先支持 fal.ai, openai，本来也想支持 google 的 imagen-4 的，但是发现目前 google 官方的 imagen-4 只支持 vertex ai 调用，不如先支持 fal 的 imagen-4。
 
 #### 请求方式支持阻塞式请求和 webhook 两种方式
 
@@ -493,8 +493,8 @@ midjourney 它的生成和其它生成不一样，webhook 回调返回得是一�
 
 - prompt: string
 - width/height: integer
-- ratio: string enum
-- size: string enum
+- aspectRatio: string enum, 命名来源：[fal](https://fal.ai/models/fal-ai/imagen4/preview), [vertextai](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/imagen-api) 都是用这个
+- size: string enum, 命名来源 [openai](https://platform.openai.com/docs/api-reference/images/create#images-create-size), [recraft](https://www.recraft.ai/docs#generate-image) 都是用这个
 - cfg: number
 - steps: number
 - seed: number

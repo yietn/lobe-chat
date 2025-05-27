@@ -9,6 +9,7 @@ import { useUpdateActiveModelEffect } from '@/store/aiImage/slices/generationCon
 import { aiImageGenerationConfigSelectors } from '@/store/aiImage/slices/generationConfig/selectors';
 import { useAiImageStore } from '@/store/aiImage/store';
 
+import AspectRatioSelect from './AspectRatioSelect';
 import ModelSelect from './ModelSelect';
 import SeedNumberInput from './SeedNumberInput';
 import SizeSelect from './SizeSelect';
@@ -36,6 +37,7 @@ const ConfigPanel = memo(() => {
   const isSupportWidth = useAiImageStore(isSupportParamSelector('width'));
   const isSupportHeight = useAiImageStore(isSupportParamSelector('height'));
   const isSupportSize = useAiImageStore(isSupportParamSelector('size'));
+  const isSupportAspectRatio = useAiImageStore(isSupportParamSelector('aspectRatio'));
   const isSupportSeed = useAiImageStore(isSupportParamSelector('seed'));
   const isSupportSteps = useAiImageStore(isSupportParamSelector('steps'));
 
@@ -48,6 +50,10 @@ const ConfigPanel = memo(() => {
       isSupportSize && {
         label: t('config.size.label'),
         children: <SizeSelect />,
+      },
+      isSupportAspectRatio && {
+        label: t('config.aspectRatio.label'),
+        children: <AspectRatioSelect />,
       },
       isSupportWidth && {
         label: t('config.width.label'),
