@@ -27,28 +27,27 @@ export function useGenerationConfigParam<N extends StandardAiImageParametersKeys
   );
 
   const paramSchema = paramsProperties?.[paramName];
-  const { description, min, max, step } = useMemo(() => {
+  const paramConstraints = useMemo(() => {
     const min = paramSchema && 'minimum' in paramSchema ? paramSchema.minimum : undefined;
     const max = paramSchema && 'maximum' in paramSchema ? paramSchema.maximum : undefined;
     const step = paramSchema && 'step' in paramSchema ? paramSchema.step : undefined;
     const description =
       paramSchema && 'description' in paramSchema ? paramSchema.description : undefined;
+    const enumValues = paramSchema && 'enum' in paramSchema ? paramSchema.enum : undefined;
 
     return {
       description,
       max,
       min,
       step,
+      enumValues,
     };
   }, [paramSchema]);
 
   return {
     value: paramValue,
     setValue,
-    description,
-    min,
-    max,
-    step,
+    ...paramConstraints,
   };
 }
 

@@ -11,6 +11,7 @@ import { useAiImageStore } from '@/store/aiImage/store';
 
 import ModelSelect from './ModelSelect';
 import SeedNumberInput from './SeedNumberInput';
+import SizeSelect from './SizeSelect';
 import SizeSliderInput from './SizeSliderInput';
 import StepsSliderInput from './StepsSliderInput';
 
@@ -34,6 +35,7 @@ const ConfigPanel = memo(() => {
 
   const isSupportWidth = useAiImageStore(isSupportParamSelector('width'));
   const isSupportHeight = useAiImageStore(isSupportParamSelector('height'));
+  const isSupportSize = useAiImageStore(isSupportParamSelector('size'));
   const isSupportSeed = useAiImageStore(isSupportParamSelector('seed'));
   const isSupportSteps = useAiImageStore(isSupportParamSelector('steps'));
 
@@ -42,6 +44,10 @@ const ConfigPanel = memo(() => {
       {
         label: t('config.model.label'),
         children: <ModelSelect />,
+      },
+      isSupportSize && {
+        label: t('config.size.label'),
+        children: <SizeSelect />,
       },
       isSupportWidth && {
         label: t('config.width.label'),

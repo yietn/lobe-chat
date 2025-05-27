@@ -32,6 +32,14 @@ export const AiImageParamsSchemaZodSchema = z.object({
         description: z.string().optional(),
       })
       .optional(),
+    size: z
+      .object({
+        type: z.literal('string').optional(),
+        default: z.string(),
+        enum: z.array(z.string()),
+        description: z.string().optional(),
+      })
+      .optional(),
     seed: z
       .object({
         type: z.tuple([z.literal('number'), z.literal('null')]).optional(),

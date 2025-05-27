@@ -13,6 +13,9 @@ export const aiImage = {
     height: {
       label: '高度',
     },
+    size: {
+      label: '尺寸',
+    },
     steps: {
       label: '步数',
     },

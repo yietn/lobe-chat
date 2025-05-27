@@ -493,7 +493,8 @@ midjourney 它的生成和其它生成不一样，webhook 回调返回得是一�
 
 - prompt: string
 - width/height: integer
-- ratio: string
+- ratio: string enum
+- size: string enum
 - cfg: number
 - steps: number
 - seed: number
