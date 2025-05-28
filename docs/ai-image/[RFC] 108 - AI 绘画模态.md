@@ -306,38 +306,35 @@ graph TD
 <img width="1098" alt="image-20250416180507201" src="https://github.com/user-attachments/assets/41594519-d9d1-400c-a246-78ef8bbf53f8" />
 
 ```typescript
-export const generationBatches = pgTable(
-  'generation_batches',
-  {
-    id: text('id')
-      .$defaultFn(() => idGenerator('sessions'))
-      .notNull(),
-    userId: text('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
-      .notNull(),
-    generationTopicId: text('generation_topic_id')
-      .notNull()
-      .references(() => generationTopics.id, { onDelete: 'cascade' }),
-    // 一期只做文生图这俩字段到需要用到的时候再加不迟
-    // type: pgEnum('generation_type', ['image', 'video', 'upscale']).notNull(),
-    // category: pgEnum('generation_type', ['textToImage', 'imageToImage',]).notNull(),
+export const generationBatches = pgTable('generation_batches', {
+  id: text('id')
+    .$defaultFn(() => idGenerator('sessions'))
+    .notNull()
+    .primaryKey(),
+  userId: text('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+  generationTopicId: text('generation_topic_id')
+    .notNull()
+    .references(() => generationTopics.id, { onDelete: 'cascade' }),
+  // 一期只做文生图这俩字段到需要用到的时候再加不迟
+  // type: pgEnum('generation_type', ['image', 'video', 'upscale']).notNull(),
+  // category: pgEnum('generation_type', ['textToImage', 'imageToImage',]).notNull(),
 
-    // 下面这些也是模型配置，考虑到用户搜索过滤需求，放顶层字段方便加索引
-    provider: text().notNull(),
-    model: text().notNull(),
-    prompt: text().notNull(),
-    // 一期先不做 prompt 翻译
-    // translatedPrompt: text();
-    width: integer(),
-    height: integer(),
-    ratio: varchar('ratio', { length: 64 }),
+  // 下面这些也是模型配置，考虑到用户搜索过滤需求，放顶层字段方便加索引
+  provider: text().notNull(),
+  model: text().notNull(),
+  prompt: text().notNull(),
+  // 一期先不做 prompt 翻译
+  // translatedPrompt: text();
+  width: integer(),
+  height: integer(),
+  ratio: varchar('ratio', { length: 64 }),
 
-    // 存储这个生成批次的配置，存放不需要建议索引的公共配置
-    config: jsonb('config'),
-    ...timestamps,
-  },
-  (table) => [primaryKey({ columns: [table.id, table.userId] })],
-);
+  // 存储这个生成批次的配置，存放不需要建议索引的公共配置
+  config: jsonb('config'),
+  ...timestamps,
+});
 ```
 
 图片的语义化搜索（后续功能）：
@@ -378,7 +375,7 @@ export const generations = pgTable('generations', {
 
   // inference related
   // 复用已有的 async_tasks 表
-  asyncTaskId: text('async_task_id').references(() => asyncTasks.id, { onDelete: 'cascade' }),
+  asyncTaskId: uuid('async_task_id').references(() => asyncTasks.id, { onDelete: 'cascade' }),
 
   // user actions - 后续实现
   // 收藏功能，用于用户标记喜欢的生成结果
@@ -429,22 +426,19 @@ export const asyncTasks = pgTable('async_tasks', {
 - 直接访问某个 topic时，需要恢复 topic 状态，例如 model, prompt, 配置项等，这个放二期再做，先上 reuse 功能平替一下。
 
 ```typescript
-export const generationTopics = pgTable(
-  'generation_topics',
-  {
-    id: text('id')
-      .$defaultFn(() => idGenerator('topics'))
-      .notNull(),
-    userId: text('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
-      .notNull(),
-    // 简要描述主题内容, LLM 生成，复用 chat 的 topic title 生成
-    title: text('title').notNull(),
-    imageUrl: text('image_url'),
-    ...timestamps,
-  },
-  (table) => [primaryKey({ columns: [table.id, table.userId] })],
-);
+export const generationTopics = pgTable('generation_topics', {
+  id: text('id')
+    .$defaultFn(() => idGenerator('topics'))
+    .notNull()
+    .primaryKey(),
+  userId: text('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+  // 简要描述主题内容, LLM 生成，复用 chat 的 topic title 生成
+  title: text('title').notNull(),
+  imageUrl: text('image_url'),
+  ...timestamps,
+});
 ```
 
 #### 多模态相关的思考
