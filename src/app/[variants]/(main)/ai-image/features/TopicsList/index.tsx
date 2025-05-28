@@ -1,6 +1,11 @@
+import React, { Suspense, lazy } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
-const TopicsList = () => {
+import SkeletonList from './SkeletonList';
+
+const TopicsListContent = lazy(() => import('./TopicListContent'));
+
+const TopicsList = async () => {
   return (
     <Flexbox
       style={{
@@ -9,9 +14,13 @@ const TopicsList = () => {
         width: 80,
       }}
     >
-      主题列表
+      <Suspense fallback={<SkeletonList />}>
+        <TopicsListContent />
+      </Suspense>
     </Flexbox>
   );
 };
+
+TopicsList.displayName = 'TopicsList';
 
 export default TopicsList;

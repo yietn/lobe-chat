@@ -1,3 +1,5 @@
+'use client';
+
 import { ActionIcon, TextArea } from '@lobehub/ui';
 import { useTheme } from 'antd-style';
 import { Sparkles } from 'lucide-react';

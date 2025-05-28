@@ -315,7 +315,9 @@ export const generationBatches = pgTable(
     userId: text('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    generationTopicId: text('generation_topic_id').notNull(),
+    generationTopicId: text('generation_topic_id')
+      .notNull()
+      .references(() => generationTopics.id, { onDelete: 'cascade' }),
     // 一期只做文生图这俩字段到需要用到的时候再加不迟
     // type: pgEnum('generation_type', ['image', 'video', 'upscale']).notNull(),
     // category: pgEnum('generation_type', ['textToImage', 'imageToImage',]).notNull(),
@@ -369,7 +371,10 @@ export const generations = pgTable('generations', {
   userId: text('user_id')
     .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
-  generationBatchId: text('generation_batch_id').notNull(),
+  /** 关联的生成批次 ID */
+  generationBatchId: varchar('generation_batch_id', { length: 64 })
+    .notNull()
+    .references(() => generationBatches.id, { onDelete: 'cascade' }),
 
   // inference related
   // 复用已有的 async_tasks 表

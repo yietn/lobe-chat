@@ -1,12 +1,12 @@
-'use client';
-
 import { Divider } from 'antd';
+import { Suspense } from 'react';
 import { Center, Flexbox } from 'react-layout-kit';
 
 import ConfigPanel from '@/app/[variants]/(main)/ai-image/features/ConfigPanel';
 import GenerationFeed from '@/app/[variants]/(main)/ai-image/features/GenerationFeed';
 import PromptInput from '@/app/[variants]/(main)/ai-image/features/PromptInput';
 import TopicsList from '@/app/[variants]/(main)/ai-image/features/TopicsList';
+import InitClientDB from '@/features/InitClientDB';
 
 export default function AiImage() {
   return (
@@ -19,6 +19,10 @@ export default function AiImage() {
         width: '100%',
       }}
     >
+      <Suspense>
+        <InitClientDB bottom={100} />
+      </Suspense>
+
       {/* 左侧配置面板 */}
       <ConfigPanel />
 

@@ -44,7 +44,6 @@ export const createGenerationConfigSlice: StateCreator<
   },
 
   updateParamsWhenModelChange: (model: AIImageModelCard) => {
-    console.log('updateParamsWhenModelChange', model);
     const { defaultValues } = parseParamsSchema(model.parameters!);
     set(
       () => ({ parameters: defaultValues, parameterSchema: model.parameters }),

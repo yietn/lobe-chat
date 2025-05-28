@@ -1,7 +1,7 @@
 import { GenerationTopicState } from '@/store/aiImage/slices/generationTopic/initialState';
 
-const currentGenerationTopic = (s: GenerationTopicState) => s.generationTopicMap[s.activeId];
+const generationTopics = (s: GenerationTopicState) => s.generationTopics;
 
 export const generationTopicSelectors = {
-  currentGenerationTopic,
+  generationTopics,
 };

@@ -26,4 +26,9 @@ export const aiImage = {
       label: '种子',
     },
   },
+  topic: {
+    createNew: '新建主题',
+    untitled: '默认主题',
+    empty: '暂无生成主题',
+  },
 } as const;

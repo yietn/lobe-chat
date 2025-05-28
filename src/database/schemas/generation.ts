@@ -55,7 +55,9 @@ export const generationBatches = pgTable(
       .notNull(),
 
     /** 关联的生成主题 ID */
-    generationTopicId: varchar('generation_topic_id', { length: 64 }).notNull(),
+    generationTopicId: text('generation_topic_id')
+      .notNull()
+      .references(() => generationTopics.id, { onDelete: 'cascade' }),
 
     /** 服务商名称 */
     provider: text('provider').notNull(),
@@ -101,7 +103,9 @@ export const generations = pgTable('generations', {
     .notNull(),
 
   /** 关联的生成批次 ID */
-  generationBatchId: varchar('generation_batch_id', { length: 64 }).notNull(),
+  generationBatchId: varchar('generation_batch_id', { length: 64 })
+    .notNull()
+    .references(() => generationBatches.id, { onDelete: 'cascade' }),
 
   /** 关联的异步任务 ID */
   asyncTaskId: text('async_task_id').references(() => asyncTasks.id, {
