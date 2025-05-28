@@ -23,7 +23,7 @@ export const generationTopics = pgTable(
       .notNull(),
 
     /** 简要描述主题内容，由 LLM 生成 */
-    title: text('title').notNull(),
+    title: text('title'),
 
     /** 主题封面图片 URL */
     imageUrl: text('image_url'),

@@ -1,9 +1,7 @@
 export interface AiImageGenerationTopic {
-  createdAt: Date;
   id: string;
-  imageUrl: string;
-  model: string;
-  provider: string;
-  title: string;
+  title?: string | null;
+  imageUrl?: string | null;
+  createdAt: Date;
   updatedAt: Date;
 }

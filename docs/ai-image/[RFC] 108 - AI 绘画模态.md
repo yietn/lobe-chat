@@ -103,6 +103,7 @@ const videoConfigs = pgTable('video_configs', {
 - 图生图
 - 支持更多 provider，例如 midjourney discord/TTAPI, replicate/runware/kling/seedream 等
 - 访问特定 generationTopic 恢复 topic 状态
+- generationTopic 列表无限加载
 - web 移动端
 - 绘图模型 pricing 显示和 cloud 版本计费
 - prompt translate/enhance
