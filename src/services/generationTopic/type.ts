@@ -1,6 +1,6 @@
-import { AiImageGenerationTopic } from '@/types/aiImage';
+import { ImageGenerationTopic } from '@/types/generation';
 
 export interface IGenerationTopicService {
-  getAllGenerationTopics(): Promise<AiImageGenerationTopic[]>;
+  getAllGenerationTopics(): Promise<ImageGenerationTopic[]>;
   createTopic(): Promise<string>;
 }

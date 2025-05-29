@@ -70,9 +70,9 @@ const TopActions = memo<TopActionProps>(({ tab, isPinned }) => {
           />
         </Link>
       )}
-      <Link aria-label={t('tab.aiImage')} href={'/ai-image'}>
+      <Link aria-label={t('tab.aiImage')} href={'/image'}>
         <ActionIcon
-          active={tab === SidebarTabKey.AiImage}
+          active={tab === SidebarTabKey.Image}
           icon={Image}
           size={ICON_SIZE}
           title={t('tab.aiImage')}

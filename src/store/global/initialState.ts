@@ -7,10 +7,10 @@ import { SessionDefaultGroup } from '@/types/session';
 import { AsyncLocalStorage } from '@/utils/localStorage';
 
 export enum SidebarTabKey {
-  AiImage = 'aiImage',
   Chat = 'chat',
   Discover = 'discover',
   Files = 'files',
+  Image = 'image',
   Me = 'me',
   Setting = 'settings',
 }

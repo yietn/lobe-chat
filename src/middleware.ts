@@ -37,7 +37,7 @@ export const config = {
     '/chat(.*)',
     '/changelog(.*)',
     '/settings(.*)',
-    '/ai-image',
+    '/image',
     '/files',
     '/files(.*)',
     '/repos(.*)',
