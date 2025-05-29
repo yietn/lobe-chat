@@ -3,3 +3,4 @@ locales/
 apps/desktop/resources/locales/
 **/__snapshots__/
 **/fixtures/
+src/database/migrations/
