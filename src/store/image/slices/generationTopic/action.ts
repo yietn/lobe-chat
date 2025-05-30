@@ -38,7 +38,6 @@ export const createGenerationTopicSlice: StateCreator<
       enabled ? [FETCH_GENERATION_TOPICS_KEY, isLogin] : null,
       () => generationTopicService.getAllGenerationTopics(),
       {
-        fallbackData: [],
         suspense: true,
       },
     ),

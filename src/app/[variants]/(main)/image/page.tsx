@@ -1,5 +1,4 @@
 import { Divider } from 'antd';
-import { Suspense } from 'react';
 import { Center, Flexbox } from 'react-layout-kit';
 
 import ConfigPanel from '@/app/[variants]/(main)/image/features/ConfigPanel';
@@ -19,9 +18,7 @@ export default function AiImage() {
         width: '100%',
       }}
     >
-      <Suspense>
-        <InitClientDB bottom={100} />
-      </Suspense>
+      <InitClientDB bottom={100} />
 
       {/* 左侧配置面板 */}
       <ConfigPanel />
