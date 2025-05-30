@@ -1,10 +1,11 @@
 'use client';
 
-import { ActionIcon, Tooltip } from '@lobehub/ui';
+import { Tooltip } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { Plus } from 'lucide-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Center } from 'react-layout-kit';
 
 const useStyles = createStyles(({ css, token }) => ({
   button: css`
@@ -13,9 +14,6 @@ const useStyles = createStyles(({ css, token }) => ({
     background: ${token.colorFillSecondary};
     border: 1px solid ${token.colorBorder};
     border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     margin-bottom: 8px;
 
     &:hover {
@@ -24,23 +22,19 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 }));
 
-const AddButton = memo(() => {
+const NewTopicButton = memo(() => {
   const { t } = useTranslation('image');
   const { styles } = useStyles();
 
   return (
     <Tooltip placement="left" title={t('topic.createNew')}>
-      <ActionIcon
-        className={styles.button}
-        icon={Plus}
-        // loading={isValidating}
-        // onClick={() => mutate()}
-        size={60}
-      />
+      <Center className={styles.button}>
+        <Plus size={12} />
+      </Center>
     </Tooltip>
   );
 });
 
-AddButton.displayName = 'AddButton';
+NewTopicButton.displayName = 'NewTopicButton';
 
-export default AddButton;
+export default NewTopicButton;

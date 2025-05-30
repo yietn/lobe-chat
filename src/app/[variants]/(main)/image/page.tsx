@@ -4,7 +4,7 @@ import { Center, Flexbox } from 'react-layout-kit';
 import ConfigPanel from '@/app/[variants]/(main)/image/features/ConfigPanel';
 import GenerationFeed from '@/app/[variants]/(main)/image/features/GenerationFeed';
 import PromptInput from '@/app/[variants]/(main)/image/features/PromptInput';
-import TopicsList from '@/app/[variants]/(main)/image/features/TopicsList';
+import Topics from '@/app/[variants]/(main)/image/features/Topics';
 import InitClientDB from '@/features/InitClientDB';
 
 export default function AiImage() {
@@ -41,7 +41,7 @@ export default function AiImage() {
       <Divider style={{ height: '100%', margin: 0 }} type="vertical" />
 
       {/* 右侧Topics列表 */}
-      <TopicsList />
+      <Topics />
     </Flexbox>
   );
 }

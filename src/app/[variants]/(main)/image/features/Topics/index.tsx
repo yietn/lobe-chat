@@ -3,15 +3,17 @@ import { Flexbox } from 'react-layout-kit';
 
 import SkeletonList from './SkeletonList';
 
-const TopicsListContent = lazy(() => import('./TopicListContent'));
+const TopicsListContent = lazy(() => import('./TopicList'));
 
-const TopicsList = async () => {
+const Topics = async () => {
   return (
     <Flexbox
+      align="center"
       style={{
-        height: '100%',
-        overflowY: 'auto',
         width: 80,
+        height: '100%',
+        paddingTop: 30,
+        overflowY: 'auto',
       }}
     >
       <Suspense fallback={<SkeletonList />}>
@@ -21,6 +23,6 @@ const TopicsList = async () => {
   );
 };
 
-TopicsList.displayName = 'TopicsList';
+Topics.displayName = 'Topics';
 
-export default TopicsList;
+export default Topics;

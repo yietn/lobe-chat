@@ -9,7 +9,7 @@ import { useFetchGenerationTopics } from '@/hooks/useFetchGenerationTopics';
 import { useImageStore } from '@/store/image';
 import { generationTopicSelectors } from '@/store/image/selectors';
 
-import AddButton from './AddButton';
+import AddButton from './NewTopicButton';
 import TopicItem from './TopicItem';
 
 const useStyles = createStyles(({ css, token }) => ({
@@ -21,7 +21,7 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 }));
 
-const TopicsListContent = memo(() => {
+const TopicsList = memo(() => {
   useFetchGenerationTopics();
 
   const { styles } = useStyles();
@@ -58,6 +58,6 @@ const TopicsListContent = memo(() => {
   );
 });
 
-TopicsListContent.displayName = 'TopicsListContent';
+TopicsList.displayName = 'TopicsList';
 
-export default TopicsListContent;
+export default TopicsList;
