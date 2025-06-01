@@ -6,17 +6,19 @@ import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
+import { useImageStore } from '@/store/image';
 import { useGenerationConfigParam } from '@/store/image/slices/generationConfig/hooks';
-
-const handleGenerate = () => {
-  // TODO: Implement generation logic
-  console.log('Generate button clicked');
-};
 
 const PromptInput = () => {
   const theme = useTheme();
   const { t } = useTranslation('image');
   const { value, setValue } = useGenerationConfigParam('prompt');
+  const createGenerationTopic = useImageStore((s) => s.createGenerationTopic);
+
+  const handleGenerate = async () => {
+    const title = await createGenerationTopic(value);
+    console.log('title', title);
+  };
 
   return (
     <Flexbox

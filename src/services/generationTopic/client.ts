@@ -13,13 +13,11 @@ export class ClientService extends BaseClientService implements IGenerationTopic
    * TODO: 滚动无限加载
    */
   getAllGenerationTopics: IGenerationTopicService['getAllGenerationTopics'] = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
     return this.topicModel.queryAll();
   };
 
-  createTopic: IGenerationTopicService['createTopic'] = async () => {
-    const item = await this.topicModel.create();
+  createTopic: IGenerationTopicService['createTopic'] = async ({ title }) => {
+    const item = await this.topicModel.create(title);
 
     if (!item) {
       throw new Error('topic create Error');

@@ -24,11 +24,12 @@ export class GenerationTopicModel {
     );
   };
 
-  create = async () => {
+  create = async (title: string) => {
     const [newGenerationTopic] = await this.db
       .insert(generationTopics)
       .values({
         userId: this.userId,
+        title,
       })
       .returning();
 

@@ -1,6 +1,10 @@
 import { ImageGenerationTopic } from '@/types/generation';
 
+interface CreateTopicParams {
+  title: string;
+}
+
 export interface IGenerationTopicService {
   getAllGenerationTopics(): Promise<ImageGenerationTopic[]>;
-  createTopic(): Promise<string>;
+  createTopic(params: CreateTopicParams): Promise<string>;
 }

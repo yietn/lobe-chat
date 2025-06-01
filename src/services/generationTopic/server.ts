@@ -6,7 +6,7 @@ export class ServerService implements IGenerationTopicService {
     return lambdaClient.generationTopic.getAllGenerationTopics.query();
   };
 
-  createTopic: IGenerationTopicService['createTopic'] = () => {
-    return lambdaClient.generationTopic.createTopic.mutate();
+  createTopic: IGenerationTopicService['createTopic'] = ({ title }) => {
+    return lambdaClient.generationTopic.createTopic.mutate({ title });
   };
 }
