@@ -16,7 +16,7 @@ const PromptInput = () => {
   const createGenerationTopic = useImageStore((s) => s.createGenerationTopic);
 
   const handleGenerate = async () => {
-    const title = await createGenerationTopic(value);
+    const title = await createGenerationTopic([value]);
     console.log('title', title);
   };
 

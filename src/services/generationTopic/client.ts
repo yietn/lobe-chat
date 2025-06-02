@@ -16,13 +16,18 @@ export class ClientService extends BaseClientService implements IGenerationTopic
     return this.topicModel.queryAll();
   };
 
-  createTopic: IGenerationTopicService['createTopic'] = async ({ title }) => {
-    const item = await this.topicModel.create(title);
+  createTopic: IGenerationTopicService['createTopic'] = async () => {
+    const item = await this.topicModel.create('');
 
     if (!item) {
       throw new Error('topic create Error');
     }
 
     return item.id;
+  };
+
+  updateTopic: IGenerationTopicService['updateTopic'] = async (id, data) => {
+    // data 已经被 IGenerationTopicService 接口约束为 UpdateTopicValue
+    return this.topicModel.update(id, data);
   };
 }

@@ -6,7 +6,12 @@ export class ServerService implements IGenerationTopicService {
     return lambdaClient.generationTopic.getAllGenerationTopics.query();
   };
 
-  createTopic: IGenerationTopicService['createTopic'] = ({ title }) => {
-    return lambdaClient.generationTopic.createTopic.mutate({ title });
+  createTopic: IGenerationTopicService['createTopic'] = async () => {
+    return lambdaClient.generationTopic.createTopic.mutate(undefined);
+  };
+
+  updateTopic: IGenerationTopicService['updateTopic'] = async (id, data) => {
+    // data 已经被 IGenerationTopicService 接口约束为 UpdateTopicValue
+    return lambdaClient.generationTopic.updateTopic.mutate({ id, value: data });
   };
 }

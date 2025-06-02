@@ -5,6 +5,8 @@ import { createStyles } from 'antd-style';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useImageStore } from '@/store/image';
+import { generationTopicSelectors } from '@/store/image/slices/generationTopic/selectors';
 import { ImageGenerationTopic } from '@/types/generation';
 
 const useStyles = createStyles(({ css, token }) => ({
@@ -24,6 +26,8 @@ const useStyles = createStyles(({ css, token }) => ({
     gap: 4px;
     padding: 8px 12px;
     min-width: 150px;
+    background: ${token.colorBgElevated};
+    border-radius: ${token.borderRadius}px;
   `,
   title: css`
     font-size: 14px;
@@ -53,6 +57,9 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
   const { t } = useTranslation('image');
   const { styles } = useStyles();
 
+  // 检查当前 topic 是否在加载中
+  const isLoading = useImageStore(generationTopicSelectors.isLoadingGenerationTopic(topic.id));
+
   const handleClick = () => {
     // TODO: 切换到对应的 topic
     console.log('Switch to topic:', topic.id);
@@ -68,12 +75,7 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
   return (
     <Tooltip arrow={false} placement="left" title={tooltipContent}>
       <div className={styles.container} onClick={handleClick}>
-        <Avatar
-          avatar={topic.imageUrl}
-          size={50}
-          style={{ borderRadius: 6 }}
-          title={topic.title || t('topic.untitled')}
-        />
+        <Avatar avatar={topic.imageUrl} loading={isLoading} size={50} style={{ borderRadius: 6 }} />
       </div>
     </Tooltip>
   );

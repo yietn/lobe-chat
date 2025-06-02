@@ -1,6 +1,7 @@
-import { eq } from 'drizzle-orm/expressions';
+import { desc, eq } from 'drizzle-orm/expressions';
 
 import { LobeChatDatabase } from '@/database/type';
+import { ImageGenerationTopic } from '@/types/generation';
 
 import { generationTopics } from '../schemas/generation';
 
@@ -19,7 +20,7 @@ export class GenerationTopicModel {
         .select()
         .from(generationTopics)
         // 按照最后更新时间排序, 这里的更新应该包括用户点击生成按钮
-        .orderBy(generationTopics.updatedAt)
+        .orderBy(desc(generationTopics.updatedAt))
         .where(eq(generationTopics.userId, this.userId))
     );
   };
@@ -34,5 +35,15 @@ export class GenerationTopicModel {
       .returning();
 
     return newGenerationTopic;
+  };
+
+  update = async (id: string, data: Partial<ImageGenerationTopic>) => {
+    const [updatedTopic] = await this.db
+      .update(generationTopics)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(generationTopics.id, id))
+      .returning();
+
+    return updatedTopic;
   };
 }

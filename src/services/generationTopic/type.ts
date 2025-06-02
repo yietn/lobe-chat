@@ -1,10 +1,8 @@
+import { UpdateTopicValue } from '@/server/routers/lambda/generationTopic';
 import { ImageGenerationTopic } from '@/types/generation';
-
-interface CreateTopicParams {
-  title: string;
-}
 
 export interface IGenerationTopicService {
   getAllGenerationTopics(): Promise<ImageGenerationTopic[]>;
-  createTopic(params: CreateTopicParams): Promise<string>;
+  createTopic(): Promise<string>;
+  updateTopic(id: string, data: UpdateTopicValue): Promise<ImageGenerationTopic>;
 }

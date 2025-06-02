@@ -1,9 +1,12 @@
+import isEqual from 'fast-deep-equal';
 import { SWRResponse, mutate } from 'swr';
 import { StateCreator } from 'zustand/vanilla';
 
 import { chainSummaryGenerationTitle } from '@/chains/summaryGenerationTitle';
+import { LOADING_FLAT } from '@/const/message';
 import { DEFAULT_SYSTEM_AGENT_ITEM } from '@/const/settings/systemAgent';
 import { useClientDataSWR } from '@/libs/swr';
+import { UpdateTopicValue } from '@/server/routers/lambda/generationTopic';
 import { chatService } from '@/services/chat';
 import { generationTopicService } from '@/services/generationTopic';
 import { ImageGenerationTopic } from '@/types/generation';
@@ -11,18 +14,27 @@ import { merge } from '@/utils/merge';
 import { setNamespace } from '@/utils/storeDebug';
 
 import type { ImageStore } from '../../store';
+import { GenerationTopicDispatch, generationTopicReducer } from './reducer';
+import { generationTopicSelectors } from './selectors';
 
 const FETCH_GENERATION_TOPICS_KEY = 'fetchGenerationTopics';
 
 const n = setNamespace('generationTopic');
 
 export interface GenerationTopicAction {
-  createGenerationTopic: (prompt: string) => Promise<string>;
+  createGenerationTopic: (prompts: string[]) => Promise<string>;
   useFetchGenerationTopics: (
     enabled: boolean,
     isLogin: boolean | undefined,
   ) => SWRResponse<ImageGenerationTopic[]>;
+  summaryGenerationTopicTitle: (topicId: string, prompts: string[]) => Promise<string>;
   refreshGenerationTopics: () => Promise<void>;
+
+  internal_updateGenerationTopicLoading: (id: string, loading: boolean) => void;
+  internal_dispatchGenerationTopic: (payload: GenerationTopicDispatch, action?: any) => void;
+  internal_createGenerationTopic: () => Promise<string>;
+  internal_updateGenerationTopic: (id: string, data: UpdateTopicValue) => Promise<void>;
+  internal_updateGenerationTopicTitleInSummary: (id: string, title: string) => void;
 }
 
 export const createGenerationTopicSlice: StateCreator<
@@ -31,23 +43,128 @@ export const createGenerationTopicSlice: StateCreator<
   [],
   GenerationTopicAction
 > = (set, get) => ({
-  createGenerationTopic: async (prompt: string) => {
-    const { refreshGenerationTopics } = get();
+  createGenerationTopic: async (prompts: string[]) => {
+    const { internal_createGenerationTopic, summaryGenerationTopicTitle } = get();
 
-    // auto generate topic title from prompt by ai
-    let title = '';
+    // Create topic with default title
+    const topicId = await internal_createGenerationTopic();
+
+    // Auto-generate title from prompts
+    if (prompts.length > 0) {
+      get().internal_updateGenerationTopicLoading(topicId, true);
+      // Run summary async, don't wait for it
+      summaryGenerationTopicTitle(topicId, prompts);
+    }
+
+    return topicId;
+  },
+
+  summaryGenerationTopicTitle: async (topicId: string, prompts: string[]) => {
+    const topic = generationTopicSelectors.getGenerationTopicById(topicId)(get());
+    if (!topic) throw new Error(`Topic ${topicId} not found`);
+
+    const { internal_updateGenerationTopicTitleInSummary, internal_updateGenerationTopicLoading } =
+      get();
+
+    internal_updateGenerationTopicTitleInSummary(topicId, LOADING_FLAT);
+
+    let output = '';
+
+    // Auto generate topic title from prompt by AI
     await chatService.fetchPresetTaskResult({
-      params: merge(DEFAULT_SYSTEM_AGENT_ITEM, chainSummaryGenerationTitle(prompt, 'image')),
-      onError: () => {},
+      params: merge(DEFAULT_SYSTEM_AGENT_ITEM, chainSummaryGenerationTitle(prompts, 'image')),
+      onError: () => {
+        internal_updateGenerationTopicTitleInSummary(topicId, topic.title || '');
+      },
       onFinish: async (text) => {
-        title = text;
+        await get().internal_updateGenerationTopic(topicId, { title: text });
+      },
+      onLoadingChange: (loading) => {
+        internal_updateGenerationTopicLoading(topicId, loading);
+      },
+      onMessageHandle: (chunk) => {
+        switch (chunk.type) {
+          case 'text': {
+            output += chunk.text;
+            internal_updateGenerationTopicTitleInSummary(topicId, output);
+          }
+        }
       },
     });
 
-    const generationTopicId = await generationTopicService.createTopic({ title });
-    await refreshGenerationTopics();
+    return output;
+  },
 
-    return generationTopicId;
+  internal_createGenerationTopic: async () => {
+    const tmpId = Date.now().toString();
+
+    // 1. Optimistic update - add temporary topic
+    get().internal_dispatchGenerationTopic(
+      { type: 'addTopic', value: { id: tmpId, title: '' } },
+      'internal_createGenerationTopic',
+    );
+
+    get().internal_updateGenerationTopicLoading(tmpId, true);
+
+    // 2. Call backend service
+    const topicId = await generationTopicService.createTopic();
+    get().internal_updateGenerationTopicLoading(tmpId, false);
+
+    // 3. Refresh data to ensure consistency
+    get().internal_updateGenerationTopicLoading(topicId, true);
+    await get().refreshGenerationTopics();
+    get().internal_updateGenerationTopicLoading(topicId, false);
+
+    return topicId;
+  },
+
+  internal_updateGenerationTopic: async (id, data) => {
+    // 1. Optimistic update
+    get().internal_dispatchGenerationTopic({ type: 'updateTopic', id, value: data });
+
+    // 2. Update loading state
+    get().internal_updateGenerationTopicLoading(id, true);
+
+    // 3. Call backend service
+    await generationTopicService.updateTopic(id, data);
+
+    // 4. Refresh data and clear loading
+    await get().refreshGenerationTopics();
+    get().internal_updateGenerationTopicLoading(id, false);
+  },
+
+  internal_updateGenerationTopicTitleInSummary: (id, title) => {
+    get().internal_dispatchGenerationTopic(
+      { type: 'updateTopic', id, value: { title } },
+      'updateGenerationTopicTitleInSummary',
+    );
+  },
+
+  internal_updateGenerationTopicLoading: (id, loading) => {
+    set(
+      (state) => {
+        if (loading) return { loadingGenerationTopicIds: [...state.loadingGenerationTopicIds, id] };
+
+        return {
+          loadingGenerationTopicIds: state.loadingGenerationTopicIds.filter((i) => i !== id),
+        };
+      },
+      false,
+      n('updateGenerationTopicLoading'),
+    );
+  },
+
+  internal_dispatchGenerationTopic: (payload, action) => {
+    const nextTopics = generationTopicReducer(get().generationTopics, payload);
+
+    // No need to update if the topics are the same
+    if (isEqual(nextTopics, get().generationTopics)) return;
+
+    set(
+      { generationTopics: nextTopics },
+      false,
+      action ?? n(`dispatchGenerationTopic/${payload.type}`),
+    );
   },
 
   useFetchGenerationTopics: (enabled, isLogin) =>
@@ -56,7 +173,11 @@ export const createGenerationTopicSlice: StateCreator<
       () => generationTopicService.getAllGenerationTopics(),
       {
         suspense: true,
+        fallbackData: [],
         onSuccess: (data) => {
+          // No need to update if data is the same
+          if (isEqual(data, get().generationTopics)) return;
+
           set({ generationTopics: data }, false, n('useFetchGenerationTopics'));
         },
       },

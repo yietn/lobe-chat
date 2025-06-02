@@ -2,10 +2,13 @@ import { globalHelpers } from '@/store/global/helpers';
 import { ChatStreamPayload } from '@/types/openai/chat';
 
 export const chainSummaryGenerationTitle = (
-  prompt: string,
+  prompts: string[],
   modal: 'image' | 'video',
 ): Partial<ChatStreamPayload> => {
   const lang = globalHelpers.getCurrentLanguage();
+
+  // Format multiple prompts for better readability
+  const formattedPrompts = prompts.map((prompt, index) => `${index + 1}. ${prompt}`).join('\n');
 
   return {
     messages: [
@@ -14,7 +17,7 @@ export const chainSummaryGenerationTitle = (
         role: 'system',
       },
       {
-        content: `提示词：${prompt}`,
+        content: `提示词：\n${formattedPrompts}`,
         role: 'user',
       },
     ],
