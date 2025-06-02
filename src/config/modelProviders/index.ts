@@ -25,6 +25,7 @@ import JinaProvider from './jina';
 import LMStudioProvider from './lmstudio';
 import MinimaxProvider from './minimax';
 import MistralProvider from './mistral';
+import ModelScopeProvider from './modelscope';
 import MoonshotProvider from './moonshot';
 import NovitaProvider from './novita';
 import NvidiaProvider from './nvidia';
@@ -68,6 +69,7 @@ export const LOBE_DEFAULT_MODEL_LIST: ChatModelCard[] = [
   GithubProvider.chatModels,
   MinimaxProvider.chatModels,
   MistralProvider.chatModels,
+  ModelScopeProvider.chatModels,
   MoonshotProvider.chatModels,
   OllamaProvider.chatModels,
   VLLMProvider.chatModels,
@@ -132,6 +134,7 @@ export const DEFAULT_MODEL_PROVIDER_LIST = [
   GroqProvider,
   PerplexityProvider,
   MistralProvider,
+  ModelScopeProvider,
   Ai21Provider,
   UpstageProvider,
   XAIProvider,
@@ -197,6 +200,7 @@ export { default as JinaProviderCard } from './jina';
 export { default as LMStudioProviderCard } from './lmstudio';
 export { default as MinimaxProviderCard } from './minimax';
 export { default as MistralProviderCard } from './mistral';
+export { default as ModelScopeProviderCard } from './modelscope';
 export { default as MoonshotProviderCard } from './moonshot';
 export { default as NovitaProviderCard } from './novita';
 export { default as NvidiaProviderCard } from './nvidia';

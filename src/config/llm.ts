@@ -165,6 +165,9 @@ export const getLLMConfig = () => {
 
       ENABLED_FAL: z.boolean(),
       FAL_API_KEY: z.string().optional(),
+
+      ENABLED_MODELSCOPE: z.boolean(),
+      MODELSCOPE_API_KEY: z.string().optional(),
     },
     runtimeEnv: {
       API_KEY_SELECT_MODE: process.env.API_KEY_SELECT_MODE,
@@ -328,6 +331,9 @@ export const getLLMConfig = () => {
 
       ENABLED_FAL: process.env.ENABLED_FAL !== '0',
       FAL_API_KEY: process.env.FAL_API_KEY,
+
+      ENABLED_MODELSCOPE: !!process.env.MODELSCOPE_API_KEY,
+      MODELSCOPE_API_KEY: process.env.MODELSCOPE_API_KEY,
     },
   });
 };

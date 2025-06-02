@@ -47,6 +47,7 @@ export enum ModelProvider {
   LMStudio = 'lmstudio',
   Minimax = 'minimax',
   Mistral = 'mistral',
+  ModelScope = 'modelscope',
   Moonshot = 'moonshot',
   Novita = 'novita',
   Nvidia = 'nvidia',
