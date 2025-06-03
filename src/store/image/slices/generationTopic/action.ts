@@ -4,11 +4,12 @@ import { StateCreator } from 'zustand/vanilla';
 
 import { chainSummaryGenerationTitle } from '@/chains/summaryGenerationTitle';
 import { LOADING_FLAT } from '@/const/message';
-import { DEFAULT_SYSTEM_AGENT_ITEM } from '@/const/settings/systemAgent';
 import { useClientDataSWR } from '@/libs/swr';
 import { UpdateTopicValue } from '@/server/routers/lambda/generationTopic';
 import { chatService } from '@/services/chat';
 import { generationTopicService } from '@/services/generationTopic';
+import { useUserStore } from '@/store/user';
+import { systemAgentSelectors } from '@/store/user/selectors';
 import { ImageGenerationTopic } from '@/types/generation';
 import { merge } from '@/utils/merge';
 import { setNamespace } from '@/utils/storeDebug';
@@ -70,9 +71,12 @@ export const createGenerationTopicSlice: StateCreator<
 
     let output = '';
 
+    const generationTopicAgentConfig = systemAgentSelectors.generationTopic(
+      useUserStore.getState(),
+    );
     // Auto generate topic title from prompt by AI
     await chatService.fetchPresetTaskResult({
-      params: merge(DEFAULT_SYSTEM_AGENT_ITEM, chainSummaryGenerationTitle(prompts, 'image')),
+      params: merge(generationTopicAgentConfig, chainSummaryGenerationTitle(prompts, 'image')),
       onError: () => {
         internal_updateGenerationTopicTitleInSummary(topicId, topic.title || '');
       },
