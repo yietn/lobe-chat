@@ -30,5 +30,7 @@ export const image = {
     createNew: '新建主题',
     untitled: '默认主题',
     empty: '暂无生成主题',
+    deleteConfirm: '删除生成主题',
+    deleteConfirmDesc: '即将删除该生成主题，删除后将不可恢复，请谨慎操作。',
   },
 } as const;

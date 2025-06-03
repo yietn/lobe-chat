@@ -30,4 +30,8 @@ export class ClientService extends BaseClientService implements IGenerationTopic
     // data 已经被 IGenerationTopicService 接口约束为 UpdateTopicValue
     return this.topicModel.update(id, data);
   };
+
+  deleteTopic: IGenerationTopicService['deleteTopic'] = async (id) => {
+    return this.topicModel.delete(id);
+  };
 }

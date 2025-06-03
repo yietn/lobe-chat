@@ -1,8 +1,10 @@
 'use client';
 
-import { Avatar, Tooltip } from '@lobehub/ui';
+import { ActionIcon, Avatar, Tooltip } from '@lobehub/ui';
+import { App } from 'antd';
 import { createStyles } from 'antd-style';
-import { memo } from 'react';
+import { Trash } from 'lucide-react';
+import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useImageStore } from '@/store/image';
@@ -35,10 +37,26 @@ const useStyles = createStyles(({ css, token }) => ({
     color: ${token.colorText};
     margin: 0;
   `,
+  timeRow: css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  `,
   time: css`
     font-size: 12px;
     color: ${token.colorTextSecondary};
     margin: 0;
+    flex: 1;
+  `,
+  deleteButton: css`
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  `,
+  tooltipContentHover: css`
+    &:hover .delete-button {
+      opacity: 1;
+    }
   `,
 }));
 
@@ -55,20 +73,56 @@ interface TopicItemProps {
 
 const TopicItem = memo<TopicItemProps>(({ topic }) => {
   const { t } = useTranslation('image');
-  const { styles } = useStyles();
+  const { styles, cx } = useStyles();
+  const { modal } = App.useApp();
+  const [isHovered, setIsHovered] = useState(false);
 
   // 检查当前 topic 是否在加载中
   const isLoading = useImageStore(generationTopicSelectors.isLoadingGenerationTopic(topic.id));
+  const removeGenerationTopic = useImageStore((s) => s.removeGenerationTopic);
 
   const handleClick = () => {
     // TODO: 切换到对应的 topic
     console.log('Switch to topic:', topic.id);
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    modal.confirm({
+      title: t('topic.deleteConfirm'),
+      content: t('topic.deleteConfirmDesc'),
+      okText: t('delete', { ns: 'common' }),
+      cancelText: t('cancel', { ns: 'common' }),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await removeGenerationTopic(topic.id);
+        } catch (error) {
+          console.error('Delete topic failed:', error);
+        }
+      },
+    });
+  };
+
   const tooltipContent = (
-    <div className={styles.tooltipContent}>
+    <div
+      className={cx(styles.tooltipContent, styles.tooltipContentHover)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <h4 className={styles.title}>{topic.title || t('topic.untitled')}</h4>
-      <p className={styles.time}>{formatTime(topic.updatedAt)}</p>
+      <div className={styles.timeRow}>
+        <p className={styles.time}>{formatTime(topic.updatedAt)}</p>
+        <ActionIcon
+          className={cx(styles.deleteButton, 'delete-button')}
+          danger
+          icon={Trash}
+          onClick={handleDelete}
+          size="small"
+          style={{ opacity: isHovered ? 1 : 0 }}
+        />
+      </div>
     </div>
   );
 

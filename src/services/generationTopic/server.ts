@@ -14,4 +14,8 @@ export class ServerService implements IGenerationTopicService {
     // data 已经被 IGenerationTopicService 接口约束为 UpdateTopicValue
     return lambdaClient.generationTopic.updateTopic.mutate({ id, value: data });
   };
+
+  deleteTopic: IGenerationTopicService['deleteTopic'] = async (id) => {
+    return lambdaClient.generationTopic.deleteTopic.mutate({ id });
+  };
 }

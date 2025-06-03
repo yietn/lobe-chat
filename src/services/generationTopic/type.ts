@@ -5,4 +5,5 @@ export interface IGenerationTopicService {
   getAllGenerationTopics(): Promise<ImageGenerationTopic[]>;
   createTopic(): Promise<string>;
   updateTopic(id: string, data: UpdateTopicValue): Promise<ImageGenerationTopic>;
+  deleteTopic(id: string): Promise<ImageGenerationTopic>;
 }

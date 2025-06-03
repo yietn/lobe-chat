@@ -24,6 +24,7 @@ const n = setNamespace('generationTopic');
 
 export interface GenerationTopicAction {
   createGenerationTopic: (prompts: string[]) => Promise<string>;
+  removeGenerationTopic: (id: string) => Promise<void>;
   useFetchGenerationTopics: (
     enabled: boolean,
     isLogin: boolean | undefined,
@@ -36,6 +37,7 @@ export interface GenerationTopicAction {
   internal_createGenerationTopic: () => Promise<string>;
   internal_updateGenerationTopic: (id: string, data: UpdateTopicValue) => Promise<void>;
   internal_updateGenerationTopicTitleInSummary: (id: string, title: string) => void;
+  internal_removeGenerationTopic: (id: string) => Promise<void>;
 }
 
 export const createGenerationTopicSlice: StateCreator<
@@ -189,5 +191,20 @@ export const createGenerationTopicSlice: StateCreator<
 
   refreshGenerationTopics: async () => {
     await mutate([FETCH_GENERATION_TOPICS_KEY, true]);
+  },
+
+  removeGenerationTopic: async (id: string) => {
+    const { internal_removeGenerationTopic } = get();
+    await internal_removeGenerationTopic(id);
+  },
+
+  internal_removeGenerationTopic: async (id: string) => {
+    get().internal_updateGenerationTopicLoading(id, true);
+    try {
+      await generationTopicService.deleteTopic(id);
+      await get().refreshGenerationTopics();
+    } finally {
+      get().internal_updateGenerationTopicLoading(id, false);
+    }
   },
 });

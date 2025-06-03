@@ -35,6 +35,11 @@ export const generationTopicRouter = router({
     .mutation(async ({ ctx, input }) => {
       return ctx.generationTopicModel.update(input.id, input.value as Partial<GenerationTopicItem>);
     }),
+  deleteTopic: generationTopicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.generationTopicModel.delete(input.id);
+    }),
 });
 
 export type GenerationTopicRouter = typeof generationTopicRouter;

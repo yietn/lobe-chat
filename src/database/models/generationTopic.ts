@@ -46,4 +46,13 @@ export class GenerationTopicModel {
 
     return updatedTopic;
   };
+
+  delete = async (id: string) => {
+    const [deletedTopic] = await this.db
+      .delete(generationTopics)
+      .where(eq(generationTopics.id, id))
+      .returning();
+
+    return deletedTopic;
+  };
 }
