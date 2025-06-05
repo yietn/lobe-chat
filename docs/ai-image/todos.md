@@ -1,0 +1,22 @@
+- [x] 增加 ai 绘画 tab 和 image 页面
+- [x] 增加 image 的 store
+  - [x] generationConfig slice
+  - [x] generationConfig topic slice
+- [x] 增加左侧的配置面板
+  - [x] 选择 fal 和 flux-schnell 作为默认 provider 和 model
+  - [x] 增加 model select, 过滤出 type 为 image 的 model
+  - [x] 从 model 的 parameters 中解析出其它标准参数
+  - [x] 封装 useGenerationConfigParam hook, 可以更方便容易获取某个参数的值和约束
+  - [x] 封装 isSupportParam selector, 可以更方便容易判断某个参数是否支持
+  - [x] 实现其它这次上线要支持的参数如 seed, steps 等
+- [x] 右侧 generationTopics 列表
+  - [x] 简单实现中间下方的 prompt 输入框，点击创建的图标回调先置空
+  - [x] 增加文档中叙述的一些列数据库表，generationTopics, generationBatches 等
+  - [x] 实现查询 generationTopics 的 model, service, 和 generationTopics slice 的 action
+  - [x] 使用 suspense实现 generationTopics 的骨架屏渲染
+  - [x] 实现创建 generationTopic 的 action, service, model
+  - [x] 实现更新 generationTopic 的 action, service, model
+  - [x] 使用 fetchPresetTaskResult 实现从用户输入的 prompt 总结出 generationTopic title, 并更新 generationTopic
+  - [x] 实现删除 generationTopic 的 action, service, model 以及对应列表项上的删除按钮和功能
+- [x] model runtime 扩展接口增加 createImage, 规范好入参和返回值
+- [x] 在 fal 的 provider runtime 中实现 createImage 接口

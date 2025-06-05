@@ -56,6 +56,42 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
     const modelsPage = (await client.models.list()) as any;
     const modelList: OpenAIModelCard[] = modelsPage.data;
 
+    // 返回的 model 结构示例 (aihubmix)
+    /*
+    {
+      "id": "gpt-4.1-mini",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "custom",
+      "permission": null,
+      "root": "gpt-4.1-mini", 
+      "parent": null
+    },
+    {
+      "id": "claude-3-5-sonnet-latest",
+      "object": "model",
+      "created": 1626777600,
+      "owned_by": "Anthropic",
+      "permission": [
+        {
+          "id": "modelperm-LwHkVFn8AcMItP432fKKDIKJ",
+          "object": "model_permission",
+          "created": 1626777600,
+          "allow_create_engine": true,
+          "allow_sampling": true,
+          "allow_logprobs": true,
+          "allow_search_indices": false,
+          "allow_view": true,
+          "allow_fine_tuning": false,
+          "organization": "*",
+          "group": null,
+          "is_blocking": false
+        }
+      ],
+      "root": "claude-3-5-sonnet-latest",
+      "parent": null
+    }
+    */
     return modelList
       .map((model) => {
         const knownModel = LOBE_DEFAULT_MODEL_LIST.find(
