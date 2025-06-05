@@ -3,17 +3,11 @@ import { StateCreator } from 'zustand/vanilla';
 import { AIImageModelCard } from '@/types/aiModel';
 
 import type { ImageStore } from '../../store';
-import {
-  StandardImageGenerationParameters,
-  StandardImageGenerationParametersKeys,
-} from '../../utils/StandardParameters';
+import { StdImageGenParams, StdImageGenParamsKeys } from '../../utils/StandardParameters';
 import { parseParamsSchema } from '../../utils/parseParamsSchema';
 
 export interface GenerationConfigAction {
-  setParamOnInput<K extends StandardImageGenerationParametersKeys>(
-    paramName: K,
-    value: StandardImageGenerationParameters[K],
-  ): void;
+  setParamOnInput<K extends StdImageGenParamsKeys>(paramName: K, value: StdImageGenParams[K]): void;
 
   setModelAndProviderOnSelect(model: string, provider: string): void;
 

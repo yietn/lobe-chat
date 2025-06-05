@@ -1,6 +1,6 @@
-import { StandardImageGenerationParameters } from '@/store/image/utils/StandardParameters';
+import { StdImageGenParams } from '@/store/image/utils/StandardParameters';
 
-export type CreateImageParams = Omit<StandardImageGenerationParameters, 'prompt'> & {
+export type CreateImageParams = Omit<StdImageGenParams, 'prompt'> & {
   prompt: string;
 };
 

@@ -5,16 +5,11 @@ import { aiProviderSelectors } from '@/store/aiInfra/slices/aiProvider/selectors
 import { AIImageModelCard } from '@/types/aiModel';
 
 import { useImageStore } from '../../store';
-import {
-  StandardImageGenerationParameters,
-  StandardImageGenerationParametersKeys,
-} from '../../utils/StandardParameters';
+import { StdImageGenParams, StdImageGenParamsKeys } from '../../utils/StandardParameters';
 import { imageGenerationConfigSelectors } from './selectors';
 
-export function useGenerationConfigParam<N extends StandardImageGenerationParametersKeys>(
-  paramName: N,
-) {
-  type ValueType = StandardImageGenerationParameters[N];
+export function useGenerationConfigParam<N extends StdImageGenParamsKeys>(paramName: N) {
+  type ValueType = StdImageGenParams[N];
 
   const parameters = useImageStore(imageGenerationConfigSelectors.parameters);
   const paramsProperties = useImageStore(imageGenerationConfigSelectors.paramsProperties);

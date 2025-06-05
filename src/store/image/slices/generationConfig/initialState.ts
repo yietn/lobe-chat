@@ -2,7 +2,7 @@
 import FluxSchnellSchema from '@/config/paramsSchemas/fal/flux-schnell.json';
 import { ModelProvider } from '@/libs/model-runtime/types/type';
 
-import { StandardImageGenerationParameters } from '../../utils/StandardParameters';
+import { StdImageGenParams } from '../../utils/StandardParameters';
 import { parseParamsSchema } from '../../utils/parseParamsSchema';
 
 export const DEFAULT_AI_IMAGE_PROVIDER = ModelProvider.Fal;
@@ -14,11 +14,11 @@ export interface GenerationConfigState {
   /**
    * store the params pass the generation api
    */
-  parameters?: Partial<StandardImageGenerationParameters>;
+  parameters?: Partial<StdImageGenParams>;
   parameterSchema?: Record<string, any>;
 }
 
-export const DEFAULT_IMAGE_GENERATION_PARAMETERS: Partial<StandardImageGenerationParameters> =
+export const DEFAULT_IMAGE_GENERATION_PARAMETERS: Partial<StdImageGenParams> =
   parseParamsSchema(FluxSchnellSchema).defaultValues;
 
 export const initialGenerationConfigState: GenerationConfigState = {

@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const MAX_SEED = 2 ** 31 - 1;
 
-export const StandardParametersSchemaZodSchema = z.object({
+export const StdParamsZodSchema = z.object({
   type: z.literal('object'),
   required: z.array(z.string()),
   properties: z.object({
@@ -81,7 +81,7 @@ export const StandardParametersSchemaZodSchema = z.object({
 });
 
 // -------------------------- compute type StandardImageGenerationParameters from zod schema ----------------------------------
-type SchemaProperties = Required<z.infer<typeof StandardParametersSchemaZodSchema>['properties']>;
+type SchemaProperties = Required<z.infer<typeof StdParamsZodSchema>['properties']>;
 type TypeMapping<T> = T extends 'string'
   ? string
   : T extends 'number'
@@ -98,8 +98,8 @@ type _StandardImageGenerationParameters<P extends keyof SchemaProperties = keyof
     [key in P]-?: TypeMapping<SchemaProperties[key]['type']>;
   };
 
-export type StandardImageGenerationParameters = _StandardImageGenerationParameters;
-export type StandardImageGenerationParametersKeys = keyof StandardImageGenerationParameters;
+export type StdImageGenParams = _StandardImageGenerationParameters;
+export type StdImageGenParamsKeys = keyof StdImageGenParams;
 // like:
 /*
 type StandardImageGenerationParameters = {
