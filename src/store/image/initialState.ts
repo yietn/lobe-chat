@@ -1,3 +1,4 @@
+import { CreateImageState, initialCreateImageState } from './slices/createImage/initialState';
 import {
   GenerationBatchState,
   initialGenerationBatchState,
@@ -11,10 +12,14 @@ import {
   initialGenerationTopicState,
 } from './slices/generationTopic/initialState';
 
-export type ImageStoreState = GenerationConfigState & GenerationTopicState & GenerationBatchState;
+export type ImageStoreState = GenerationConfigState &
+  GenerationTopicState &
+  GenerationBatchState &
+  CreateImageState;
 
 export const initialState: ImageStoreState = {
   ...initialGenerationConfigState,
   ...initialGenerationTopicState,
   ...initialGenerationBatchState,
+  ...initialCreateImageState,
 };

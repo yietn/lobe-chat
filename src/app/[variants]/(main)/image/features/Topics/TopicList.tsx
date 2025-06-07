@@ -9,8 +9,10 @@ import { generationTopicSelectors } from '@/store/image/selectors';
 
 import AddButton from './NewTopicButton';
 import TopicItem from './TopicItem';
+import { useTopicFromSearchParams } from './useTopicFromSearchParams';
 
 const TopicsList = memo(() => {
+  useTopicFromSearchParams();
   useFetchGenerationTopics();
 
   const generationTopics = useImageStore(generationTopicSelectors.generationTopics);

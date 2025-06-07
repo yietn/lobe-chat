@@ -52,9 +52,10 @@ export const createGenerationTopicSlice: StateCreator<
     // Create topic with default title
     const topicId = await internal_createGenerationTopic();
 
+    set({ activeGenerationTopicId: topicId }, false, n('createGenerationTopic'));
+
     // Auto-generate title from prompts
     if (prompts.length > 0) {
-      get().internal_updateGenerationTopicLoading(topicId, true);
       // Run summary async, don't wait for it
       summaryGenerationTopicTitle(topicId, prompts);
     }
@@ -69,6 +70,7 @@ export const createGenerationTopicSlice: StateCreator<
     const { internal_updateGenerationTopicTitleInSummary, internal_updateGenerationTopicLoading } =
       get();
 
+    internal_updateGenerationTopicLoading(topicId, true);
     internal_updateGenerationTopicTitleInSummary(topicId, LOADING_FLAT);
 
     let output = '';

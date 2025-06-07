@@ -10,7 +10,7 @@ import { setNamespace } from '@/utils/storeDebug';
 
 import { ImageStore } from '../../store';
 
-const n = setNamespace('gb');
+const n = setNamespace('generationBatch');
 
 // ====== SWR key ====== //
 const SWR_USE_FETCH_GENERATION_BATCHES = 'SWR_USE_FETCH_GENERATION_BATCHES';
