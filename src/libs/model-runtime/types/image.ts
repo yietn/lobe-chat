@@ -6,6 +6,7 @@ export type CreateImageParams = Omit<StdImageGenParams, 'prompt'> & {
 
 export type CreateImagePayload = {
   model: string;
+  imageNum: number;
   params: CreateImageParams;
 };
 

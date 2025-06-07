@@ -11,6 +11,7 @@ import { documentRouter } from './document';
 import { exporterRouter } from './exporter';
 import { fileRouter } from './file';
 import { generationTopicRouter } from './generationTopic';
+import { imageRouter } from './image';
 import { importerRouter } from './importer';
 import { knowledgeBaseRouter } from './knowledgeBase';
 import { messageRouter } from './message';
@@ -42,6 +43,7 @@ export const lambdaRouter = router({
   topic: topicRouter,
   user: userRouter,
   generationTopic: generationTopicRouter,
+  image: imageRouter,
 });
 
 export type LambdaRouter = typeof lambdaRouter;

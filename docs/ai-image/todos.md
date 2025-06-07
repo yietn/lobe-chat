@@ -20,3 +20,15 @@
   - [x] 实现删除 generationTopic 的 action, service, model 以及对应列表项上的删除按钮和功能
 - [x] model runtime 扩展接口增加 createImage, 规范好入参和返回值
 - [x] 在 fal 的 provider runtime 中实现 createImage 接口
+- [x] 创建 image service 和 image lambda router, 在 image service 中调用 lambda router 的 createImage 接口
+- [x] 在 image lambda 中实现任务派发逻辑
+  - [x] 获取传入的 generationTopicId, 并以此创建 generationBatch
+  - [x] 一期先固定每次生成 4 张，创建 4 个 generations
+  - [x] 为每个 generation 创建 pending 状态的 asyncTask
+  - [x] 创建 async image router
+  - [x] 并发触发 async image router 中的任务
+- [ ] 在 async image router 中实现核心生图逻辑
+  - [ ] 在其中调用 model runtime 的 createImage 接口
+  - [ ] 生图结束上传图片到 s3
+  - [ ] 生成缩略图
+  - [ ] 更新 generation 的 asset 和 asyncTask status
