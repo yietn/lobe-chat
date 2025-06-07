@@ -27,8 +27,24 @@
   - [x] 为每个 generation 创建 pending 状态的 asyncTask
   - [x] 创建 async image router
   - [x] 并发触发 async image router 中的任务
-- [ ] 在 async image router 中实现核心生图逻辑
-  - [ ] 在其中调用 model runtime 的 createImage 接口
-  - [ ] 生图结束上传图片到 s3
-  - [ ] 生成缩略图
-  - [ ] 更新 generation 的 asset 和 asyncTask status
+- [x] 在 async image router 中实现核心生图逻辑
+  - [x] 在其中调用 model runtime 的 createImage 接口
+  - [x] 生图结束上传图片到 s3
+  - [x] 生成缩略图
+  - [x] 更新 generation 的 asset 和 asyncTask status
+- [ ] **实现 中间的 generation feed**
+  - [x] **数据层**:
+    - [x] DB Model: 实现 `generationBatch` 的 model
+    - [x] DB Repository: 实现 `generationFeed` repository，用于获取 `GenerationBatch` 及其关联的 `Generation` 列表
+  - [x] **服务层**:
+    - [x] Service: 实现 `generationBatch` service，调用 repository
+    - [x] API: 在 tRPC router 中新增 `getGenerationBatches` 接口
+  - [x] **前端**:
+    - [x] Types: 在 `src/types/generation` 中定义前端所需的 `Generation` 和 `GenerationBatch` 类型
+    - [x] Zustand Slice: 创建 `generation` 和 `generationBatch` 两个 slice
+      - [ ] `generationBatch` slice 包含 `generationBatchesMap` 和 SWR hook for data fetching
+    - [ ] Component: 实现 `GenerationFeed` 组件
+      - [ ] 实现 `GenerationFeed` 的骨架屏组件 `Skeleton`
+      - [ ] 实现 `GenerationFeed` 的内容渲染组件 `List` 和 `BatchItem`
+      - [ ] 在 `GenerationFeed/index.tsx` 中使用 `Suspense` 和 `lazy` 组合 `Skeleton` 和 `List`
+      - [ ] 在 `List` 组件中调用 zustand action 获取并渲染数据
