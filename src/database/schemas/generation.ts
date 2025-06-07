@@ -3,6 +3,7 @@ import { integer, jsonb, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-cor
 import { createInsertSchema } from 'drizzle-zod';
 
 import { idGenerator } from '@/database/utils/idGenerator';
+import { GenerationAsset } from '@/types/generation';
 
 import { timestamps } from './_helpers';
 import { asyncTasks } from './asyncTask';
@@ -117,7 +118,7 @@ export const generations = pgTable('generations', {
   seed: text('seed'),
 
   /** 生成的资源信息，包含 URL、尺寸等 */
-  asset: jsonb('asset'),
+  asset: jsonb('asset').$type<GenerationAsset>(),
 
   ...timestamps,
 });

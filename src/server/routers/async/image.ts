@@ -24,7 +24,6 @@ const imageProcedure = asyncAuthedProcedure.use(async (opts) => {
 
 const createImageInputSchema = z.object({
   taskId: z.string(),
-  apiKey: z.string(),
   generationId: z.string(),
   provider: z.string(),
   model: z.string(),
@@ -42,7 +41,7 @@ const createImageInputSchema = z.object({
 
 export const imageRouter = router({
   createImage: imageProcedure.input(createImageInputSchema).mutation(async ({ input, ctx }) => {
-    const { taskId, generationId, provider, model, params, apiKey } = input;
+    const { taskId, generationId, provider, model, params } = input;
 
     log('Starting async image generation: %O', {
       taskId,
@@ -58,12 +57,10 @@ export const imageRouter = router({
 
     try {
       log('Initializing agent runtime for provider: %s', provider);
-      const agentRuntime = await initAgentRuntimeWithUserPayload(provider, ctx.jwtPayload, {
-        apiKey,
-      });
+      const agentRuntime = await initAgentRuntimeWithUserPayload(provider, ctx.jwtPayload);
 
       log('Agent runtime initialized, calling createImage');
-      const response = await agentRuntime.createImage?.({
+      const response = await agentRuntime.createImage({
         model,
         imageNum: 1,
         params: params as unknown as CreateImageParams,
@@ -84,8 +81,9 @@ export const imageRouter = router({
       const { imageUrl, width, height } = response;
 
       log('Updating generation asset: %s', generationId);
+      // TODO: 上传到自己家 s3，生成缩略图等，为了测试先暂时先这样
       await ctx.generationModel.update(generationId, {
-        asset: { imageUrl, width, height },
+        asset: { originalUrl: imageUrl, url: imageUrl, width, height, thumbnailUrl: imageUrl },
       });
 
       log('Updating task status to Success: %s', taskId);

@@ -1,10 +1,8 @@
 import { StateCreator } from 'zustand';
 
-import { setNamespace } from '@/utils/storeDebug';
+import { imageService } from '@/services/image';
 
 import { ImageStore } from '../../store';
-
-const n = setNamespace('createImage');
 
 // ====== action interface ====== //
 
@@ -21,7 +19,9 @@ export const createCreateImageSlice: StateCreator<
   CreateImageAction
 > = (set, get) => ({
   async createImage() {
-    const { activeGenerationTopicId, createGenerationTopic, parameters } = get();
+    set({ isCreating: true }, false, 'createImage/startCreateImage');
+
+    const { activeGenerationTopicId, createGenerationTopic, provider, model, parameters } = get();
     if (!parameters) {
       throw new TypeError('parameters is not initialized');
     }
@@ -36,5 +36,14 @@ export const createCreateImageSlice: StateCreator<
       const prompts = [parameters.prompt];
       generationTopicId = await createGenerationTopic(prompts);
     }
+
+    await imageService.createImage({
+      generationTopicId,
+      provider,
+      model,
+      params: parameters as any,
+    });
+
+    set({ isCreating: false }, false, 'createImage/endCreateImage');
   },
 });

@@ -13,11 +13,10 @@ const PromptInput = () => {
   const theme = useTheme();
   const { t } = useTranslation('image');
   const { value, setValue } = useGenerationConfigParam('prompt');
-  const createGenerationTopic = useImageStore((s) => s.createGenerationTopic);
+  const createImage = useImageStore((s) => s.createImage);
 
   const handleGenerate = async () => {
-    const title = await createGenerationTopic([value]);
-    console.log('title', title);
+    await createImage();
   };
 
   return (

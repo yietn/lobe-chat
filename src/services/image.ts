@@ -7,13 +7,8 @@ import { CreateImageServicePayload } from '@/server/routers/lambda/image';
 const log = debug('lobe-image:service');
 
 export class AiImageService {
-  constructor(private readonly userId: string) {
-    log('AiImageService initialized for user: %s', userId);
-  }
-
   async createImage(payload: CreateImageServicePayload) {
     log('Creating image with payload: %O', {
-      userId: this.userId,
       generationTopicId: payload.generationTopicId,
       provider: payload.provider,
       model: payload.model,
@@ -27,9 +22,7 @@ export class AiImageService {
 
     try {
       const result = await lambdaClient.image.createImage.mutate(payload);
-
       log('Image creation service call completed successfully: %O', {
-        userId: this.userId,
         success: result.success,
         batchId: result.data?.batch?.id,
         generationCount: result.data?.generations?.length,
@@ -38,7 +31,6 @@ export class AiImageService {
       return result;
     } catch (error) {
       log('Image creation service call failed: %O', {
-        userId: this.userId,
         error: (error as Error).message,
         payload: {
           generationTopicId: payload.generationTopicId,
@@ -51,3 +43,5 @@ export class AiImageService {
     }
   }
 }
+
+export const imageService = new AiImageService();

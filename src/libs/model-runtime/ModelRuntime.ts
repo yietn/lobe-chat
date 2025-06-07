@@ -1,3 +1,4 @@
+import debug from 'debug';
 import { ClientOptions } from 'openai';
 
 import type { TracePayload } from '@/const/trace';
@@ -24,6 +25,8 @@ export interface AgentChatOptions {
   provider: string;
   trace?: TracePayload;
 }
+
+const log = debug('lobe-image:async');
 
 class ModelRuntime {
   private _runtime: LobeRuntimeAI;
@@ -70,6 +73,7 @@ class ModelRuntime {
   }
 
   async createImage(payload: CreateImagePayload) {
+    log('had createImage method: ', !!this._runtime.createImage);
     return this._runtime.createImage?.(payload);
   }
 
@@ -111,6 +115,14 @@ class ModelRuntime {
         LobeCloudflareParams & { apiKey?: string; apiVersion?: string; baseURL?: string }
     >,
   ) {
+    log('Initializing runtime with provider: %s and params: %O', provider, params);
+    // @ts-expect-error ignore
+    if (providerRuntimeMap[provider]) {
+      log('Provider runtime map found for provider: %s', provider);
+    } else {
+      log('Provider runtime map not found for provider: %s', provider);
+    }
+
     // @ts-expect-error runtime map not include vertex so it will be undefined
     const providerAI = providerRuntimeMap[provider] ?? LobeOpenAI;
     const runtimeModel: LobeRuntimeAI = new providerAI(params);

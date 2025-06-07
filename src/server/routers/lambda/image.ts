@@ -11,7 +11,7 @@ import {
   generations,
 } from '@/database/schemas';
 import { authedProcedure, router } from '@/libs/trpc/lambda';
-import { serverDatabase } from '@/libs/trpc/lambda/middleware';
+import { keyVaults, serverDatabase } from '@/libs/trpc/lambda/middleware';
 import { createAsyncServerClient } from '@/server/routers/async';
 import {
   AsyncTaskError,
@@ -23,18 +23,20 @@ import {
 // Create debug logger
 const log = debug('lobe-image:lambda');
 
-const imageProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
-  const { ctx } = opts;
+const imageProcedure = authedProcedure
+  .use(serverDatabase)
+  .use(keyVaults)
+  .use(async (opts) => {
+    const { ctx } = opts;
 
-  return opts.next({
-    ctx: {
-      asyncTaskModel: new AsyncTaskModel(ctx.serverDB, ctx.userId),
-    },
+    return opts.next({
+      ctx: {
+        asyncTaskModel: new AsyncTaskModel(ctx.serverDB, ctx.userId),
+      },
+    });
   });
-});
 
 const createImageInputSchema = z.object({
-  apiKey: z.string(),
   generationTopicId: z.string(),
   provider: z.string(),
   model: z.string(),
@@ -56,7 +58,7 @@ export type CreateImageServicePayload = z.infer<typeof createImageInputSchema>;
 export const imageRouter = router({
   createImage: imageProcedure.input(createImageInputSchema).mutation(async ({ input, ctx }) => {
     const { userId, serverDB, asyncTaskModel } = ctx;
-    const { apiKey, generationTopicId, provider, model, params } = input;
+    const { generationTopicId, provider, model, params } = input;
 
     log('Starting image creation process: %O', {
       userId,
@@ -139,6 +141,7 @@ export const imageRouter = router({
 
       // 4. 并发触发所有异步生图任务
       const asyncCaller = await createAsyncServerClient(userId, ctx.jwtPayload as JWTPayload);
+      log('Async caller created, jwtPayload: %O', ctx.jwtPayload);
 
       log('Triggering %d async image generation tasks', asyncTasks.length);
 
@@ -149,7 +152,6 @@ export const imageRouter = router({
 
             await asyncCaller.image.createImage.mutate({
               taskId: asyncTaskId,
-              apiKey,
               generationId: generation.id,
               provider,
               model,

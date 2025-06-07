@@ -1,11 +1,15 @@
 import { fal } from '@fal-ai/client';
+import debug from 'debug';
 import { pick } from 'lodash-es';
 import { ClientOptions } from 'openai';
 
 import { StdImageGenParamsKeys } from '@/store/image/utils/StandardParameters';
 
 import { LobeRuntimeAI } from '../BaseAI';
-import { CreateImageParams, CreateImagePayload, CreateImageResponse } from '../types/image';
+import { CreateImagePayload, CreateImageResponse } from '../types/image';
+
+// Create debug logger
+const log = debug('lobe-image:fal');
 
 type FluxDevOutput = Awaited<ReturnType<typeof fal.subscribe<'fal-ai/flux/dev'>>>['data'];
 
@@ -16,10 +20,12 @@ export class LobeFalAI implements LobeRuntimeAI {
     fal.config({
       credentials: apiKey ?? DEFAULT_API_KEY,
     });
+    log('FalAI initialized with apiKey: %s', apiKey ? '*****' : 'Not set');
   }
 
   async createImage(payload: CreateImagePayload): Promise<CreateImageResponse> {
     const { model, params } = payload;
+    log('Creating image with model: %s and params: %O', model, params);
 
     const paramsMap = new Map<StdImageGenParamsKeys, string>([
       ['steps', 'num_inference_steps'],
@@ -37,6 +43,11 @@ export class LobeFalAI implements LobeRuntimeAI {
       ]),
     );
     const endpoint = `fal-ai/${model}`;
+    log('Calling fal.subscribe with endpoint: %s and input: %O', endpoint, {
+      ...defaultInput,
+      ...userInput,
+    });
+
     const { data } = await fal.subscribe(endpoint, {
       input: {
         ...defaultInput,
@@ -44,6 +55,7 @@ export class LobeFalAI implements LobeRuntimeAI {
       },
     });
     const image = (data as FluxDevOutput).images[0];
+    log('Received image data: %O', image);
 
     return {
       imageUrl: image.url,
