@@ -13,20 +13,19 @@ const useStyles = createStyles(({ css, token }) => ({
     border: 1px solid ${token.colorBorderSecondary};
   `,
   imageGrid: css`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
     gap: 8px;
     width: 100%;
-    max-width: 260px;
+    overflow-x: hidden;
   `,
   imageGridItem: css`
-    position: relative;
-    height: 0;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
-
+    flex-shrink: 0;
+    width: 200px;
+    height: 200px;
     background: ${token.colorFillContent};
     border-radius: ${token.borderRadius}px;
     overflow: hidden;
+    position: relative;
   `,
   skeletonFill: css`
     position: absolute;

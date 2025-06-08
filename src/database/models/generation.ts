@@ -43,6 +43,20 @@ export class GenerationModel {
     return result;
   }
 
+  async findByIdWithAsyncTask(id: string): Promise<GenerationItem | undefined> {
+    log('Finding generation by ID: %s for user: %s', id, this.userId);
+
+    const result = await this.db.query.generations.findFirst({
+      where: and(eq(generations.id, id), eq(generations.userId, this.userId)),
+      with: {
+        asyncTask: true,
+      },
+    });
+
+    log('Generation %s: %s', id, result ? 'found' : 'not found');
+    return result;
+  }
+
   async update(id: string, value: Partial<NewGeneration>) {
     log('Updating generation: %s with values: %O', id, {
       hasAsset: !!value.asset,

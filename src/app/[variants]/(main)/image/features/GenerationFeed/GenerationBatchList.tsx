@@ -1,22 +1,48 @@
 'use client';
 
-import { PreviewGroup } from '@lobehub/ui';
+import { Icon } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
-import GalleyGrid from '@/components/GalleyGrid';
 import ImageItem from '@/components/ImageItem';
 import { useImageStore } from '@/store/image';
 import { generationTopicSelectors } from '@/store/image/selectors';
 import { generationBatchSelectors } from '@/store/image/slices/generationBatch/selectors';
 import { AsyncTaskStatus } from '@/types/asyncTask';
-import { GenerationBatch } from '@/types/generation';
+import { Generation, GenerationBatch } from '@/types/generation';
+
+import { ElapsedTime } from './ElapsedTime';
 
 // 扩展 dayjs 插件
 dayjs.extend(relativeTime);
+
+// 计算图片的显示尺寸，保持原图比例
+const calculateImageSize = (generation: Generation) => {
+  const asset = generation.asset;
+  if (!asset?.width || !asset?.height) {
+    // 如果没有尺寸信息，使用默认尺寸
+    return { width: 200, height: 200 };
+  }
+
+  const maxHeight = 200; // 最大高度
+  const aspectRatio = asset.width / asset.height;
+
+  let width = maxHeight * aspectRatio;
+  let height = maxHeight;
+
+  // 如果宽度太大，限制宽度并调整高度
+  const maxWidth = 300;
+  if (width > maxWidth) {
+    width = maxWidth;
+    height = width / aspectRatio;
+  }
+
+  return { width: Math.round(width), height: Math.round(height) };
+};
 
 const useStyles = createStyles(({ css, token }) => ({
   batchContainer: css`
@@ -48,34 +74,141 @@ const useStyles = createStyles(({ css, token }) => ({
     align-items: center;
     gap: 4px;
   `,
-  skeletonContainer: css`
-    padding: 16px;
-    border-radius: ${token.borderRadiusLG}px;
-    background: ${token.colorBgContainer};
-    border: 1px solid ${token.colorBorderSecondary};
+  imageGrid: css`
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    overflow-x: auto;
+
+    /* Hide scrollbar for webkit browsers */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  `,
+  imageContainer: css`
+    flex-shrink: 0;
+    border-radius: ${token.borderRadius}px;
+    overflow: hidden;
+  `,
+  placeholderContainer: css`
+    flex-shrink: 0;
+    border-radius: ${token.borderRadius}px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: ${token.colorFillSecondary};
+    border: 1px solid ${token.colorBorder};
+  `,
+  loadingContent: css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: ${token.colorTextTertiary};
+    font-size: 12px;
+  `,
+  errorContent: css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: ${token.colorError};
+    font-size: 12px;
+    text-align: center;
+    padding: 8px;
+  `,
+  spinIcon: css`
+    color: ${token.colorPrimary};
+  `,
+  errorIcon: css`
+    color: ${token.colorError};
   `,
 }));
+
+// Generation item component
+const GenerationItem = memo<{
+  generation: Generation;
+  prompt: string;
+}>(({ generation, prompt }) => {
+  const { styles } = useStyles();
+  const useCheckGenerationStatus = useImageStore((s) => s.useCheckGenerationStatus);
+  const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
+
+  const isFinalized =
+    generation.task.status === AsyncTaskStatus.Success ||
+    generation.task.status === AsyncTaskStatus.Error;
+
+  const shouldPoll = !isFinalized;
+  useCheckGenerationStatus(generation.id, generation.task.id, activeTopicId!, shouldPoll);
+
+  const imageSize = calculateImageSize(generation);
+
+  // 如果生成成功且有图片 URL，显示图片
+  if (generation.task.status === AsyncTaskStatus.Success && generation.asset?.url) {
+    return (
+      <div className={styles.imageContainer} style={{ ...imageSize }}>
+        <ImageItem
+          alt={prompt}
+          style={{ width: '100%', height: '100%' }}
+          url={generation.asset.url}
+        />
+      </div>
+    );
+  }
+
+  // 如果生成失败，显示错误状态
+  if (generation.task.status === AsyncTaskStatus.Error) {
+    return (
+      <div className={styles.placeholderContainer} style={{ ...imageSize }}>
+        <div className={styles.errorContent}>
+          <Icon className={styles.errorIcon} icon={AlertTriangle} size={20} />
+          <div>生成失败</div>
+          {generation.task.error && (
+            <div style={{ fontSize: '10px', opacity: 0.8 }}>
+              {typeof generation.task.error.body === 'string'
+                ? generation.task.error.body
+                : generation.task.error.body?.detail ||
+                  generation.task.error.name ||
+                  'Unknown error'}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 否则显示 loading 状态（Processing 或 Pending）
+  const isGenerating =
+    generation.task.status === AsyncTaskStatus.Processing ||
+    generation.task.status === AsyncTaskStatus.Pending;
+
+  return (
+    <div className={styles.placeholderContainer} style={{ ...imageSize }}>
+      <div className={styles.loadingContent}>
+        <Icon className={styles.spinIcon} icon={Loader2} size={20} spin />
+        <div>生成中...</div>
+        <ElapsedTime generationId={generation.id} isActive={isGenerating} />
+      </div>
+    </div>
+  );
+});
 
 // Batch item component
 const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
   const { styles } = useStyles();
 
-  const imageItems = useMemo(() => {
-    return batch.generations.map((generation) => ({
-      id: generation.id,
-      url: generation.asset?.url || '',
-      alt: batch.prompt,
-      loading:
-        generation.task.status === AsyncTaskStatus.Pending ||
-        generation.task.status === AsyncTaskStatus.Processing,
-    }));
-  }, [batch.generations, batch.prompt]);
-
   const timeAgo = useMemo(() => {
     return dayjs(batch.createdAt).fromNow();
   }, [batch.createdAt]);
 
-  if (imageItems.length === 0) {
+  if (batch.generations.length === 0) {
     return null;
   }
 
@@ -100,14 +233,16 @@ const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
             <span>{timeAgo}</span>
           </span>
           <span className={styles.metadataItem}>
-            <span>{imageItems.length} 张图片</span>
+            <span>{batch.generations.length} 张图片</span>
           </span>
         </div>
       </div>
 
-      <PreviewGroup>
-        <GalleyGrid items={imageItems} renderItem={ImageItem} />
-      </PreviewGroup>
+      <div className={styles.imageGrid}>
+        {batch.generations.map((generation) => (
+          <GenerationItem generation={generation} key={generation.id} prompt={batch.prompt} />
+        ))}
+      </div>
     </div>
   );
 });

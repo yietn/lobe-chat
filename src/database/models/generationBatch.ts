@@ -2,6 +2,8 @@ import debug from 'debug';
 import { and, eq } from 'drizzle-orm';
 
 import { LobeChatDatabase } from '@/database/type';
+import { AsyncTaskStatus } from '@/types/asyncTask';
+import { Generation, GenerationAsset, GenerationBatch, GenerationConfig } from '@/types/generation';
 
 import { GenerationBatchItem, NewGenerationBatch, generationBatches } from '../schemas/generation';
 
@@ -85,6 +87,45 @@ export class GenerationBatchModel {
 
     log('Found %d generation batches with generations for topic %s', results.length, topicId);
     return results;
+  }
+
+  async queryGenerationBatchesByTopicIdWithGenerations(
+    topicId: string,
+  ): Promise<(GenerationBatch & { generations: (Generation & { asyncTaskId?: string })[] })[]> {
+    log('Fetching generation batches for topic ID: %s for user: %s', topicId, this.userId);
+
+    const batchesWithGenerations = await this.findByTopicIdWithGenerations(topicId);
+    if (batchesWithGenerations.length === 0) {
+      log('No batches found for topic: %s', topicId);
+      return [];
+    }
+
+    // Transform the database result to match our frontend types
+    const result: GenerationBatch[] = batchesWithGenerations.map((batch) => ({
+      id: batch.id,
+      provider: batch.provider,
+      model: batch.model,
+      prompt: batch.prompt,
+      width: batch.width,
+      height: batch.height,
+      config: batch.config as GenerationConfig,
+      createdAt: batch.createdAt,
+      generations: batch.generations.map((gen): Generation & { asyncTaskId?: string } => ({
+        id: gen.id,
+        asset: gen.asset as GenerationAsset | null,
+        seed: gen.seed,
+        createdAt: gen.createdAt,
+        asyncTaskId: gen.asyncTaskId || undefined,
+        task: {
+          id: gen.asyncTaskId,
+          status: gen.asyncTask?.status as AsyncTaskStatus,
+          error: gen.asyncTask?.error ? gen.asyncTask.error : undefined,
+        },
+      })),
+    }));
+
+    log('Feed construction complete for topic: %s, returning %d batches', topicId, result.length);
+    return result;
   }
 
   async delete(id: string) {

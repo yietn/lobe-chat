@@ -1,6 +1,9 @@
+import { lambdaClient } from '@/libs/trpc/client';
+
 class GenerationService {
-  // This service can be expanded later to handle single generation actions like favorite, etc.
-  // For now, it's a placeholder
+  async getGenerationStatus(generationId: string, asyncTaskId: string) {
+    return lambdaClient.generation.getGenerationStatus.query({ generationId, asyncTaskId });
+  }
 }
 
 export const generationService = new GenerationService();

@@ -47,6 +47,7 @@ export interface Generation {
   createdAt: Date;
 
   task: {
+    id: string;
     status: AsyncTaskStatus;
     error?: AsyncTaskError;
   };

@@ -44,11 +44,11 @@
     - [x] Types: 在 `src/types/generation` 中定义前端所需的 `Generation` 和 `GenerationBatch` 类型
     - [x] Zustand Slice: 创建 `generation` 和 `generationBatch` 两个 slice
       - [ ] `generationBatch` slice 包含 `generationBatchesMap` 和 SWR hook for data fetching
-    - [ ] Component: 实现 `GenerationFeed` 组件
-      - [ ] 实现 `GenerationFeed` 的骨架屏组件 `Skeleton`
-      - [ ] 实现 `GenerationFeed` 的内容渲染组件 `List` 和 `BatchItem`
-      - [ ] 在 `GenerationFeed/index.tsx` 中使用 `Suspense` 和 `lazy` 组合 `Skeleton` 和 `List`
-      - [ ] 在 `List` 组件中调用 zustand action 获取并渲染数据
+    - [x] Component: 实现 `GenerationFeed` 组件
+      - [x] 实现 `GenerationFeed` 的骨架屏组件 `Skeleton`
+      - [x] 实现 `GenerationFeed` 的内容渲染组件 `List` 和 `BatchItem`
+      - [x] 在 `GenerationFeed/index.tsx` 中使用 `Suspense` 和 `lazy` 组合 `Skeleton` 和 `List`
+      - [x] 在 `List` 组件中调用 zustand action 获取并渲染数据
 
 - [ ] 生成状态轮训
 - [ ] 上传到 oss
