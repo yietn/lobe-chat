@@ -175,6 +175,13 @@
       "when": 1749301573666,
       "tag": "0024_add_rbac_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1749368077118,
+      "tag": "0025_ai_image",
+      "breakpoints": true
     }
   ],
   "version": "6"
