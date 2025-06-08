@@ -1,3 +1,4 @@
+import { waitUntil } from '@vercel/functions';
 import debug from 'debug';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
@@ -138,42 +139,58 @@ export const imageRouter = router({
 
     log('Database transaction completed successfully. Starting async task triggers.');
 
-    // 步骤 2: 事务外并发触发所有异步生图任务
+    // 步骤 2: 使用 after 函数在响应后异步触发所有生图任务
     const asyncCaller = await createAsyncServerClient(userId, ctx.jwtPayload as JWTPayload);
     log('Async caller created, jwtPayload: %O', ctx.jwtPayload);
-    log('Triggering %d async image generation tasks', generationsWithTasks.length);
-
-    await Promise.all(
-      generationsWithTasks.map(async ({ generation, asyncTaskId }) => {
-        try {
-          log('Triggering async task %s for generation %s', asyncTaskId, generation.id);
-          const start = performance.now();
-          await asyncCaller.image.createImage.mutate({
-            taskId: asyncTaskId,
-            generationId: generation.id,
-            provider,
-            model,
-            params,
-          });
-
-          const end = performance.now();
-          log('Successfully triggered async task %s, cost: %ds', asyncTaskId, (end - start) / 1000);
-        } catch (e) {
-          log('Failed to trigger async task %s: %O', asyncTaskId, e);
-          console.error('[createImage] async task trigger error:', e);
-
-          await asyncTaskModel.update(asyncTaskId, {
-            error: new AsyncTaskError(
-              AsyncTaskErrorType.TaskTriggerError,
-              'trigger image generation async task error. Please make sure the APP_URL is available from your server.',
-            ),
-            status: AsyncTaskStatus.Error,
-          });
-        }
-      }),
+    log(
+      'Scheduling %d async image generation tasks to run after response',
+      generationsWithTasks.length,
     );
 
-    log('All async tasks triggered');
+    // 使用 waitUntil 函数将任务调度到响应发送后执行
+    waitUntil(
+      (async () => {
+        log('Background task triggered, starting async image generation tasks');
+
+        await Promise.all(
+          generationsWithTasks.map(async ({ generation, asyncTaskId }) => {
+            try {
+              log('Triggering async task %s for generation %s', asyncTaskId, generation.id);
+              const start = performance.now();
+              await asyncCaller.image.createImage.mutate({
+                taskId: asyncTaskId,
+                generationId: generation.id,
+                provider,
+                model,
+                params,
+              });
+
+              const end = performance.now();
+              log(
+                'Successfully triggered async task %s, cost: %ds',
+                asyncTaskId,
+                (end - start) / 1000,
+              );
+            } catch (e) {
+              log('Failed to trigger async task %s: %O', asyncTaskId, e);
+              console.error('[createImage] async task trigger error:', e);
+
+              await asyncTaskModel.update(asyncTaskId, {
+                error: new AsyncTaskError(
+                  AsyncTaskErrorType.TaskTriggerError,
+                  'trigger image generation async task error. Please make sure the APP_URL is available from your server.',
+                ),
+                status: AsyncTaskStatus.Error,
+              });
+            }
+          }),
+        );
+
+        log('All async tasks completed in background');
+      })(),
+    );
+
+    log('Async tasks scheduled, returning immediate response');
 
     const createdGenerations = generationsWithTasks.map((item) => item.generation);
 

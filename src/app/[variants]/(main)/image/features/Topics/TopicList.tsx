@@ -1,5 +1,6 @@
 'use client';
 
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { memo } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
@@ -14,7 +15,7 @@ import { useTopicFromSearchParams } from './useTopicFromSearchParams';
 const TopicsList = memo(() => {
   useTopicFromSearchParams();
   useFetchGenerationTopics();
-
+  const [parent] = useAutoAnimate();
   const generationTopics = useImageStore(generationTopicSelectors.generationTopics);
   const isEmpty = !generationTopics || generationTopics.length === 0;
 
@@ -36,7 +37,7 @@ const TopicsList = memo(() => {
     >
       <AddButton />
 
-      <Flexbox align="center" gap={6}>
+      <Flexbox align="center" gap={6} ref={parent}>
         {generationTopics.map((topic) => (
           <div key={topic.id}>
             <TopicItem topic={topic} />

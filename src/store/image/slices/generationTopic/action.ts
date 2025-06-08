@@ -31,6 +31,7 @@ export interface GenerationTopicAction {
   ) => SWRResponse<ImageGenerationTopic[]>;
   summaryGenerationTopicTitle: (topicId: string, prompts: string[]) => Promise<string>;
   refreshGenerationTopics: () => Promise<void>;
+  switchGenerationTopic: (topicId: string) => void;
 
   internal_updateGenerationTopicLoading: (id: string, loading: boolean) => void;
   internal_dispatchGenerationTopic: (payload: GenerationTopicDispatch, action?: any) => void;
@@ -61,6 +62,22 @@ export const createGenerationTopicSlice: StateCreator<
     }
 
     return topicId;
+  },
+
+  switchGenerationTopic: (topicId: string) => {
+    // Check if topic exists
+    const currentTopics = get().generationTopics;
+    const targetTopic = currentTopics.find((topic) => topic.id === topicId);
+
+    if (!targetTopic) {
+      console.warn(`Generation topic with id ${topicId} not found`);
+      return;
+    }
+
+    // Don't update if already active
+    if (get().activeGenerationTopicId === topicId) return;
+
+    set({ activeGenerationTopicId: topicId }, false, n('switchGenerationTopic'));
   },
 
   summaryGenerationTopicTitle: async (topicId: string, prompts: string[]) => {

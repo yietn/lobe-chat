@@ -33,6 +33,7 @@
   - [x] 生成缩略图
   - [x] 更新 generation 的 asset 和 asyncTask status
 - [ ] **实现 中间的 generation feed**
+
   - [x] **数据层**:
     - [x] DB Model: 实现 `generationBatch` 的 model
     - [x] DB Repository: 实现 `generationFeed` repository，用于获取 `GenerationBatch` 及其关联的 `Generation` 列表
@@ -48,3 +49,11 @@
       - [ ] 实现 `GenerationFeed` 的内容渲染组件 `List` 和 `BatchItem`
       - [ ] 在 `GenerationFeed/index.tsx` 中使用 `Suspense` 和 `lazy` 组合 `Skeleton` 和 `List`
       - [ ] 在 `List` 组件中调用 zustand action 获取并渲染数据
+
+- [ ] 生成状态轮训
+- [ ] 上传到 oss
+- [ ] 缩略图的生成
+- [ ] seed 支持
+- [ ] reuse settings 支持
+- [ ] 图片上传支持
+- [ ] gp4-image-1 支持

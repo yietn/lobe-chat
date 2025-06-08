@@ -17,9 +17,43 @@ const useStyles = createStyles(({ css, token }) => ({
     transition: all 0.2s ease-in-out;
     border-radius: 6px;
     overflow: hidden;
+    position: relative;
+    background: transparent;
 
     &:hover {
       transform: scale(1.05);
+      background: ${token.colorFillSecondary};
+    }
+
+    &:active {
+      transform: scale(0.98);
+      background: ${token.colorFillTertiary};
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, ${token.colorPrimary}20 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      border-radius: 6px;
+    }
+
+    &:active::before {
+      opacity: 1;
+    }
+  `,
+  activeContainer: css`
+    background: ${token.colorPrimaryBg};
+    border: 2px solid ${token.colorPrimary};
+
+    &:hover {
+      background: ${token.colorPrimaryBgHover};
     }
   `,
   tooltipContent: css`
@@ -80,10 +114,13 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
   // 检查当前 topic 是否在加载中
   const isLoading = useImageStore(generationTopicSelectors.isLoadingGenerationTopic(topic.id));
   const removeGenerationTopic = useImageStore((s) => s.removeGenerationTopic);
+  const switchGenerationTopic = useImageStore((s) => s.switchGenerationTopic);
+  const activeTopicId = useImageStore(generationTopicSelectors.activeGenerationTopicId);
+
+  const isActive = activeTopicId === topic.id;
 
   const handleClick = () => {
-    // TODO: 切换到对应的 topic
-    console.log('Switch to topic:', topic.id);
+    switchGenerationTopic(topic.id);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -128,7 +165,10 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
 
   return (
     <Tooltip arrow={false} placement="left" title={tooltipContent}>
-      <div className={styles.container} onClick={handleClick}>
+      <div
+        className={cx(styles.container, isActive && styles.activeContainer)}
+        onClick={handleClick}
+      >
         <Avatar avatar={topic.imageUrl} loading={isLoading} size={50} style={{ borderRadius: 6 }} />
       </div>
     </Tooltip>

@@ -3,7 +3,7 @@ import { Flexbox } from 'react-layout-kit';
 
 import SkeletonList from './SkeletonList';
 
-const TopicsListContent = lazy(() => import('./TopicList'));
+const TopicsList = lazy(() => import('./TopicList'));
 
 const Topics = async () => {
   return (
@@ -17,7 +17,7 @@ const Topics = async () => {
       }}
     >
       <Suspense fallback={<SkeletonList />}>
-        <TopicsListContent />
+        <TopicsList />
       </Suspense>
     </Flexbox>
   );
