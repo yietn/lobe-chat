@@ -7,12 +7,14 @@ import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
 import { useImageStore } from '@/store/image';
+import { createImageSelectors } from '@/store/image/selectors';
 import { useGenerationConfigParam } from '@/store/image/slices/generationConfig/hooks';
 
 const PromptInput = () => {
   const theme = useTheme();
   const { t } = useTranslation('image');
   const { value, setValue } = useGenerationConfigParam('prompt');
+  const isCreating = useImageStore(createImageSelectors.isCreating);
   const createImage = useImageStore((s) => s.createImage);
 
   const handleGenerate = async () => {
@@ -43,6 +45,7 @@ const PromptInput = () => {
       />
       <ActionIcon
         icon={Sparkles}
+        loading={isCreating}
         onClick={handleGenerate}
         size={36}
         style={{

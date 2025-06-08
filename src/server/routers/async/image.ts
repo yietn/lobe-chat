@@ -8,7 +8,6 @@ import { asyncAuthedProcedure, asyncRouter as router } from '@/libs/trpc/async';
 import { initAgentRuntimeWithUserPayload } from '@/server/modules/AgentRuntime';
 import { AsyncTaskError, AsyncTaskStatus } from '@/types/asyncTask';
 
-// Create debug logger
 const log = debug('lobe-image:async');
 
 const imageProcedure = asyncAuthedProcedure.use(async (opts) => {
@@ -62,7 +61,6 @@ export const imageRouter = router({
       log('Agent runtime initialized, calling createImage');
       const response = await agentRuntime.createImage({
         model,
-        imageNum: 1,
         params: params as unknown as CreateImageParams,
       });
 

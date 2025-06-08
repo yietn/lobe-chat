@@ -7,6 +7,7 @@ import { AsyncTaskModel } from '@/database/models/asyncTask';
 import {
   NewGeneration,
   NewGenerationBatch,
+  asyncTasks,
   generationBatches,
   generations,
 } from '@/database/schemas';
@@ -20,14 +21,20 @@ import {
   AsyncTaskType,
 } from '@/types/asyncTask';
 
-// Create debug logger
 const log = debug('lobe-image:lambda');
 
 const imageProcedure = authedProcedure
-  .use(serverDatabase)
   .use(keyVaults)
+  .use(serverDatabase)
   .use(async (opts) => {
     const { ctx } = opts;
+
+    const { apiKey } = ctx.jwtPayload;
+    if (apiKey) {
+      log('API key found in jwtPayload: %s', apiKey);
+    } else {
+      log('No API key found in jwtPayload');
+    }
 
     return opts.next({
       ctx: {
@@ -48,11 +55,9 @@ const createImageInputSchema = z.object({
       seed: z.number().nullable().optional(),
       steps: z.number().optional(),
       cfg: z.number().optional(),
-      // 其他标准化参数...
     })
-    .passthrough(), // 允许其他未定义的参数通过
+    .passthrough(),
 });
-
 export type CreateImageServicePayload = z.infer<typeof createImageInputSchema>;
 
 export const imageRouter = router({
@@ -60,17 +65,10 @@ export const imageRouter = router({
     const { userId, serverDB, asyncTaskModel } = ctx;
     const { generationTopicId, provider, model, params } = input;
 
-    log('Starting image creation process: %O', {
-      userId,
-      generationTopicId,
-      provider,
-      model,
-      prompt: params.prompt,
-      imageParams: { width: params.width, height: params.height, steps: params.steps },
-    });
+    log('Starting image creation process, input: %O', input);
 
-    // 在事务中创建 generationBatch 和 4 个 generation
-    const result = await serverDB.transaction(async (tx) => {
+    // 步骤 1: 在事务中原子性地创建所有数据库记录
+    const { batch: createdBatch, generationsWithTasks } = await serverDB.transaction(async (tx) => {
       log('Starting database transaction for image generation');
 
       // 1. 创建 generationBatch
@@ -84,47 +82,41 @@ export const imageRouter = router({
         height: params.height,
         config: params, // 将整个 params 作为 config 存储
       };
-
-      log('Creating generation batch: %O', {
-        generationTopicId,
-        provider,
-        model,
-        prompt: params.prompt,
-      });
-
-      const [createdBatch] = await tx.insert(generationBatches).values(newBatch).returning();
-
-      log('Generation batch created successfully: %s', createdBatch.id);
+      log('Creating generation batch: %O', newBatch);
+      const [batch] = await tx.insert(generationBatches).values(newBatch).returning();
+      log('Generation batch created successfully: %s', batch.id);
 
       // 2. 创建 4 个 generation（一期固定生成 4 张）
-      const newGenerations: NewGeneration[] = Array.from({ length: 4 }, () => ({
+      const imageNum = 4;
+      const newGenerations: NewGeneration[] = Array.from({ length: imageNum }, () => ({
         userId,
-        generationBatchId: createdBatch.id,
-
+        generationBatchId: batch.id,
         // FIXME: 后面单独会修这块问题，先不管
         // seed: params.seed?.toString(), // 每个 generation 可以有不同的 seed
       }));
 
-      log('Creating %d generations for batch: %s', newGenerations.length, createdBatch.id);
-
+      log('Creating %d generations for batch: %s', newGenerations.length, batch.id);
       const createdGenerations = await tx.insert(generations).values(newGenerations).returning();
-
       log(
         'Generations created successfully: %O',
         createdGenerations.map((g) => g.id),
       );
 
-      // 3. 并发为每个 generation 创建 asyncTask 并触发异步生图
+      // 3. 并发为每个 generation 创建 asyncTask（在事务中）
       log('Creating async tasks for generations');
-
-      const asyncTasks = await Promise.all(
+      const generationsWithTasks = await Promise.all(
         createdGenerations.map(async (generation) => {
-          // 创建 asyncTask
-          const asyncTaskId = await asyncTaskModel.create({
-            status: AsyncTaskStatus.Pending,
-            type: AsyncTaskType.ImageGeneration,
-          });
+          // 在事务中直接创建 asyncTask
+          const [createdAsyncTask] = await tx
+            .insert(asyncTasks)
+            .values({
+              userId,
+              status: AsyncTaskStatus.Pending,
+              type: AsyncTaskType.ImageGeneration,
+            })
+            .returning();
 
+          const asyncTaskId = createdAsyncTask.id;
           log('Created async task %s for generation %s', asyncTaskId, generation.id);
 
           // 更新 generation 的 asyncTaskId
@@ -136,61 +128,67 @@ export const imageRouter = router({
           return { generation, asyncTaskId };
         }),
       );
-
-      log('All async tasks created, preparing to trigger image generation');
-
-      // 4. 并发触发所有异步生图任务
-      const asyncCaller = await createAsyncServerClient(userId, ctx.jwtPayload as JWTPayload);
-      log('Async caller created, jwtPayload: %O', ctx.jwtPayload);
-
-      log('Triggering %d async image generation tasks', asyncTasks.length);
-
-      await Promise.all(
-        asyncTasks.map(async ({ generation, asyncTaskId }) => {
-          try {
-            log('Triggering async task %s for generation %s', asyncTaskId, generation.id);
-
-            await asyncCaller.image.createImage.mutate({
-              taskId: asyncTaskId,
-              generationId: generation.id,
-              provider,
-              model,
-              params,
-            });
-
-            log('Successfully triggered async task %s', asyncTaskId);
-          } catch (e) {
-            log('Failed to trigger async task %s: %O', asyncTaskId, e);
-            console.error('[createImage] async task trigger error:', e);
-
-            await asyncTaskModel.update(asyncTaskId, {
-              error: new AsyncTaskError(
-                AsyncTaskErrorType.TaskTriggerError,
-                'trigger image generation async task error. Please make sure the APP_URL is available from your server.',
-              ),
-              status: AsyncTaskStatus.Error,
-            });
-          }
-        }),
-      );
-
-      log('All async tasks triggered, transaction completed');
+      log('All async tasks created in transaction');
 
       return {
-        batch: createdBatch,
-        generations: createdGenerations,
+        batch,
+        generationsWithTasks,
       };
     });
 
+    log('Database transaction completed successfully. Starting async task triggers.');
+
+    // 步骤 2: 事务外并发触发所有异步生图任务
+    const asyncCaller = await createAsyncServerClient(userId, ctx.jwtPayload as JWTPayload);
+    log('Async caller created, jwtPayload: %O', ctx.jwtPayload);
+    log('Triggering %d async image generation tasks', generationsWithTasks.length);
+
+    await Promise.all(
+      generationsWithTasks.map(async ({ generation, asyncTaskId }) => {
+        try {
+          log('Triggering async task %s for generation %s', asyncTaskId, generation.id);
+          const start = performance.now();
+          await asyncCaller.image.createImage.mutate({
+            taskId: asyncTaskId,
+            generationId: generation.id,
+            provider,
+            model,
+            params,
+          });
+
+          const end = performance.now();
+          log('Successfully triggered async task %s, cost: %ds', asyncTaskId, (end - start) / 1000);
+        } catch (e) {
+          log('Failed to trigger async task %s: %O', asyncTaskId, e);
+          console.error('[createImage] async task trigger error:', e);
+
+          await asyncTaskModel.update(asyncTaskId, {
+            error: new AsyncTaskError(
+              AsyncTaskErrorType.TaskTriggerError,
+              'trigger image generation async task error. Please make sure the APP_URL is available from your server.',
+            ),
+            status: AsyncTaskStatus.Error,
+          });
+        }
+      }),
+    );
+
+    log('All async tasks triggered');
+
+    const createdGenerations = generationsWithTasks.map((item) => item.generation);
+
     log('Image creation process completed successfully: %O', {
-      batchId: result.batch.id,
-      generationCount: result.generations.length,
-      generationIds: result.generations.map((g) => g.id),
+      batchId: createdBatch.id,
+      generationCount: createdGenerations.length,
+      generationIds: createdGenerations.map((g) => g.id),
     });
 
     return {
       success: true,
-      data: result,
+      data: {
+        batch: createdBatch,
+        generations: createdGenerations,
+      },
     };
   }),
 });

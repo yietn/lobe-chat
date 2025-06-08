@@ -37,6 +37,7 @@ export const createCreateImageSlice: StateCreator<
       generationTopicId = await createGenerationTopic(prompts);
     }
 
+    // 2. Create image
     await imageService.createImage({
       generationTopicId,
       provider,

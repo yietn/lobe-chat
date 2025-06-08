@@ -8,17 +8,7 @@ const log = debug('lobe-image:service');
 
 export class AiImageService {
   async createImage(payload: CreateImageServicePayload) {
-    log('Creating image with payload: %O', {
-      generationTopicId: payload.generationTopicId,
-      provider: payload.provider,
-      model: payload.model,
-      prompt: payload.params.prompt,
-      imageParams: {
-        width: payload.params.width,
-        height: payload.params.height,
-        steps: payload.params.steps,
-      },
-    });
+    log('Creating image with payload: %O', payload);
 
     try {
       const result = await lambdaClient.image.createImage.mutate(payload);
@@ -32,11 +22,7 @@ export class AiImageService {
     } catch (error) {
       log('Image creation service call failed: %O', {
         error: (error as Error).message,
-        payload: {
-          generationTopicId: payload.generationTopicId,
-          provider: payload.provider,
-          model: payload.model,
-        },
+        payload,
       });
 
       throw error;
