@@ -19,7 +19,7 @@ const SWR_USE_FETCH_GENERATION_BATCHES = 'SWR_USE_FETCH_GENERATION_BATCHES';
 
 export interface GenerationBatchAction {
   internal_toggleGenerationBatchLoading: (topicId: string, loading: boolean) => void;
-  useFetchGenerationBatches: (enable: boolean, topicId: string) => SWRResponse<GenerationBatch[]>;
+  useFetchGenerationBatches: (topicId?: string | null) => SWRResponse<GenerationBatch[]>;
 }
 
 // ====== action implementation ====== //
@@ -44,18 +44,20 @@ export const createGenerationBatchSlice: StateCreator<
     );
   },
 
-  useFetchGenerationBatches: (enable, topicId) =>
+  useFetchGenerationBatches: (topicId) =>
     useClientDataSWR<GenerationBatch[]>(
-      enable ? [SWR_USE_FETCH_GENERATION_BATCHES, topicId] : null,
+      topicId ? [SWR_USE_FETCH_GENERATION_BATCHES, topicId] : null,
       async ([, topicId]: [string, string]) => {
         return generationBatchService.getGenerationBatches(topicId);
       },
       {
         suspense: true,
         onSuccess: (data) => {
+          console.log('GenerationBatchAction.useFetchGenerationBatches.onSuccess', data);
+
           const nextMap = {
             ...get().generationBatchesMap,
-            [topicId]: data,
+            [topicId!]: data,
           };
 
           // no need to update map if the map is the same

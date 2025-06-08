@@ -76,6 +76,9 @@ export class GenerationBatchModel {
       with: {
         generations: {
           orderBy: (table, { asc }) => [asc(table.createdAt)],
+          with: {
+            asyncTask: true,
+          },
         },
       },
     });

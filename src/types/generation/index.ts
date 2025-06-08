@@ -1,3 +1,5 @@
+import { AsyncTaskError, AsyncTaskStatus } from '../asyncTask';
+
 export interface ImageGenerationTopic {
   id: string;
   title?: string | null;
@@ -43,6 +45,11 @@ export interface Generation {
   asset?: GenerationAsset | null;
   seed?: string | null;
   createdAt: Date;
+
+  task: {
+    status: AsyncTaskStatus;
+    error?: AsyncTaskError;
+  };
 }
 
 export interface GenerationBatch {

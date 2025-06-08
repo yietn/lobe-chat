@@ -1,15 +1,15 @@
 import { GenerationBatch } from '@/types/generation';
 
 import { ImageStoreState } from '../../initialState';
+import { generationTopicSelectors } from '../generationTopic/selectors';
 
 // ====== topic batch selectors ====== //
 
-const generationBatchesByTopicId =
-  (topicId?: string) =>
-  (s: ImageStoreState): GenerationBatch[] => {
-    if (!topicId) return [];
-    return s.generationBatchesMap[topicId] || [];
-  };
+const currentGenerationBatches = (s: ImageStoreState): GenerationBatch[] => {
+  const activeTopicId = generationTopicSelectors.activeGenerationTopicId(s);
+  if (!activeTopicId) return [];
+  return s.generationBatchesMap[activeTopicId] || [];
+};
 
 const isGenerationBatchLoading =
   (topicId?: string) =>
@@ -18,9 +18,16 @@ const isGenerationBatchLoading =
     return s.generationBatchLoadingIds.includes(topicId);
   };
 
+const isCurrentGenerationBatchLoading = (s: ImageStoreState): boolean => {
+  const activeTopicId = generationTopicSelectors.activeGenerationTopicId(s);
+  if (!activeTopicId) return false;
+  return s.generationBatchLoadingIds.includes(activeTopicId);
+};
+
 // ====== aggregate selectors ====== //
 
 export const generationBatchSelectors = {
-  generationBatchesByTopicId,
+  currentGenerationBatches,
   isGenerationBatchLoading,
+  isCurrentGenerationBatchLoading,
 };

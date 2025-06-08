@@ -3,7 +3,8 @@ import debug from 'debug';
 import { GenerationModel } from '@/database/models/generation';
 import { GenerationBatchModel } from '@/database/models/generationBatch';
 import { LobeChatDatabase } from '@/database/type';
-import { Generation, GenerationAsset, GenerationBatch } from '@/types/generation';
+import { AsyncTaskStatus } from '@/types/asyncTask';
+import { Generation, GenerationAsset, GenerationBatch, GenerationConfig } from '@/types/generation';
 
 const log = debug('lobe-db:generation-feed-repo');
 
@@ -44,7 +45,7 @@ export class GenerationFeedRepository {
       prompt: batch.prompt,
       width: batch.width,
       height: batch.height,
-      config: batch.config,
+      config: batch.config as GenerationConfig,
       createdAt: batch.createdAt,
       generations: batch.generations.map(
         (gen): Generation => ({
@@ -52,6 +53,10 @@ export class GenerationFeedRepository {
           asset: gen.asset as GenerationAsset | null,
           seed: gen.seed,
           createdAt: gen.createdAt,
+          task: {
+            status: gen.asyncTask?.status as AsyncTaskStatus,
+            error: gen.asyncTask?.error ? gen.asyncTask.error : undefined,
+          },
         }),
       ),
     }));
