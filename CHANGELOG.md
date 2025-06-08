@@ -2,6 +2,216 @@
 
 # Changelog
 
+### [Version 1.92.2](https://github.com/lobehub/lobe-chat/compare/v1.92.1...v1.92.2)
+
+<sup>Released on **2025-06-07**</sup>
+
+#### 💄 Styles
+
+- **misc**: Add support to azureopenai embedding.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Add support to azureopenai embedding, closes [#8075](https://github.com/lobehub/lobe-chat/issues/8075) ([0725f94](https://github.com/lobehub/lobe-chat/commit/0725f94))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.92.1](https://github.com/lobehub/lobe-chat/compare/v1.92.0...v1.92.1)
+
+<sup>Released on **2025-06-07**</sup>
+
+#### 💄 Styles
+
+- **ModelSelect**: Add responsive layout for mobile devices.
+- **misc**: Improve `{{username}}` placeholder variable, Update Gemini & Qwen models.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **ModelSelect**: Add responsive layout for mobile devices, closes [#7960](https://github.com/lobehub/lobe-chat/issues/7960) ([cb84c3e](https://github.com/lobehub/lobe-chat/commit/cb84c3e))
+- **misc**: Improve `{{username}}` placeholder variable, closes [#8100](https://github.com/lobehub/lobe-chat/issues/8100) ([95fd588](https://github.com/lobehub/lobe-chat/commit/95fd588))
+- **misc**: Update Gemini & Qwen models, closes [#8083](https://github.com/lobehub/lobe-chat/issues/8083) ([6308237](https://github.com/lobehub/lobe-chat/commit/6308237))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+## [Version 1.92.0](https://github.com/lobehub/lobe-chat/compare/v1.91.3...v1.92.0)
+
+<sup>Released on **2025-06-06**</sup>
+
+#### ✨ Features
+
+- **misc**: Support placeholder variables in prompts and input.
+
+#### 🐛 Bug Fixes
+
+- **misc**: Some web search bugs.
+
+#### 💄 Styles
+
+- **misc**: Support Vertex AI thought summaries.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's improved
+
+- **misc**: Support placeholder variables in prompts and input, closes [#8060](https://github.com/lobehub/lobe-chat/issues/8060) ([3752739](https://github.com/lobehub/lobe-chat/commit/3752739))
+
+#### What's fixed
+
+- **misc**: Some web search bugs, closes [#8068](https://github.com/lobehub/lobe-chat/issues/8068) ([bebe7a3](https://github.com/lobehub/lobe-chat/commit/bebe7a3))
+
+#### Styles
+
+- **misc**: Support Vertex AI thought summaries, closes [#8090](https://github.com/lobehub/lobe-chat/issues/8090) ([1355a2e](https://github.com/lobehub/lobe-chat/commit/1355a2e))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.91.3](https://github.com/lobehub/lobe-chat/compare/v1.91.2...v1.91.3)
+
+<sup>Released on **2025-06-05**</sup>
+
+#### 🐛 Bug Fixes
+
+- **misc**: Correct deepseek R1 fc support display.
+
+#### 💄 Styles
+
+- **misc**: Add openAI websearch and claude 4 to modelproviders.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's fixed
+
+- **misc**: Correct deepseek R1 fc support display, closes [#8069](https://github.com/lobehub/lobe-chat/issues/8069) ([ed5bb5f](https://github.com/lobehub/lobe-chat/commit/ed5bb5f))
+
+#### Styles
+
+- **misc**: Add openAI websearch and claude 4 to modelproviders, closes [#7988](https://github.com/lobehub/lobe-chat/issues/7988) ([95994f4](https://github.com/lobehub/lobe-chat/commit/95994f4))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.91.2](https://github.com/lobehub/lobe-chat/compare/v1.91.1...v1.91.2)
+
+<sup>Released on **2025-06-05**</sup>
+
+#### 💄 Styles
+
+- **misc**: Add Volcengine & OpenAI-like Provider (e.g. oneapi) model fetch support.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Add Volcengine & OpenAI-like Provider (e.g. oneapi) model fetch support, closes [#8064](https://github.com/lobehub/lobe-chat/issues/8064) ([d3dafe1](https://github.com/lobehub/lobe-chat/commit/d3dafe1))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.91.1](https://github.com/lobehub/lobe-chat/compare/v1.91.0...v1.91.1)
+
+<sup>Released on **2025-06-04**</sup>
+
+#### 💄 Styles
+
+- **misc**: Improve loading state.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Improve loading state, closes [#8072](https://github.com/lobehub/lobe-chat/issues/8072) ([f0a7193](https://github.com/lobehub/lobe-chat/commit/f0a7193))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+## [Version 1.91.0](https://github.com/lobehub/lobe-chat/compare/v1.90.4...v1.91.0)
+
+<sup>Released on **2025-06-03**</sup>
+
+#### ✨ Features
+
+- **misc**: Add more provider support for search & crawl.
+
+#### 💄 Styles
+
+- **misc**: Update modelscope models.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's improved
+
+- **misc**: Add more provider support for search & crawl, closes [#8033](https://github.com/lobehub/lobe-chat/issues/8033) ([23fade3](https://github.com/lobehub/lobe-chat/commit/23fade3))
+
+#### Styles
+
+- **misc**: Update modelscope models, closes [#8057](https://github.com/lobehub/lobe-chat/issues/8057) ([3e02c25](https://github.com/lobehub/lobe-chat/commit/3e02c25))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
 ### [Version 1.90.4](https://github.com/lobehub/lobe-chat/compare/v1.90.3...v1.90.4)
 
 <sup>Released on **2025-06-02**</sup>

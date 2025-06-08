@@ -1,6 +1,5 @@
-import type { ChatModelCard } from '@/types/llm';
-
 import { ModelProvider } from '../types';
+import { processMultiProviderModelList } from '../utils/modelParse';
 import { createOpenAICompatibleRuntime } from '../utils/openaiCompatibleFactory';
 import { pruneReasoningPayload } from '../utils/openaiHelpers';
 
@@ -45,81 +44,11 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
     chatCompletion: () => process.env.DEBUG_OPENAI_CHAT_COMPLETION === '1',
   },
   models: async ({ client }) => {
-    const { LOBE_DEFAULT_MODEL_LIST } = await import('@/config/aiModels');
-
-    const functionCallKeywords = ['4o', '4.1', 'o3', 'o4'];
-
-    const visionKeywords = ['4o', '4.1', 'o4'];
-
-    const reasoningKeywords = ['o1', 'o3', 'o4'];
-
     const modelsPage = (await client.models.list()) as any;
     const modelList: OpenAIModelCard[] = modelsPage.data;
 
-    // 返回的 model 结构示例 (aihubmix)
-    /*
-    {
-      "id": "gpt-4.1-mini",
-      "object": "model",
-      "created": 1626777600,
-      "owned_by": "custom",
-      "permission": null,
-      "root": "gpt-4.1-mini", 
-      "parent": null
-    },
-    {
-      "id": "claude-3-5-sonnet-latest",
-      "object": "model",
-      "created": 1626777600,
-      "owned_by": "Anthropic",
-      "permission": [
-        {
-          "id": "modelperm-LwHkVFn8AcMItP432fKKDIKJ",
-          "object": "model_permission",
-          "created": 1626777600,
-          "allow_create_engine": true,
-          "allow_sampling": true,
-          "allow_logprobs": true,
-          "allow_search_indices": false,
-          "allow_view": true,
-          "allow_fine_tuning": false,
-          "organization": "*",
-          "group": null,
-          "is_blocking": false
-        }
-      ],
-      "root": "claude-3-5-sonnet-latest",
-      "parent": null
-    }
-    */
-    return modelList
-      .map((model) => {
-        const knownModel = LOBE_DEFAULT_MODEL_LIST.find(
-          (m) => model.id.toLowerCase() === m.id.toLowerCase(),
-        );
-
-        return {
-          contextWindowTokens: knownModel?.contextWindowTokens ?? undefined,
-          displayName: knownModel?.displayName ?? undefined,
-          enabled: knownModel?.enabled || false,
-          functionCall:
-            (functionCallKeywords.some((keyword) => model.id.toLowerCase().includes(keyword)) &&
-              !model.id.toLowerCase().includes('audio')) ||
-            knownModel?.abilities?.functionCall ||
-            false,
-          id: model.id,
-          reasoning:
-            reasoningKeywords.some((keyword) => model.id.toLowerCase().includes(keyword)) ||
-            knownModel?.abilities?.reasoning ||
-            false,
-          vision:
-            (visionKeywords.some((keyword) => model.id.toLowerCase().includes(keyword)) &&
-              !model.id.toLowerCase().includes('audio')) ||
-            knownModel?.abilities?.vision ||
-            false,
-        };
-      })
-      .filter(Boolean) as ChatModelCard[];
+    // 自动检测模型提供商并选择相应配置
+    return processMultiProviderModelList(modelList);
   },
   provider: ModelProvider.OpenAI,
 });
