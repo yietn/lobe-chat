@@ -53,8 +53,6 @@ export const createGenerationBatchSlice: StateCreator<
       {
         suspense: true,
         onSuccess: (data) => {
-          console.log('GenerationBatchAction.useFetchGenerationBatches.onSuccess', data);
-
           const nextMap = {
             ...get().generationBatchesMap,
             [topicId!]: data,

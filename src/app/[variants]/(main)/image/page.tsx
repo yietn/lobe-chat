@@ -7,6 +7,8 @@ import PromptInput from '@/app/[variants]/(main)/image/features/PromptInput';
 import Topics from '@/app/[variants]/(main)/image/features/Topics';
 import InitClientDB from '@/features/InitClientDB';
 
+import TopicUrlSync from './features/Topics/TopicUrlSync';
+
 export default function AiImage() {
   return (
     <Flexbox
@@ -19,6 +21,7 @@ export default function AiImage() {
       }}
     >
       <InitClientDB bottom={100} />
+      <TopicUrlSync />
 
       {/* 左侧配置面板 */}
       <ConfigPanel />

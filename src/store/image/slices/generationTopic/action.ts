@@ -198,11 +198,9 @@ export const createGenerationTopicSlice: StateCreator<
       () => generationTopicService.getAllGenerationTopics(),
       {
         suspense: true,
-        fallbackData: [],
         onSuccess: (data) => {
           // No need to update if data is the same
           if (isEqual(data, get().generationTopics)) return;
-
           set({ generationTopics: data }, false, n('useFetchGenerationTopics'));
         },
       },
