@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 import { ModelProvider } from '../types';
 import { processMultiProviderModelList } from '../utils/modelParse';
 import { createOpenAICompatibleRuntime } from '../utils/openaiCompatibleFactory';
@@ -8,6 +10,8 @@ export interface OpenAIModelCard {
 }
 
 const prunePrefixes = ['o1', 'o3', 'o4'];
+
+const log = debug('lobe-image:fal');
 
 export const LobeOpenAI = createOpenAICompatibleRuntime({
   baseURL: 'https://api.openai.com/v1',
@@ -39,6 +43,21 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
 
       return { ...payload, stream: payload.stream ?? true };
     },
+  },
+  createImage: async (payload) => {
+    const { model, params, client } = payload;
+    log('Creating image with model: %s and params: %O', model, params);
+
+    const img = await client.images.generate({
+      model,
+      ...(params as any),
+    });
+
+    log('Received image data: %O', img);
+
+    return {
+      imageUrl: img.data![0].b64_json!,
+    };
   },
   debug: {
     chatCompletion: () => process.env.DEBUG_OPENAI_CHAT_COMPLETION === '1',
