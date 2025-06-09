@@ -6,6 +6,10 @@ import { GenerationModel } from '@/database/models/generation';
 import { CreateImageParams } from '@/libs/model-runtime/types/image';
 import { asyncAuthedProcedure, asyncRouter as router } from '@/libs/trpc/async';
 import { initAgentRuntimeWithUserPayload } from '@/server/modules/AgentRuntime';
+import {
+  transformImageForGeneration,
+  uploadImageForGeneration,
+} from '@/server/services/generation';
 import { AsyncTaskError, AsyncTaskStatus } from '@/types/asyncTask';
 
 const log = debug('lobe-image:async');
@@ -70,18 +74,27 @@ export const imageRouter = router({
       }
 
       log('Image generation successful: %O', {
-        hasImageUrl: !!response.imageUrl,
+        imageUrl: response.imageUrl,
         width: response.width,
         height: response.height,
       });
 
-      //  TODO: 后续需要实现 b64_json 和 cdn url 的转换
       const { imageUrl, width, height } = response;
+      const { image, thumbnailImage } = await transformImageForGeneration(imageUrl);
+      const { imageUrl: uploadedImageUrl, thumbnailImageUrl } = await uploadImageForGeneration(
+        image,
+        thumbnailImage,
+      );
 
       log('Updating generation asset: %s', generationId);
-      // TODO: 上传到自己家 s3，生成缩略图等，为了测试先暂时先这样
       await ctx.generationModel.update(generationId, {
-        asset: { originalUrl: imageUrl, url: imageUrl, width, height, thumbnailUrl: imageUrl },
+        asset: {
+          originalUrl: imageUrl,
+          url: uploadedImageUrl,
+          width: width ?? image.width,
+          height: height ?? image.height,
+          thumbnailUrl: thumbnailImageUrl,
+        },
       });
 
       log('Updating task status to Success: %s', taskId);
