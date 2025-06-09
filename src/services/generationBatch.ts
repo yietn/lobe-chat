@@ -12,6 +12,13 @@ class GenerationBatchService {
   async getGenerationBatches(topicId: string): Promise<GenerationBatchWithAsyncTaskId[]> {
     return lambdaClient.generationBatch.getGenerationBatches.query({ topicId });
   }
+
+  /**
+   * Delete a generation batch
+   */
+  async deleteGenerationBatch(batchId: string): Promise<void> {
+    return lambdaClient.generationBatch.deleteGenerationBatch.mutate({ batchId });
+  }
 }
 
 export const generationBatchService = new GenerationBatchService();

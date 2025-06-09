@@ -28,6 +28,10 @@ const SWR_USE_CHECK_GENERATION_STATUS = 'SWR_USE_CHECK_GENERATION_STATUS';
 // ====== action interface ====== //
 
 export interface GenerationBatchAction {
+  deleteGeneration: (generationId: string) => Promise<void>;
+  deleteGenerationBatch: (batchId: string, topicId: string) => Promise<void>;
+  internal_deleteGeneration: (generationId: string) => Promise<void>;
+  internal_deleteGenerationBatch: (batchId: string, topicId: string) => Promise<void>;
   internal_dispatchGenerationBatch: (
     topicId: string,
     payload: GenerationBatchDispatch,
@@ -54,6 +58,97 @@ export const createGenerationBatchSlice: StateCreator<
   [],
   GenerationBatchAction
 > = (set, get) => ({
+  deleteGeneration: async (generationId: string) => {
+    const { internal_deleteGeneration, activeGenerationTopicId, refreshGenerationBatches } = get();
+
+    await internal_deleteGeneration(generationId);
+
+    // 检查删除后是否有batch变成空的，如果有则删除空batch
+    if (activeGenerationTopicId) {
+      const updatedBatches = get().generationBatchesMap[activeGenerationTopicId] || [];
+      const emptyBatches = updatedBatches.filter((batch) => batch.generations.length === 0);
+
+      // 删除所有空的batch
+      for (const emptyBatch of emptyBatches) {
+        await get().internal_deleteGenerationBatch(emptyBatch.id, activeGenerationTopicId);
+      }
+
+      // 如果删除了空batch，再次刷新数据确保一致性
+      if (emptyBatches.length > 0) {
+        await refreshGenerationBatches();
+      }
+    }
+  },
+
+  deleteGenerationBatch: async (batchId: string, topicId: string) => {
+    const { internal_deleteGenerationBatch } = get();
+    await internal_deleteGenerationBatch(batchId, topicId);
+  },
+
+  internal_deleteGeneration: async (generationId: string) => {
+    const { activeGenerationTopicId, refreshGenerationBatches, internal_dispatchGenerationBatch } =
+      get();
+
+    if (!activeGenerationTopicId) return;
+
+    // 找到包含该 generation 的 batch
+    const currentBatches = get().generationBatchesMap[activeGenerationTopicId] || [];
+    const targetBatch = currentBatches.find((batch) =>
+      batch.generations.some((gen) => gen.id === generationId),
+    );
+
+    if (!targetBatch) return;
+
+    // 1. 立即更新前端状态（乐观更新）
+    internal_dispatchGenerationBatch(
+      activeGenerationTopicId,
+      { type: 'deleteGenerationInBatch', batchId: targetBatch.id, generationId },
+      'internal_deleteGeneration',
+    );
+
+    // 显示加载状态
+    get().internal_toggleGenerationBatchLoading(activeGenerationTopicId, true);
+
+    try {
+      // 2. 调用后端服务删除generation
+      await generationService.deleteGeneration(generationId);
+
+      // 3. 刷新数据确保一致性
+      await refreshGenerationBatches();
+    } catch (error) {
+      console.error('Failed to delete generation:', error);
+      throw error;
+    } finally {
+      // 确保清除加载状态（无论成功或失败）
+      get().internal_toggleGenerationBatchLoading(activeGenerationTopicId, false);
+    }
+  },
+
+  internal_deleteGenerationBatch: async (batchId: string, topicId: string) => {
+    const { internal_dispatchGenerationBatch, refreshGenerationBatches } = get();
+
+    // 1. 立即更新前端状态（乐观更新）
+    internal_dispatchGenerationBatch(
+      topicId,
+      { type: 'deleteBatch', id: batchId },
+      'internal_deleteGenerationBatch',
+    );
+
+    // 显示加载状态
+    get().internal_toggleGenerationBatchLoading(topicId, true);
+
+    try {
+      // 2. 调用后端服务
+      await generationBatchService.deleteGenerationBatch(batchId);
+
+      // 3. 刷新数据确保一致性
+      await refreshGenerationBatches();
+    } finally {
+      // 确保清除加载状态（无论成功或失败）
+      get().internal_toggleGenerationBatchLoading(topicId, false);
+    }
+  },
+
   internal_dispatchGenerationBatch: (topicId, payload, action) => {
     const currentBatches = get().generationBatchesMap[topicId] || [];
     const nextBatches = generationBatchReducer(currentBatches, payload);

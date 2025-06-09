@@ -15,7 +15,22 @@ interface UpdateGenerationBatchAction {
   value: Partial<GenerationBatch>;
 }
 
-export type GenerationBatchDispatch = UpdateGenerationInBatchAction | UpdateGenerationBatchAction;
+interface DeleteGenerationBatchAction {
+  id: string;
+  type: 'deleteBatch';
+}
+
+interface DeleteGenerationInBatchAction {
+  batchId: string;
+  generationId: string;
+  type: 'deleteGenerationInBatch';
+}
+
+export type GenerationBatchDispatch =
+  | UpdateGenerationInBatchAction
+  | UpdateGenerationBatchAction
+  | DeleteGenerationBatchAction
+  | DeleteGenerationInBatchAction;
 
 export const generationBatchReducer = (
   state: GenerationBatch[] = [],
@@ -48,6 +63,21 @@ export const generationBatchReducer = (
           ...draftState[batchIndex],
           ...payload.value,
         };
+      });
+    }
+
+    case 'deleteBatch': {
+      return state.filter((batch) => batch.id !== payload.id);
+    }
+
+    case 'deleteGenerationInBatch': {
+      return produce(state, (draftState) => {
+        const batchIndex = draftState.findIndex((batch) => batch.id === payload.batchId);
+        if (batchIndex === -1) return;
+
+        draftState[batchIndex].generations = draftState[batchIndex].generations.filter(
+          (gen) => gen.id !== payload.generationId,
+        );
       });
     }
 

@@ -49,6 +49,7 @@ export const generationRouter = router({
 
         const generationWithAsyncTask: Generation = {
           ...generation,
+          seed: generation.seed?.toString(),
           task: {
             id: asyncTask.id,
             status: asyncTask.status as AsyncTaskStatus,
@@ -62,6 +63,12 @@ export const generationRouter = router({
       }
 
       return result;
+    }),
+
+  deleteGeneration: generationProcedure
+    .input(z.object({ generationId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.generationModel.delete(input.generationId);
     }),
 });
 

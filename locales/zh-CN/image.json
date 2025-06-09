@@ -26,6 +26,20 @@
       "label": "种子"
     }
   },
+  "generation": {
+    "status": {
+      "generating": "生成中...",
+      "failed": "生成失败"
+    },
+    "actions": {
+      "delete": "删除",
+      "reuseSettings": "复用设置",
+      "deleteBatch": "删除批次"
+    },
+    "metadata": {
+      "count": "{{count}} 张图片"
+    }
+  },
   "topic": {
     "createNew": "新建主题",
     "untitled": "默认主题",

@@ -65,10 +65,20 @@ export class GenerationModel {
 
     const result = await this.db
       .update(generations)
-      .set(value)
+      .set({ ...value, updatedAt: new Date() })
       .where(and(eq(generations.id, id), eq(generations.userId, this.userId)));
 
     log('Generation %s updated successfully', id);
     return result;
+  }
+
+  async delete(id: string) {
+    log('Deleting generation: %s for user: %s', id, this.userId);
+
+    await this.db
+      .delete(generations)
+      .where(and(eq(generations.id, id), eq(generations.userId, this.userId)));
+
+    log('Generation %s deleted successfully', id);
   }
 }

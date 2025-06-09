@@ -33,4 +33,18 @@ export const image = {
     deleteConfirm: '删除生成主题',
     deleteConfirmDesc: '即将删除该生成主题，删除后将不可恢复，请谨慎操作。',
   },
+  generation: {
+    status: {
+      generating: '生成中...',
+      failed: '生成失败',
+    },
+    actions: {
+      delete: '删除',
+      reuseSettings: '复用设置',
+      deleteBatch: '删除批次',
+    },
+    metadata: {
+      count: '{{count}} 张图片',
+    },
+  },
 } as const;

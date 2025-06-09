@@ -20,6 +20,12 @@ export const generationBatchRouter = router({
     .query(async ({ ctx, input }) => {
       return ctx.generationBatchModel.queryGenerationBatchesByTopicIdWithGenerations(input.topicId);
     }),
+
+  deleteGenerationBatch: generationBatchProcedure
+    .input(z.object({ batchId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.generationBatchModel.delete(input.batchId);
+    }),
 });
 
 export type GenerationBatchRouter = typeof generationBatchRouter;

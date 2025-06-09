@@ -1,11 +1,13 @@
 'use client';
 
-import { Icon } from '@lobehub/ui';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { Icon, Tooltip } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2, Settings, Trash2 } from 'lucide-react';
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
 import ImageItem from '@/components/ImageItem';
@@ -46,6 +48,7 @@ const calculateImageSize = (generation: Generation) => {
 
 const useStyles = createStyles(({ css, token }) => ({
   batchContainer: css`
+    position: relative;
     padding: 16px;
     border-radius: ${token.borderRadiusLG}px;
     background: ${token.colorBgContainer};
@@ -74,6 +77,37 @@ const useStyles = createStyles(({ css, token }) => ({
     align-items: center;
     gap: 4px;
   `,
+  batchActions: css`
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: flex-start;
+  `,
+  actionButton: css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid ${token.colorBorderSecondary};
+    background: ${token.colorBgContainer};
+    border-radius: ${token.borderRadius}px;
+    cursor: pointer;
+    color: ${token.colorTextSecondary};
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: ${token.colorFillSecondary};
+      color: ${token.colorText};
+      border-color: ${token.colorBorder};
+    }
+
+    &.delete-button:hover {
+      background: ${token.colorErrorBg};
+      color: ${token.colorError};
+      border-color: ${token.colorError};
+    }
+  `,
   imageGrid: css`
     display: flex;
     gap: 8px;
@@ -90,11 +124,42 @@ const useStyles = createStyles(({ css, token }) => ({
     scrollbar-width: none;
   `,
   imageContainer: css`
+    position: relative;
     flex-shrink: 0;
     border-radius: ${token.borderRadius}px;
     overflow: hidden;
+
+    &:hover .generation-delete {
+      opacity: 1;
+    }
+  `,
+  generationDelete: css`
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: ${token.colorBgContainer};
+    border-radius: 50%;
+    cursor: pointer;
+    color: ${token.colorTextSecondary};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: ${token.boxShadow};
+    border: 1px solid ${token.colorBorderSecondary};
+
+    &:hover {
+      background: ${token.colorErrorBg};
+      color: ${token.colorError};
+      border-color: ${token.colorError};
+    }
   `,
   placeholderContainer: css`
+    position: relative;
     flex-shrink: 0;
     border-radius: ${token.borderRadius}px;
     overflow: hidden;
@@ -103,6 +168,10 @@ const useStyles = createStyles(({ css, token }) => ({
     justify-content: center;
     background: ${token.colorFillSecondary};
     border: 1px solid ${token.colorBorder};
+
+    &:hover .generation-delete {
+      opacity: 1;
+    }
   `,
   loadingContent: css`
     display: flex;
@@ -138,7 +207,9 @@ const GenerationItem = memo<{
   prompt: string;
 }>(({ generation, prompt }) => {
   const { styles } = useStyles();
+  const { t } = useTranslation('image');
   const useCheckGenerationStatus = useImageStore((s) => s.useCheckGenerationStatus);
+  const deleteGeneration = useImageStore((s) => s.deleteGeneration);
   const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
 
   const isFinalized =
@@ -150,6 +221,14 @@ const GenerationItem = memo<{
 
   const imageSize = calculateImageSize(generation);
 
+  const handleDeleteGeneration = async () => {
+    try {
+      await deleteGeneration(generation.id);
+    } catch (error) {
+      console.error('Failed to delete generation:', error);
+    }
+  };
+
   // 如果生成成功且有图片 URL，显示图片
   if (generation.task.status === AsyncTaskStatus.Success && generation.asset?.url) {
     return (
@@ -159,6 +238,15 @@ const GenerationItem = memo<{
           style={{ width: '100%', height: '100%' }}
           url={generation.asset.url}
         />
+        <Tooltip title={t('generation.actions.delete')}>
+          <button
+            className={`${styles.generationDelete} generation-delete`}
+            onClick={handleDeleteGeneration}
+            type="button"
+          >
+            <Icon icon={Trash2} size={14} />
+          </button>
+        </Tooltip>
       </div>
     );
   }
@@ -169,7 +257,7 @@ const GenerationItem = memo<{
       <div className={styles.placeholderContainer} style={{ ...imageSize }}>
         <div className={styles.errorContent}>
           <Icon className={styles.errorIcon} icon={AlertTriangle} size={20} />
-          <div>生成失败</div>
+          <div>{t('generation.status.failed')}</div>
           {generation.task.error && (
             <div style={{ fontSize: '10px', opacity: 0.8 }}>
               {typeof generation.task.error.body === 'string'
@@ -180,6 +268,15 @@ const GenerationItem = memo<{
             </div>
           )}
         </div>
+        <Tooltip title={t('generation.actions.delete')}>
+          <button
+            className={`${styles.generationDelete} generation-delete`}
+            onClick={handleDeleteGeneration}
+            type="button"
+          >
+            <Icon icon={Trash2} size={14} />
+          </button>
+        </Tooltip>
       </div>
     );
   }
@@ -193,9 +290,18 @@ const GenerationItem = memo<{
     <div className={styles.placeholderContainer} style={{ ...imageSize }}>
       <div className={styles.loadingContent}>
         <Icon className={styles.spinIcon} icon={Loader2} size={20} spin />
-        <div>生成中...</div>
+        <div>{t('generation.status.generating')}</div>
         <ElapsedTime generationId={generation.id} isActive={isGenerating} />
       </div>
+      <Tooltip title={t('generation.actions.delete')}>
+        <button
+          className={`${styles.generationDelete} generation-delete`}
+          onClick={handleDeleteGeneration}
+          type="button"
+        >
+          <Icon icon={Trash2} size={14} />
+        </button>
+      </Tooltip>
     </div>
   );
 });
@@ -203,10 +309,29 @@ const GenerationItem = memo<{
 // Batch item component
 const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
   const { styles } = useStyles();
+  const { t } = useTranslation('image');
+  const deleteGenerationBatch = useImageStore((s) => s.deleteGenerationBatch);
+  const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
+  const [imageGridRef] = useAutoAnimate();
 
   const timeAgo = useMemo(() => {
     return dayjs(batch.createdAt).fromNow();
   }, [batch.createdAt]);
+
+  const handleBatchSettings = () => {
+    // TODO: 实现批次设置逻辑
+    console.log('Batch settings:', batch.id);
+  };
+
+  const handleDeleteBatch = async () => {
+    if (!activeTopicId) return;
+
+    try {
+      await deleteGenerationBatch(batch.id, activeTopicId);
+    } catch (error) {
+      console.error('Failed to delete batch:', error);
+    }
+  };
 
   if (batch.generations.length === 0) {
     return null;
@@ -233,15 +358,32 @@ const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
             <span>{timeAgo}</span>
           </span>
           <span className={styles.metadataItem}>
-            <span>{batch.generations.length} 张图片</span>
+            <span>{t('generation.metadata.count', { count: batch.generations.length })}</span>
           </span>
         </div>
       </div>
 
-      <div className={styles.imageGrid}>
+      <div className={styles.imageGrid} ref={imageGridRef}>
         {batch.generations.map((generation) => (
           <GenerationItem generation={generation} key={generation.id} prompt={batch.prompt} />
         ))}
+      </div>
+
+      <div className={styles.batchActions}>
+        <Tooltip title={t('generation.actions.reuseSettings')}>
+          <button className={styles.actionButton} onClick={handleBatchSettings} type="button">
+            <Icon icon={Settings} size={16} />
+          </button>
+        </Tooltip>
+        <Tooltip title={t('generation.actions.deleteBatch')}>
+          <button
+            className={`${styles.actionButton} delete-button`}
+            onClick={handleDeleteBatch}
+            type="button"
+          >
+            <Icon icon={Trash2} size={16} />
+          </button>
+        </Tooltip>
       </div>
     </div>
   );
@@ -249,6 +391,7 @@ const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
 
 // Main GenerationBatchList component
 const GenerationBatchList = memo(() => {
+  const [parent] = useAutoAnimate();
   const activeTopicId = useImageStore(generationTopicSelectors.activeGenerationTopicId);
   const useFetchGenerationBatches = useImageStore((s) => s.useFetchGenerationBatches);
   useFetchGenerationBatches(activeTopicId);
@@ -260,7 +403,7 @@ const GenerationBatchList = memo(() => {
   }
 
   return (
-    <Flexbox gap={16} width="100%">
+    <Flexbox gap={16} ref={parent} width="100%">
       {currentGenerationBatches.map((batch) => (
         <BatchItem batch={batch} key={batch.id} />
       ))}
