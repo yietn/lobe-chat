@@ -248,7 +248,7 @@ table generations {
   user_id text [not null]
   generation_batch_id varchar(64) [not null]
   async_task_id uuid
-  seed text
+  seed integer
   asset jsonb
   accessed_at "timestamp with time zone" [not null, default: `now()`]
   created_at "timestamp with time zone" [not null, default: `now()`]

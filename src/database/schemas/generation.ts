@@ -115,7 +115,7 @@ export const generations = pgTable('generations', {
   //   published: boolean('published').default(false).notNull(),
 
   /** 生成种子值 */
-  seed: text('seed'),
+  seed: integer('seed'),
 
   /** 生成的资源信息，包含 URL、尺寸等 */
   asset: jsonb('asset').$type<GenerationAsset>(),

@@ -21,6 +21,7 @@ import {
   AsyncTaskStatus,
   AsyncTaskType,
 } from '@/types/asyncTask';
+import { generateUniqueSeeds } from '@/utils/number';
 
 const log = debug('lobe-image:lambda');
 
@@ -89,12 +90,17 @@ export const imageRouter = router({
 
       // 2. 创建 4 个 generation（一期固定生成 4 张）
       const imageNum = 4;
-      const newGenerations: NewGeneration[] = Array.from({ length: imageNum }, () => ({
-        userId,
-        generationBatchId: batch.id,
-        // FIXME: 后面单独会修这块问题，先不管
-        // seed: params.seed?.toString(), // 每个 generation 可以有不同的 seed
-      }));
+      const seeds =
+        'seed' in params
+          ? generateUniqueSeeds(imageNum)
+          : Array.from({ length: imageNum }, () => null);
+      const newGenerations: NewGeneration[] = Array.from({ length: imageNum }, (_, index) => {
+        return {
+          userId,
+          generationBatchId: batch.id,
+          seed: seeds[index],
+        };
+      });
 
       log('Creating %d generations for batch: %s', newGenerations.length, batch.id);
       const createdGenerations = await tx.insert(generations).values(newGenerations).returning();
