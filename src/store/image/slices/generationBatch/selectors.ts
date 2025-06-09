@@ -5,10 +5,14 @@ import { generationTopicSelectors } from '../generationTopic/selectors';
 
 // ====== topic batch selectors ====== //
 
+const getGenerationBatchByTopicId = (topicId: string) => (s: ImageStoreState) => {
+  return s.generationBatchesMap[topicId] || [];
+};
+
 const currentGenerationBatches = (s: ImageStoreState): GenerationBatch[] => {
   const activeTopicId = generationTopicSelectors.activeGenerationTopicId(s);
   if (!activeTopicId) return [];
-  return s.generationBatchesMap[activeTopicId] || [];
+  return getGenerationBatchByTopicId(activeTopicId)(s);
 };
 
 const isGenerationBatchLoading =
@@ -27,6 +31,7 @@ const isCurrentGenerationBatchLoading = (s: ImageStoreState): boolean => {
 // ====== aggregate selectors ====== //
 
 export const generationBatchSelectors = {
+  getGenerationBatchByTopicId,
   currentGenerationBatches,
   isGenerationBatchLoading,
   isCurrentGenerationBatchLoading,

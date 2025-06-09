@@ -116,6 +116,9 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
   const removeGenerationTopic = useImageStore((s) => s.removeGenerationTopic);
   const switchGenerationTopic = useImageStore((s) => s.switchGenerationTopic);
   const activeTopicId = useImageStore(generationTopicSelectors.activeGenerationTopicId);
+  const thumbnailUrl = useImageStore(
+    generationTopicSelectors.getGenerationTopicThumbnailUrl(topic.id),
+  );
 
   const isActive = activeTopicId === topic.id;
 
@@ -169,7 +172,7 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
         className={cx(styles.container, isActive && styles.activeContainer)}
         onClick={handleClick}
       >
-        <Avatar avatar={topic.imageUrl} loading={isLoading} size={50} style={{ borderRadius: 6 }} />
+        <Avatar avatar={thumbnailUrl} loading={isLoading} size={50} style={{ borderRadius: 6 }} />
       </div>
     </Tooltip>
   );

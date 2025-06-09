@@ -8,13 +8,14 @@ import { useFetchGenerationTopics } from '@/hooks/useFetchGenerationTopics';
 import { useImageStore } from '@/store/image';
 import { generationTopicSelectors } from '@/store/image/selectors';
 
-import AddButton from './NewTopicButton';
+import NewTopicButton from './NewTopicButton';
 import TopicItem from './TopicItem';
 
 const TopicsList = memo(() => {
   useFetchGenerationTopics();
   const [parent] = useAutoAnimate();
   const generationTopics = useImageStore(generationTopicSelectors.generationTopics);
+  const openNewGenerationTopic = useImageStore((s) => s.openNewGenerationTopic);
   const isEmpty = !generationTopics || generationTopics.length === 0;
 
   if (isEmpty) {
@@ -32,7 +33,7 @@ const TopicsList = memo(() => {
         width: 60,
       }}
     >
-      <AddButton />
+      <NewTopicButton onClick={openNewGenerationTopic} />
 
       <Flexbox align="center" gap={6} ref={parent}>
         {generationTopics.map((topic) => (

@@ -32,6 +32,7 @@ export interface GenerationTopicAction {
   summaryGenerationTopicTitle: (topicId: string, prompts: string[]) => Promise<string>;
   refreshGenerationTopics: () => Promise<void>;
   switchGenerationTopic: (topicId: string) => void;
+  openNewGenerationTopic: () => void;
 
   internal_updateGenerationTopicLoading: (id: string, loading: boolean) => void;
   internal_dispatchGenerationTopic: (payload: GenerationTopicDispatch, action?: any) => void;
@@ -78,6 +79,10 @@ export const createGenerationTopicSlice: StateCreator<
     if (get().activeGenerationTopicId === topicId) return;
 
     set({ activeGenerationTopicId: topicId }, false, n('switchGenerationTopic'));
+  },
+
+  openNewGenerationTopic: () => {
+    set({ activeGenerationTopicId: null }, false, n('openNewGenerationTopic'));
   },
 
   summaryGenerationTopicTitle: async (topicId: string, prompts: string[]) => {
