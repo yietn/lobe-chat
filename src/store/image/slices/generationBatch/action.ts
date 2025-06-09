@@ -12,6 +12,7 @@ import { Generation, GenerationBatch } from '@/types/generation';
 import { setNamespace } from '@/utils/storeDebug';
 
 import { ImageStore } from '../../store';
+import { generationTopicSelectors } from '../generationTopic/selectors';
 import { GenerationBatchDispatch, generationBatchReducer } from './reducer';
 
 type GenerationBatchWithAsyncTaskId = GenerationBatch & {
@@ -140,6 +141,20 @@ export const createGenerationBatchSlice: StateCreator<
                   `useCheckGenerationStatus/${data.status === AsyncTaskStatus.Success ? 'success' : 'error'}`,
                 ),
               );
+
+              // 如果生成成功且有缩略图，检查当前 topic 是否有 imageUrl
+              if (data.status === AsyncTaskStatus.Success && data.generation.asset?.thumbnailUrl) {
+                const currentTopic =
+                  generationTopicSelectors.getGenerationTopicById(topicId)(get());
+
+                // 如果当前 topic 没有 imageUrl，使用这个 generation 的 thumbnailUrl 更新
+                if (currentTopic && !currentTopic.imageUrl) {
+                  await get().updateGenerationTopicImageUrl(
+                    topicId,
+                    data.generation.asset.thumbnailUrl,
+                  );
+                }
+              }
             }
 
             // 在成功或失败后都要 refreshGenerationBatches

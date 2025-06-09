@@ -33,6 +33,7 @@ export interface GenerationTopicAction {
   refreshGenerationTopics: () => Promise<void>;
   switchGenerationTopic: (topicId: string) => void;
   openNewGenerationTopic: () => void;
+  updateGenerationTopicImageUrl: (topicId: string, imageUrl: string) => Promise<void>;
 
   internal_updateGenerationTopicLoading: (id: string, loading: boolean) => void;
   internal_dispatchGenerationTopic: (payload: GenerationTopicDispatch, action?: any) => void;
@@ -228,5 +229,10 @@ export const createGenerationTopicSlice: StateCreator<
     } finally {
       get().internal_updateGenerationTopicLoading(id, false);
     }
+  },
+
+  updateGenerationTopicImageUrl: async (topicId: string, imageUrl: string) => {
+    const { internal_updateGenerationTopic } = get();
+    await internal_updateGenerationTopic(topicId, { imageUrl });
   },
 });
