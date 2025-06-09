@@ -5,6 +5,7 @@ import { Icon, Tooltip } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { omit } from 'lodash-es';
 import { AlertTriangle, Loader2, Settings, Trash2 } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +15,7 @@ import ImageItem from '@/components/ImageItem';
 import { useImageStore } from '@/store/image';
 import { generationTopicSelectors } from '@/store/image/selectors';
 import { generationBatchSelectors } from '@/store/image/slices/generationBatch/selectors';
+import { StdImageGenParams } from '@/store/image/utils/StandardParameters';
 import { AsyncTaskStatus } from '@/types/asyncTask';
 import { Generation, GenerationBatch } from '@/types/generation';
 
@@ -310,8 +312,9 @@ const GenerationItem = memo<{
 const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
   const { styles } = useStyles();
   const { t } = useTranslation('image');
-  const deleteGenerationBatch = useImageStore((s) => s.deleteGenerationBatch);
   const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
+  const deleteGenerationBatch = useImageStore((s) => s.deleteGenerationBatch);
+  const reuseSettings = useImageStore((s) => s.reuseSettings);
   const [imageGridRef] = useAutoAnimate();
 
   const timeAgo = useMemo(() => {
@@ -319,8 +322,7 @@ const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
   }, [batch.createdAt]);
 
   const handleBatchSettings = () => {
-    // TODO: 实现批次设置逻辑
-    console.log('Batch settings:', batch.id);
+    reuseSettings(omit(batch.config as StdImageGenParams, ['seed']));
   };
 
   const handleDeleteBatch = async () => {
