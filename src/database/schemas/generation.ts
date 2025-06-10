@@ -26,7 +26,7 @@ export const generationTopics = pgTable('generation_topics', {
   title: text('title'),
 
   /** 主题封面图片 URL */
-  imageUrl: text('image_url'),
+  coverUrl: text('cover_url'),
 
   ...timestamps,
 });

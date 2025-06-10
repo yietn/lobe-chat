@@ -1,1 +1,0 @@
-ALTER TABLE "generations" ALTER COLUMN "seed" SET DATA TYPE integer USING seed::integer;

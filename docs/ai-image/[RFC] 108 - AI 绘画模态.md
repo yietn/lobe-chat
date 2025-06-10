@@ -287,7 +287,7 @@ graph TD
     H --> L[Asset<br/>文件资源]
 
     subgraph "GenerationTopic 内容"
-        AT[title: 主题标题<br/>imageUrl: 主题封面<br/>model/provider: 模型信息]
+        AT[title: 主题标题<br/>coverUrl: 主题封面<br/>model/provider: 模型信息]
     end
 
     subgraph "GenerationBatch 内容"
@@ -299,7 +299,7 @@ graph TD
     end
 
     subgraph "Asset 内容"
-        LT[originImageUrl: 原始CDN地址<br/>imageUrl: OSS地址<br/>thumbnailUrl: 缩略图<br/>width/height: 图片尺寸]
+        LT[originImageUrl: 原始CDN地址<br/>coverUrl: OSS地址<br/>thumbnailUrl: 缩略图<br/>width/height: 图片尺寸]
     end
 
     style A fill:#e1f5fe
@@ -445,7 +445,7 @@ export const generationTopics = pgTable('generation_topics', {
     .notNull(),
   // 简要描述主题内容, LLM 生成，复用 chat 的 topic title 生成
   title: text('title').notNull(),
-  imageUrl: text('image_url'),
+  coverUrl: text('cover_url'),
   ...timestamps,
 });
 ```

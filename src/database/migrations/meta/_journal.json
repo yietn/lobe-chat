@@ -179,15 +179,15 @@
     {
       "idx": 25,
       "version": "7",
-      "when": 1749368077118,
-      "tag": "0025_ai_image",
+      "when": 1749309388370,
+      "tag": "0025_add_provider_config",
       "breakpoints": true
     },
     {
       "idx": 26,
       "version": "7",
-      "when": 1749456201152,
-      "tag": "0026_change_seed_type",
+      "when": 1749521244623,
+      "tag": "0026_ai_image",
       "breakpoints": true
     }
   ],

@@ -1,6 +1,6 @@
 import debug from 'debug';
 
-import { ModelProvider } from '../types';
+import { ChatStreamPayload, ModelProvider } from '../types';
 import { processMultiProviderModelList } from '../utils/modelParse';
 import { createOpenAICompatibleRuntime } from '../utils/openaiCompatibleFactory';
 import { pruneReasoningPayload } from '../utils/openaiHelpers';
@@ -18,6 +18,10 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
   chatCompletion: {
     handlePayload: (payload) => {
       const { model } = payload;
+
+      if (model === 'o1-pro') {
+        return { ...payload, apiMode: 'responses' } as ChatStreamPayload;
+      }
 
       if (prunePrefixes.some((prefix) => model.startsWith(prefix))) {
         return pruneReasoningPayload(payload) as any;
@@ -61,6 +65,7 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
   },
   debug: {
     chatCompletion: () => process.env.DEBUG_OPENAI_CHAT_COMPLETION === '1',
+    responses: () => process.env.DEBUG_OPENAI_RESPONSES === '1',
   },
   models: async ({ client }) => {
     const modelsPage = (await client.models.list()) as any;
@@ -70,4 +75,18 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
     return processMultiProviderModelList(modelList);
   },
   provider: ModelProvider.OpenAI,
+  responses: {
+    handlePayload: (payload: ChatStreamPayload) => {
+      const { model } = payload;
+      if (prunePrefixes.some((prefix) => model.startsWith(prefix))) {
+        if (!payload.reasoning) {
+          payload.reasoning = { summary: 'auto' };
+        } else {
+          payload.reasoning.summary = 'auto';
+        }
+      }
+
+      return { ...payload, stream: payload.stream ?? true };
+    },
+  },
 });

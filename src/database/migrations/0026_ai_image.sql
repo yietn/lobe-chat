@@ -18,7 +18,7 @@ CREATE TABLE "generation_topics" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
 	"title" text,
-	"image_url" text,
+	"cover_url" text,
 	"accessed_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
@@ -29,7 +29,7 @@ CREATE TABLE "generations" (
 	"user_id" text NOT NULL,
 	"generation_batch_id" varchar(64) NOT NULL,
 	"async_task_id" uuid,
-	"seed" text,
+	"seed" integer,
 	"asset" jsonb,
 	"accessed_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
