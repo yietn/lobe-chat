@@ -2,6 +2,7 @@ import debug from 'debug';
 import { z } from 'zod';
 
 import { ASYNC_TASK_TIMEOUT, AsyncTaskModel } from '@/database/models/asyncTask';
+import { FileModel } from '@/database/models/file';
 import { GenerationModel } from '@/database/models/generation';
 import { CreateImageParams } from '@/libs/model-runtime/types/image';
 import { asyncAuthedProcedure, asyncRouter as router } from '@/libs/trpc/async';
@@ -21,6 +22,7 @@ const imageProcedure = asyncAuthedProcedure.use(async (opts) => {
     ctx: {
       asyncTaskModel: new AsyncTaskModel(ctx.serverDB, ctx.userId),
       generationModel: new GenerationModel(ctx.serverDB, ctx.userId),
+      fileModel: new FileModel(ctx.serverDB, ctx.userId),
     },
   });
 });
@@ -98,7 +100,27 @@ export const imageRouter = router({
           thumbnailImage,
         );
 
-        log('Updating generation asset: %s', generationId);
+        // 创建对应的文件记录
+        log('Creating file record for generated image: %s', generationId);
+        const file = await ctx.fileModel.create(
+          {
+            fileType: image.mime,
+            fileHash: image.hash,
+            name: `${params.prompt.slice(0, 50)}.${image.extension}`, // 使用 prompt 前50个字符作为文件名
+            size: image.size,
+            url: uploadedImageUrl,
+            metadata: {
+              width: image.width,
+              height: image.height,
+              generationId,
+            },
+          },
+          // 基本上不会重复，所以每次都创建 globalFile，先判断是否存在纯浪费
+          true,
+        );
+
+        // 更新 generation 记录，关联创建的文件 ID
+        log('Updating generation with asset and file ID: %s', file.id);
         await ctx.generationModel.update(generationId, {
           asset: {
             originalUrl: imageUrl,
@@ -107,6 +129,7 @@ export const imageRouter = router({
             height: height ?? image.height,
             thumbnailUrl: thumbnailImageUrl,
           },
+          fileId: file.id,
         });
 
         log('Updating task status to Success: %s', taskId);

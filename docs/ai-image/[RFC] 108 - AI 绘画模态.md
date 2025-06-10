@@ -400,6 +400,7 @@ export const generations = pgTable('generations', {
   // 直接对图片的 upscale 可以考虑把升级后的地址放 asset
   asset: jsonb('asset'),
   // { imageUrl: '', thumbnailUrl: '', image2x: '', width: 1024, height: 1024 }
+  fileId: text('file_id').references(() => files.id, { onDelete: 'set null' }),
 
   // 图片语义化搜索功能 - 后续实现
   // imageEmbedding: vector(1536),

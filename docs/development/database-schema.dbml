@@ -249,6 +249,7 @@ table generations {
   user_id text [not null]
   generation_batch_id varchar(64) [not null]
   async_task_id uuid
+  file_id text
   seed integer
   asset jsonb
   accessed_at "timestamp with time zone" [not null, default: `now()`]
@@ -885,6 +886,8 @@ ref: unstructured_chunks.file_id - files.id
 ref: document_chunks.document_id > documents.id
 
 ref: documents.file_id > files.id
+
+ref: generations.file_id - files.id
 
 ref: files.embedding_task_id - async_tasks.id
 

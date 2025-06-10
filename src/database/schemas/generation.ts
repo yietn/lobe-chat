@@ -7,6 +7,7 @@ import { GenerationAsset } from '@/types/generation';
 
 import { timestamps } from './_helpers';
 import { asyncTasks } from './asyncTask';
+import { files } from './file';
 import { users } from './user';
 
 /**
@@ -107,6 +108,9 @@ export const generations = pgTable('generations', {
   asyncTaskId: uuid('async_task_id').references(() => asyncTasks.id, {
     onDelete: 'set null',
   }),
+
+  /** 关联的生成文件 ID，删除文件时连带删除生成记录 */
+  fileId: text('file_id').references(() => files.id, { onDelete: 'cascade' }),
 
   /** 是否收藏 */
   //   favorite: boolean('favorite').default(false).notNull(),

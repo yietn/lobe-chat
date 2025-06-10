@@ -537,5 +537,14 @@
     "bps": true,
     "folderMillis": 1749521244623,
     "hash": "f53e8bf5ff54200917572ad938db90c3836db89f0c508779b04c1f5c0d4ea870"
+  },
+  {
+    "sql": [
+      "ALTER TABLE \"generations\" ADD COLUMN \"file_id\" text;",
+      "\nALTER TABLE \"generations\" ADD CONSTRAINT \"generations_file_id_files_id_fk\" FOREIGN KEY (\"file_id\") REFERENCES \"public\".\"files\"(\"id\") ON DELETE cascade ON UPDATE no action;"
+    ],
+    "bps": true,
+    "folderMillis": 1749552657856,
+    "hash": "97687ea54d469eddcd16461d710030a52c994dac4cdd38c76a7947dbdf6f9286"
   }
 ]

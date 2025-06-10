@@ -2,6 +2,7 @@ import debug from 'debug';
 import { and, eq } from 'drizzle-orm';
 
 import { LobeChatDatabase } from '@/database/type';
+import { GenerationAsset } from '@/types/generation';
 
 import { GenerationItem, NewGeneration, generations } from '../schemas/generation';
 
@@ -70,6 +71,11 @@ export class GenerationModel {
 
     log('Generation %s updated successfully', id);
     return result;
+  }
+
+  async updateAsset(id: string, asset: GenerationAsset) {
+    log('Updating generation asset: %s with dimensions: %dx%d', id, asset.width, asset.height);
+    return this.update(id, { asset });
   }
 
   async delete(id: string) {

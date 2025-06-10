@@ -155,7 +155,10 @@ export const filesRelations = relations(files, ({ many, one }) => ({
   sessions: many(filesToSessions),
   agents: many(agentsFiles),
   documents: many(documents, { relationName: 'fileDocuments' }),
-
+  generation: one(generations, {
+    fields: [files.id],
+    references: [generations.fileId],
+  }),
   chunkingTask: one(asyncTasks, {
     fields: [files.chunkTaskId],
     references: [asyncTasks.id],
@@ -228,5 +231,9 @@ export const generationsRelations = relations(generations, ({ one }) => ({
   asyncTask: one(asyncTasks, {
     fields: [generations.asyncTaskId],
     references: [asyncTasks.id],
+  }),
+  file: one(files, {
+    fields: [generations.fileId],
+    references: [files.id],
   }),
 }));

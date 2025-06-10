@@ -1,9 +1,11 @@
 import debug from 'debug';
+import { sha256 } from 'js-sha256';
 import { nanoid } from 'nanoid';
 import sharp from 'sharp';
 
 import { S3 } from '@/server/modules/S3';
 import { getYYYYmmddHHMMss } from '@/utils/time';
+import { inferContentTypeFromImageUrl } from '@/utils/url';
 
 const log = debug('lobe-image:generation-service');
 
@@ -12,6 +14,9 @@ interface ImageForGeneration {
   width: number;
   height: number;
   extension: string;
+  mime: string;
+  size: number;
+  hash: string;
 }
 
 /**
@@ -25,10 +30,13 @@ export async function transformImageForGeneration(url: string): Promise<{
 
   // If the url is in base64 format, extract the Buffer directly; otherwise, use fetch to get the Buffer
   let originalImageBuffer: Buffer;
+  let originalMimeType: string;
+
   if (url.startsWith('data:')) {
     log('Processing base64 image data');
-    // Extract the base64 data part
-    const base64Data = url.split(',')[1];
+    // Extract the MIME type and base64 data part
+    const [mimeTypePart, base64Data] = url.split(',');
+    originalMimeType = mimeTypePart.split(':')[1].split(';')[0];
     originalImageBuffer = Buffer.from(base64Data, 'base64');
   } else {
     log('Fetching image from URL:', url);
@@ -37,8 +45,13 @@ export async function transformImageForGeneration(url: string): Promise<{
       throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
     }
     originalImageBuffer = Buffer.from(await response.arrayBuffer());
+    originalMimeType = inferContentTypeFromImageUrl(url) || 'image/jpeg';
     log('Successfully fetched image, buffer size:', originalImageBuffer.length);
   }
+
+  // Calculate hash for original image
+  const originalHash = sha256(originalImageBuffer);
+  log('Original image hash calculated:', originalHash);
 
   const sharpInstance = sharp(originalImageBuffer);
   const { format, width, height } = await sharpInstance.metadata();
@@ -66,6 +79,10 @@ export async function transformImageForGeneration(url: string): Promise<{
     ? await sharpInstance.resize(thumbnailWidth, thumbnailHeight).webp().toBuffer()
     : originalImageBuffer;
 
+  // Calculate hash for thumbnail
+  const thumbnailHash = sha256(thumbnailBuffer);
+  log('Thumbnail image hash calculated:', thumbnailHash);
+
   log('Image transformation completed successfully');
 
   return {
@@ -73,13 +90,19 @@ export async function transformImageForGeneration(url: string): Promise<{
       buffer: originalImageBuffer,
       width,
       height,
-      extension: url.split('.').pop() || '',
+      extension: url.split('.').pop() || format || 'jpg',
+      mime: originalMimeType,
+      size: originalImageBuffer.length,
+      hash: originalHash,
     },
     thumbnailImage: {
       buffer: thumbnailBuffer,
       width: thumbnailWidth,
       height: thumbnailHeight,
       extension: 'webp',
+      mime: 'image/webp',
+      size: thumbnailBuffer.length,
+      hash: thumbnailHash,
     },
   };
 }
