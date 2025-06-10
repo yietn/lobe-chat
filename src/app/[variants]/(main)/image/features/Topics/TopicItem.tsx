@@ -169,7 +169,7 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
         className={cx(styles.container, isActive && styles.activeContainer)}
         onClick={handleClick}
       >
-        <Avatar avatar={topic.imageUrl} loading={isLoading} size={50} style={{ borderRadius: 6 }} />
+        <Avatar avatar={topic.coverUrl} loading={isLoading} size={50} style={{ borderRadius: 6 }} />
       </div>
     </Tooltip>
   );

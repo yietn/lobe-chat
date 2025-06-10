@@ -184,7 +184,6 @@ export interface AIEmbeddingModelCard extends AIBaseModelCard {
 }
 
 export interface AIImageModelCard extends AIBaseModelCard {
-  // [resolution: string]: number;
   parameters?: Record<string, any>;
   pricing?: {
     /**

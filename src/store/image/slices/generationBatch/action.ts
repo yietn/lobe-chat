@@ -243,7 +243,7 @@ export const createGenerationBatchSlice: StateCreator<
                   generationTopicSelectors.getGenerationTopicById(topicId)(get());
 
                 // 如果当前 topic 没有 imageUrl，使用这个 generation 的 thumbnailUrl 更新
-                if (currentTopic && !currentTopic.imageUrl) {
+                if (currentTopic && !currentTopic.coverUrl) {
                   await get().updateGenerationTopicImageUrl(
                     topicId,
                     data.generation.asset.thumbnailUrl,

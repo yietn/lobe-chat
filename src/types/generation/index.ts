@@ -3,7 +3,7 @@ import { AsyncTaskError, AsyncTaskStatus } from '../asyncTask';
 export interface ImageGenerationTopic {
   id: string;
   title?: string | null;
-  imageUrl?: string | null;
+  coverUrl?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,9 +32,13 @@ export interface GenerationAsset {
 }
 
 export interface GenerationConfig {
-  size: string;
-  steps: number;
-  cfg: number;
+  prompt: string;
+  width?: number;
+  height?: number;
+  aspectRatio?: string;
+  size?: string;
+  steps?: number;
+  cfg?: number;
 }
 
 export interface Generation {

@@ -34,7 +34,7 @@ export const generationTopicReducer = (
         const now = new Date();
         draftState.unshift({
           title: payload.value.title || null,
-          imageUrl: payload.value.imageUrl || null,
+          coverUrl: payload.value.coverUrl || null,
           createdAt: payload.value.createdAt || now,
           updatedAt: payload.value.updatedAt || now,
           ...payload.value,

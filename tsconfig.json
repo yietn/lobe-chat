@@ -36,7 +36,6 @@
     "next-env.d.ts",
     "src",
     "tests",
-    "vitest.config.ts",
-    "test.mts"
+    "vitest.config.ts"
   ]
 }
