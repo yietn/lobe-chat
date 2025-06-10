@@ -237,6 +237,9 @@ const GenerationItem = memo<{
       <div className={styles.imageContainer} style={{ ...imageSize }}>
         <ImageItem
           alt={prompt}
+          preview={{
+            src: generation.asset.thumbnailUrl,
+          }}
           style={{ width: '100%', height: '100%' }}
           url={generation.asset.url}
         />

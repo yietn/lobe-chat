@@ -2,6 +2,7 @@ import debug from 'debug';
 import { and, eq } from 'drizzle-orm';
 
 import { LobeChatDatabase } from '@/database/type';
+import { FileService } from '@/server/services/file';
 import { AsyncTaskStatus } from '@/types/asyncTask';
 import { Generation, GenerationAsset, GenerationBatch, GenerationConfig } from '@/types/generation';
 
@@ -12,10 +13,12 @@ const log = debug('lobe-image:generation-batch-model');
 export class GenerationBatchModel {
   private db: LobeChatDatabase;
   private userId: string;
+  private fileService: FileService;
 
   constructor(db: LobeChatDatabase, userId: string) {
     this.db = db;
     this.userId = userId;
+    this.fileService = new FileService(db, userId);
   }
 
   async create(value: NewGenerationBatch): Promise<GenerationBatchItem> {
@@ -101,28 +104,48 @@ export class GenerationBatchModel {
     }
 
     // Transform the database result to match our frontend types
-    const result: GenerationBatch[] = batchesWithGenerations.map((batch) => ({
-      id: batch.id,
-      provider: batch.provider,
-      model: batch.model,
-      prompt: batch.prompt,
-      width: batch.width,
-      height: batch.height,
-      config: batch.config as GenerationConfig,
-      createdAt: batch.createdAt,
-      generations: batch.generations.map((gen): Generation & { asyncTaskId?: string } => ({
-        id: gen.id,
-        asset: gen.asset as GenerationAsset | null,
-        seed: gen.seed,
-        createdAt: gen.createdAt,
-        asyncTaskId: gen.asyncTaskId || undefined,
-        task: {
-          id: gen.asyncTaskId,
-          status: gen.asyncTask?.status as AsyncTaskStatus,
-          error: gen.asyncTask?.error ? gen.asyncTask.error : undefined,
-        },
-      })),
-    }));
+    const result: GenerationBatch[] = await Promise.all(
+      batchesWithGenerations.map(async (batch) => {
+        const generations = await Promise.all(
+          batch.generations.map(async (gen): Promise<Generation & { asyncTaskId?: string }> => {
+            const asset = gen.asset as GenerationAsset | null;
+            if (asset && asset.url && asset.thumbnailUrl) {
+              const [url, thumbnailUrl] = await Promise.all([
+                this.fileService.getFullFileUrl(asset.url),
+                this.fileService.getFullFileUrl(asset.thumbnailUrl),
+              ]);
+              asset.url = url;
+              asset.thumbnailUrl = thumbnailUrl;
+            }
+
+            return {
+              id: gen.id,
+              asset,
+              seed: gen.seed,
+              createdAt: gen.createdAt,
+              asyncTaskId: gen.asyncTaskId || undefined,
+              task: {
+                id: gen.asyncTaskId,
+                status: gen.asyncTask?.status as AsyncTaskStatus,
+                error: gen.asyncTask?.error ? gen.asyncTask.error : undefined,
+              },
+            };
+          }),
+        );
+
+        return {
+          id: batch.id,
+          provider: batch.provider,
+          model: batch.model,
+          prompt: batch.prompt,
+          width: batch.width,
+          height: batch.height,
+          config: batch.config as GenerationConfig,
+          createdAt: batch.createdAt,
+          generations,
+        };
+      }),
+    );
 
     log('Feed construction complete for topic: %s, returning %d batches', topicId, result.length);
     return result;

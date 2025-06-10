@@ -29,6 +29,9 @@ export const generationRouter = router({
   getGenerationStatus: generationProcedure
     .input(z.object({ generationId: z.string(), asyncTaskId: z.string() }))
     .query(async ({ ctx, input }) => {
+      // Check for timeout tasks before querying
+      await ctx.asyncTaskModel.checkTimeoutTasks([input.asyncTaskId]);
+
       const asyncTask = await ctx.asyncTaskModel.findById(input.asyncTaskId);
       if (!asyncTask) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Async task not found' });

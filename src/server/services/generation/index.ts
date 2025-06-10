@@ -96,10 +96,10 @@ export async function uploadImageForGeneration(
   const uuid = nanoid();
   const dateTime = getYYYYmmddHHMMss(new Date());
   const pathPrefix = `${generationImagesFolder}/${uuid}_${image.width}x${image.height}_${dateTime}`;
-  const imagePath = `${pathPrefix}_raw.${image.extension}`;
-  const thumbnailPath = `${pathPrefix}_thumb.${thumbnail.extension}`;
+  const imageKey = `${pathPrefix}_raw.${image.extension}`;
+  const thumbnailKey = `${pathPrefix}_thumb.${thumbnail.extension}`;
 
-  log('Generated paths:', { imagePath, thumbnailPath });
+  log('Generated paths:', { imagePath: imageKey, thumbnailPath: thumbnailKey });
 
   // Check if image and thumbnail buffers are identical
   const isIdenticalBuffer = image.buffer.equals(thumbnail.buffer);
@@ -112,26 +112,29 @@ export async function uploadImageForGeneration(
   if (isIdenticalBuffer) {
     log('Buffers are identical, uploading single image');
     // If buffers are identical, only upload once
-    const imageUrl = await s3.uploadMedia(imagePath, image.buffer);
-    log('Single image uploaded successfully:', imageUrl);
+    await s3.uploadMedia(imageKey, image.buffer);
+    log('Single image uploaded successfully:', imageKey);
     // Use the same URL for both image and thumbnail
     return {
-      imageUrl,
-      thumbnailImageUrl: imageUrl,
+      imageUrl: imageKey,
+      thumbnailImageUrl: imageKey,
     };
   } else {
     log('Buffers are different, uploading both images');
     // If buffers are different, upload both
-    const [imageUrl, thumbnailImageUrl] = await Promise.all([
-      s3.uploadMedia(imagePath, image.buffer),
-      s3.uploadMedia(thumbnailPath, thumbnail.buffer),
+    await Promise.all([
+      s3.uploadMedia(imageKey, image.buffer),
+      s3.uploadMedia(thumbnailKey, thumbnail.buffer),
     ]);
 
-    log('Both images uploaded successfully:', { imageUrl, thumbnailImageUrl });
+    log('Both images uploaded successfully:', {
+      imageUrl: imageKey,
+      thumbnailImageUrl: thumbnailKey,
+    });
 
     return {
-      imageUrl,
-      thumbnailImageUrl,
+      imageUrl: imageKey,
+      thumbnailImageUrl: thumbnailKey,
     };
   }
 }

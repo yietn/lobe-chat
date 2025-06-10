@@ -145,19 +145,16 @@ export class S3 {
     return this.client.send(command);
   }
 
-  public async uploadMedia(path: string, buffer: Buffer) {
+  public async uploadMedia(key: string, buffer: Buffer) {
     const command = new PutObjectCommand({
       ACL: this.setAcl ? 'public-read' : undefined,
       Bucket: this.bucket,
-      Key: path,
+      Key: key,
       Body: buffer,
       CacheControl: `public, max-age=${YEAR}`,
-      ContentType: inferContentTypeFromImageUrl(path)!,
+      ContentType: inferContentTypeFromImageUrl(key)!,
     });
 
     await this.client.send(command);
-
-    // Return the public URL of the uploaded image
-    return `${fileEnv.S3_PUBLIC_DOMAIN}/${path}`;
   }
 }

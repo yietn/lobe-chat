@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { z } from 'zod';
 
-import { AsyncTaskModel } from '@/database/models/asyncTask';
+import { ASYNC_TASK_TIMEOUT, AsyncTaskModel } from '@/database/models/asyncTask';
 import { GenerationModel } from '@/database/models/generation';
 import { CreateImageParams } from '@/libs/model-runtime/types/image';
 import { asyncAuthedProcedure, asyncRouter as router } from '@/libs/trpc/async';
@@ -10,7 +10,7 @@ import {
   transformImageForGeneration,
   uploadImageForGeneration,
 } from '@/server/services/generation';
-import { AsyncTaskError, AsyncTaskStatus } from '@/types/asyncTask';
+import { AsyncTaskError, AsyncTaskErrorType, AsyncTaskStatus } from '@/types/asyncTask';
 
 const log = debug('lobe-image:async');
 
@@ -59,50 +59,67 @@ export const imageRouter = router({
     await ctx.asyncTaskModel.update(taskId, { status: AsyncTaskStatus.Processing });
 
     try {
-      log('Initializing agent runtime for provider: %s', provider);
-      const agentRuntime = await initAgentRuntimeWithUserPayload(provider, ctx.jwtPayload);
-
-      log('Agent runtime initialized, calling createImage');
-      const response = await agentRuntime.createImage({
-        model,
-        params: params as unknown as CreateImageParams,
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new AsyncTaskError(
+              AsyncTaskErrorType.Timeout,
+              'image generation task is timeout, please try again',
+            ),
+          );
+        }, ASYNC_TASK_TIMEOUT);
       });
 
-      if (!response) {
-        log('Create image response is empty');
-        throw new Error('Create image response is empty');
-      }
+      const imageGenerationPromise = async () => {
+        log('Initializing agent runtime for provider: %s', provider);
+        const agentRuntime = await initAgentRuntimeWithUserPayload(provider, ctx.jwtPayload);
 
-      log('Image generation successful: %O', {
-        imageUrl: response.imageUrl,
-        width: response.width,
-        height: response.height,
-      });
+        log('Agent runtime initialized, calling createImage');
+        const response = await agentRuntime.createImage({
+          model,
+          params: params as unknown as CreateImageParams,
+        });
 
-      const { imageUrl, width, height } = response;
-      const { image, thumbnailImage } = await transformImageForGeneration(imageUrl);
-      const { imageUrl: uploadedImageUrl, thumbnailImageUrl } = await uploadImageForGeneration(
-        image,
-        thumbnailImage,
-      );
+        if (!response) {
+          log('Create image response is empty');
+          throw new Error('Create image response is empty');
+        }
 
-      log('Updating generation asset: %s', generationId);
-      await ctx.generationModel.update(generationId, {
-        asset: {
-          originalUrl: imageUrl,
-          url: uploadedImageUrl,
-          width: width ?? image.width,
-          height: height ?? image.height,
-          thumbnailUrl: thumbnailImageUrl,
-        },
-      });
+        log('Image generation successful: %O', {
+          imageUrl: response.imageUrl,
+          width: response.width,
+          height: response.height,
+        });
 
-      log('Updating task status to Success: %s', taskId);
-      await ctx.asyncTaskModel.update(taskId, {
-        status: AsyncTaskStatus.Success,
-      });
+        const { imageUrl, width, height } = response;
+        const { image, thumbnailImage } = await transformImageForGeneration(imageUrl);
+        const { imageUrl: uploadedImageUrl, thumbnailImageUrl } = await uploadImageForGeneration(
+          image,
+          thumbnailImage,
+        );
 
-      log('Async image generation completed successfully: %s', taskId);
+        log('Updating generation asset: %s', generationId);
+        await ctx.generationModel.update(generationId, {
+          asset: {
+            originalUrl: imageUrl,
+            url: uploadedImageUrl,
+            width: width ?? image.width,
+            height: height ?? image.height,
+            thumbnailUrl: thumbnailImageUrl,
+          },
+        });
+
+        log('Updating task status to Success: %s', taskId);
+        await ctx.asyncTaskModel.update(taskId, {
+          status: AsyncTaskStatus.Success,
+        });
+
+        log('Async image generation completed successfully: %s', taskId);
+        return { success: true };
+      };
+
+      // Race between the image generation process and the timeout
+      return await Promise.race([imageGenerationPromise(), timeoutPromise]);
     } catch (e) {
       log('Async image generation failed: %O', {
         taskId,
@@ -116,6 +133,11 @@ export const imageRouter = router({
       });
 
       log('Task status updated to Error: %s', taskId);
+
+      return {
+        message: `Image generation ${taskId} failed: ${(e as Error).message}`,
+        success: false,
+      };
     }
   }),
 });

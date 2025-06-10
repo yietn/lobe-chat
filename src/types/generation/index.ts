@@ -14,7 +14,7 @@ export interface GenerationAsset {
    */
   originalUrl?: string;
   /**
-   * 存到自己 oss 的 url
+   * 存到自己 oss 的 url, 只存了 key， 完整的 url 需要使用 FileService.getFullFileUrl 获取
    */
   url?: string;
   /**
