@@ -47,4 +47,22 @@ export const image = {
       count: '{{count}} 张图片',
     },
   },
+  notSupportGuide: {
+    desc: '当前部署实例为客户端数据库模式，无法使用 AI 图像生成功能。请切换到<1>服务端数据库部署模式</1>，或直接使用 <3>LobeChat Cloud</3>',
+    features: {
+      multiProviders: {
+        desc: '支持多种 AI 绘画服务商，包括 OpenAI DALL-E、Google Imagen、FAL.ai 等，提供丰富的模型选择',
+        title: '多 Providers 支持',
+      },
+      fileIntegration: {
+        desc: '与文件管理系统深度整合，生成的图片自动保存到文件系统，支持统一管理和组织',
+        title: '文件系统互通',
+      },
+      llmAssisted: {
+        desc: '结合大语言模型能力，智能优化和扩展提示词，提升图像生成质量（Coming Soon）',
+        title: 'LLM 辅助生图',
+      },
+    },
+    title: '当前部署模式不支持 AI 绘画',
+  },
 } as const;
