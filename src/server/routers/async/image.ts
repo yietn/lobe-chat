@@ -93,16 +93,25 @@ export const imageRouter = router({
           height: response.height,
         });
 
+        log('Transforming image for generation');
         const { imageUrl, width, height } = response;
         const { image, thumbnailImage } = await transformImageForGeneration(imageUrl);
+        log('Uploading image for generation');
         const { imageUrl: uploadedImageUrl, thumbnailImageUrl } = await uploadImageForGeneration(
           image,
           thumbnailImage,
         );
 
-        // 创建对应的文件记录
-        log('Creating file record for generated image: %s', generationId);
-        const file = await ctx.fileModel.create(
+        log('Updating generation asset and file');
+        await ctx.generationModel.updateAssetAndFile(
+          generationId,
+          {
+            originalUrl: imageUrl,
+            url: uploadedImageUrl,
+            width: width ?? image.width,
+            height: height ?? image.height,
+            thumbnailUrl: thumbnailImageUrl,
+          },
           {
             fileType: image.mime,
             fileHash: image.hash,
@@ -115,22 +124,7 @@ export const imageRouter = router({
               generationId,
             },
           },
-          // 基本上不会重复，所以每次都创建 globalFile，先判断是否存在纯浪费
-          true,
         );
-
-        // 更新 generation 记录，关联创建的文件 ID
-        log('Updating generation with asset and file ID: %s', file.id);
-        await ctx.generationModel.update(generationId, {
-          asset: {
-            originalUrl: imageUrl,
-            url: uploadedImageUrl,
-            width: width ?? image.width,
-            height: height ?? image.height,
-            thumbnailUrl: thumbnailImageUrl,
-          },
-          fileId: file.id,
-        });
 
         log('Updating task status to Success: %s', taskId);
         await ctx.asyncTaskModel.update(taskId, {

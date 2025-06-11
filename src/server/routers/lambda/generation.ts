@@ -5,6 +5,7 @@ import { AsyncTaskModel } from '@/database/models/asyncTask';
 import { GenerationModel } from '@/database/models/generation';
 import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
+import { FileService } from '@/server/services/file';
 import { AsyncTaskError, AsyncTaskStatus } from '@/types/asyncTask';
 import { Generation } from '@/types/generation';
 
@@ -15,6 +16,7 @@ const generationProcedure = authedProcedure.use(serverDatabase).use(async (opts)
     ctx: {
       asyncTaskModel: new AsyncTaskModel(ctx.serverDB, ctx.userId),
       generationModel: new GenerationModel(ctx.serverDB, ctx.userId),
+      fileService: new FileService(ctx.serverDB, ctx.userId),
     },
   });
 });
@@ -71,7 +73,14 @@ export const generationRouter = router({
   deleteGeneration: generationProcedure
     .input(z.object({ generationId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.generationModel.delete(input.generationId);
+      const result = await ctx.generationModel.deleteGenerationAndFile(input.generationId);
+
+      if (!result) return;
+
+      // If there's an associated file that was deleted, also delete it from S3
+      if (result.deletedFile) {
+        await ctx.fileService.deleteFile(result.deletedFile.url!);
+      }
     }),
 });
 
