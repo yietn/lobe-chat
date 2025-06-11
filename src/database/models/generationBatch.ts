@@ -80,7 +80,7 @@ export class GenerationBatchModel {
       orderBy: (table, { desc }) => [desc(table.createdAt)],
       with: {
         generations: {
-          orderBy: (table, { asc }) => [asc(table.createdAt)],
+          orderBy: (table, { asc }) => [asc(table.createdAt), asc(table.id)],
           with: {
             asyncTask: true,
           },

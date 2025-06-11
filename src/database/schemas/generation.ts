@@ -15,7 +15,7 @@ import { users } from './user';
  */
 export const generationTopics = pgTable('generation_topics', {
   id: text('id')
-    .$defaultFn(() => idGenerator('topics'))
+    .$defaultFn(() => idGenerator('generationTopics'))
     .notNull()
     .primaryKey(),
 
@@ -43,7 +43,7 @@ export type GenerationTopicItem = typeof generationTopics.$inferSelect;
 export const generationBatches = pgTable('generation_batches', {
   /** 批次 ID */
   id: text('id')
-    .$defaultFn(() => idGenerator('sessions'))
+    .$defaultFn(() => idGenerator('generationBatches'))
     .notNull()
     .primaryKey(),
 
@@ -91,7 +91,7 @@ export type GenerationBatchItem = typeof generationBatches.$inferSelect;
  */
 export const generations = pgTable('generations', {
   id: text('id')
-    .$defaultFn(() => idGenerator('messages'))
+    .$defaultFn(() => idGenerator('generations'))
     .notNull()
     .primaryKey(),
 
