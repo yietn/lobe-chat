@@ -231,8 +231,8 @@ export const createGenerationTopicSlice: StateCreator<
     }
   },
 
-  updateGenerationTopicImageUrl: async (topicId: string, imageUrl: string) => {
+  updateGenerationTopicImageUrl: async (topicId: string, coverUrl: string) => {
     const { internal_updateGenerationTopic } = get();
-    await internal_updateGenerationTopic(topicId, { imageUrl });
+    await internal_updateGenerationTopic(topicId, { coverUrl });
   },
 });

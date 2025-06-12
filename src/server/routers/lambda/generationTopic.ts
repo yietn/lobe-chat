@@ -18,7 +18,7 @@ const updateTopicSchema = z.object({
   id: z.string(),
   value: z.object({
     title: z.string().nullable().optional(),
-    imageUrl: z.string().nullable().optional(),
+    coverUrl: z.string().nullable().optional(),
   }),
 });
 

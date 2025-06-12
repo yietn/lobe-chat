@@ -1,6 +1,7 @@
 import { desc, eq } from 'drizzle-orm/expressions';
 
 import { LobeChatDatabase } from '@/database/type';
+import { FileService } from '@/server/services/file';
 import { ImageGenerationTopic } from '@/types/generation';
 
 import { generationTopics } from '../schemas/generation';
@@ -8,20 +9,31 @@ import { generationTopics } from '../schemas/generation';
 export class GenerationTopicModel {
   private userId: string;
   private db: LobeChatDatabase;
+  private fileService: FileService;
 
   constructor(db: LobeChatDatabase, userId: string) {
     this.userId = userId;
     this.db = db;
+    this.fileService = new FileService(db, userId);
   }
 
   queryAll = async () => {
-    return (
-      this.db
-        .select()
-        .from(generationTopics)
-        // 按照最后更新时间排序, 这里的更新应该包括用户点击生成按钮
-        .orderBy(desc(generationTopics.updatedAt))
-        .where(eq(generationTopics.userId, this.userId))
+    const topics = await this.db
+      .select()
+      .from(generationTopics)
+      .orderBy(desc(generationTopics.updatedAt))
+      .where(eq(generationTopics.userId, this.userId));
+
+    return Promise.all(
+      topics.map(async (topic) => {
+        if (topic.coverUrl) {
+          return {
+            ...topic,
+            coverUrl: await this.fileService.getFullFileUrl(topic.coverUrl),
+          };
+        }
+        return topic;
+      }),
     );
   };
 
