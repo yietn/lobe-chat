@@ -7,7 +7,8 @@ export interface GenerationTopicState {
 }
 
 export const initialGenerationTopicState: GenerationTopicState = {
-  activeGenerationTopicId: null,
+  activeGenerationTopicId:
+    typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('topic') : null,
   loadingGenerationTopicIds: [],
   generationTopics: [],
 };
