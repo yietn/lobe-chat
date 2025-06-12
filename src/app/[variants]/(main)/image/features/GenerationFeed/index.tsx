@@ -1,12 +1,14 @@
 'use client';
 
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { Icon, Tooltip } from '@lobehub/ui';
+import { ModelIcon } from '@lobehub/icons';
+import { ActionIcon, Icon } from '@lobehub/ui';
+import { App } from 'antd';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { omit } from 'lodash-es';
-import { AlertTriangle, Loader2, Settings, Trash2 } from 'lucide-react';
+import { AlertTriangle, Dices, Download, Loader2, Settings, Trash2 } from 'lucide-react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
@@ -64,6 +66,14 @@ const useStyles = createStyles(({ css, token }) => ({
     margin-bottom: 4px;
     word-break: break-word;
     line-height: 1.4;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: ${token.borderRadius}px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: ${token.colorFillSecondary};
+    }
   `,
   metadata: css`
     font-size: 12px;
@@ -83,31 +93,6 @@ const useStyles = createStyles(({ css, token }) => ({
     gap: 8px;
     margin-top: 12px;
     justify-content: flex-start;
-  `,
-  actionButton: css`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 1px solid ${token.colorBorderSecondary};
-    background: ${token.colorBgContainer};
-    border-radius: ${token.borderRadius}px;
-    cursor: pointer;
-    color: ${token.colorTextSecondary};
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: ${token.colorFillSecondary};
-      color: ${token.colorText};
-      border-color: ${token.colorBorder};
-    }
-
-    &.delete-button:hover {
-      background: ${token.colorErrorBg};
-      color: ${token.colorError};
-      border-color: ${token.colorError};
-    }
   `,
   imageGrid: css`
     display: flex;
@@ -130,34 +115,32 @@ const useStyles = createStyles(({ css, token }) => ({
     border-radius: ${token.borderRadius}px;
     overflow: hidden;
 
-    &:hover .generation-delete {
+    &:hover .generation-action-button {
       opacity: 1;
     }
   `,
-  generationDelete: css`
+  // 图片操作按钮的公共样式
+  generationActionButton: css`
     position: absolute;
-    top: 8px;
     right: 8px;
     opacity: 0;
     transition: opacity 0.2s ease;
-    width: 24px;
-    height: 24px;
-    border: none;
-    background: ${token.colorBgContainer};
-    border-radius: 50%;
-    cursor: pointer;
-    color: ${token.colorTextSecondary};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: ${token.boxShadow};
+    background: ${token.colorBgContainer} !important;
     border: 1px solid ${token.colorBorderSecondary};
+    box-shadow: ${token.boxShadow};
 
     &:hover {
-      background: ${token.colorErrorBg};
-      color: ${token.colorError};
-      border-color: ${token.colorError};
+      background: ${token.colorBgContainer} !important;
     }
+  `,
+  generationDelete: css`
+    top: 8px;
+  `,
+  generationDownload: css`
+    top: 40px;
+  `,
+  generationCopySeed: css`
+    top: 72px;
   `,
   placeholderContainer: css`
     position: relative;
@@ -170,7 +153,7 @@ const useStyles = createStyles(({ css, token }) => ({
     background: ${token.colorFillSecondary};
     border: 1px solid ${token.colorBorder};
 
-    &:hover .generation-delete {
+    &:hover .generation-action-button {
       opacity: 1;
     }
   `,
@@ -200,6 +183,13 @@ const useStyles = createStyles(({ css, token }) => ({
   errorIcon: css`
     color: ${token.colorError};
   `,
+  batchDeleteButton: css`
+    &:hover {
+      background: ${token.colorErrorBg} !important;
+      color: ${token.colorError} !important;
+      border-color: ${token.colorError} !important;
+    }
+  `,
 }));
 
 // Generation item component
@@ -209,6 +199,7 @@ const GenerationItem = memo<{
 }>(({ generation, prompt }) => {
   const { styles } = useStyles();
   const { t } = useTranslation('image');
+  const { message } = App.useApp();
   const useCheckGenerationStatus = useImageStore((s) => s.useCheckGenerationStatus);
   const deleteGeneration = useImageStore((s) => s.deleteGeneration);
   const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
@@ -230,6 +221,70 @@ const GenerationItem = memo<{
     }
   };
 
+  const handleDownloadImage = async () => {
+    if (!generation.asset?.url) return;
+
+    try {
+      // Use better CORS handling similar to download-image.ts
+      const response = await fetch(generation.asset.url, {
+        mode: 'cors',
+        credentials: 'omit',
+        // Avoid image disk cache which can cause incorrect CORS headers
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      // Generate filename with prompt and timestamp
+      const timestamp = dayjs(generation.createdAt).format('YYYY-MM-DD_HH-mm-ss');
+      const safePrompt = prompt
+        .slice(0, 30)
+        .replaceAll(/[^\s\w-]/g, '')
+        .trim();
+
+      // Detect file extension from URL
+      const imageUrl = generation.asset.url.toLowerCase();
+      const fileExtension = imageUrl.includes('.webp')
+        ? 'webp'
+        : imageUrl.includes('.jpg') || imageUrl.includes('.jpeg')
+          ? 'jpg'
+          : 'png';
+      link.download = `${safePrompt}_${timestamp}.${fileExtension}`;
+
+      // Trigger download
+      document.body.append(link);
+      link.click();
+
+      // Cleanup
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+      message.error(t('generation.actions.downloadFailed'));
+    }
+  };
+
+  const handleCopySeed = async () => {
+    if (!generation.seed) return;
+
+    try {
+      await navigator.clipboard.writeText(generation.seed.toString());
+      message.success(t('generation.actions.seedCopied'));
+    } catch (error) {
+      console.error('Failed to copy seed:', error);
+      message.error(t('generation.actions.seedCopyFailed'));
+    }
+  };
+
   // 如果生成成功且有图片 URL，显示图片
   if (generation.task.status === AsyncTaskStatus.Success && generation.asset?.url) {
     return (
@@ -237,20 +292,37 @@ const GenerationItem = memo<{
         <ImageItem
           alt={prompt}
           preview={{
-            src: generation.asset.thumbnailUrl,
+            src: generation.asset.url,
           }}
           style={{ width: '100%', height: '100%' }}
-          url={generation.asset.url}
+          url={generation.asset.thumbnailUrl}
         />
-        <Tooltip title={t('generation.actions.delete')}>
-          <button
-            className={`${styles.generationDelete} generation-delete`}
-            onClick={handleDeleteGeneration}
-            type="button"
-          >
-            <Icon icon={Trash2} size={14} />
-          </button>
-        </Tooltip>
+        <ActionIcon
+          className={`${styles.generationActionButton} ${styles.generationDelete} generation-action-button`}
+          icon={Trash2}
+          onClick={handleDeleteGeneration}
+          size={{ blockSize: 24, size: 14 }}
+          title={t('generation.actions.delete')}
+          tooltipProps={{ placement: 'right' }}
+        />
+        <ActionIcon
+          className={`${styles.generationActionButton} ${styles.generationDownload} generation-action-button`}
+          icon={Download}
+          onClick={handleDownloadImage}
+          size={{ blockSize: 24, size: 14 }}
+          title={t('generation.actions.download')}
+          tooltipProps={{ placement: 'right' }}
+        />
+        {generation.seed && (
+          <ActionIcon
+            className={`${styles.generationActionButton} ${styles.generationCopySeed} generation-action-button`}
+            icon={Dices}
+            onClick={handleCopySeed}
+            size={{ blockSize: 24, size: 14 }}
+            title={t('generation.actions.copySeed')}
+            tooltipProps={{ placement: 'right' }}
+          />
+        )}
       </div>
     );
   }
@@ -272,15 +344,14 @@ const GenerationItem = memo<{
             </div>
           )}
         </div>
-        <Tooltip title={t('generation.actions.delete')}>
-          <button
-            className={`${styles.generationDelete} generation-delete`}
-            onClick={handleDeleteGeneration}
-            type="button"
-          >
-            <Icon icon={Trash2} size={14} />
-          </button>
-        </Tooltip>
+        <ActionIcon
+          className={`${styles.generationActionButton} ${styles.generationDelete} generation-action-button`}
+          icon={Trash2}
+          onClick={handleDeleteGeneration}
+          size={{ blockSize: 24, size: 14 }}
+          title={t('generation.actions.delete')}
+          tooltipProps={{ placement: 'right' }}
+        />
       </div>
     );
   }
@@ -297,15 +368,14 @@ const GenerationItem = memo<{
         <div>{t('generation.status.generating')}</div>
         <ElapsedTime generationId={generation.id} isActive={isGenerating} />
       </div>
-      <Tooltip title={t('generation.actions.delete')}>
-        <button
-          className={`${styles.generationDelete} generation-delete`}
-          onClick={handleDeleteGeneration}
-          type="button"
-        >
-          <Icon icon={Trash2} size={14} />
-        </button>
-      </Tooltip>
+      <ActionIcon
+        className={`${styles.generationActionButton} ${styles.generationDelete} generation-action-button`}
+        icon={Trash2}
+        onClick={handleDeleteGeneration}
+        size={{ blockSize: 24, size: 14 }}
+        title={t('generation.actions.delete')}
+        tooltipProps={{ placement: 'right' }}
+      />
     </div>
   );
 });
@@ -314,6 +384,7 @@ const GenerationItem = memo<{
 const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
   const { styles } = useStyles();
   const { t } = useTranslation('image');
+  const { message } = App.useApp();
   const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
   const deleteGenerationBatch = useImageStore((s) => s.deleteGenerationBatch);
   const reuseSettings = useImageStore((s) => s.reuseSettings);
@@ -322,6 +393,16 @@ const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
   const timeAgo = useMemo(() => {
     return dayjs(batch.createdAt).fromNow();
   }, [batch.createdAt]);
+
+  const handleCopyPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(batch.prompt);
+      message.success(t('generation.actions.promptCopied'));
+    } catch (error) {
+      console.error('Failed to copy prompt:', error);
+      message.error(t('generation.actions.promptCopyFailed'));
+    }
+  };
 
   const handleBatchSettings = () => {
     reuseSettings(omit(batch.config as StdImageGenParams, ['seed']));
@@ -344,11 +425,12 @@ const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
   return (
     <div className={styles.batchContainer}>
       <div className={styles.batchHeader}>
-        <div className={styles.prompt}>{batch.prompt}</div>
+        <div className={styles.prompt} onClick={handleCopyPrompt}>
+          {batch.prompt}
+        </div>
         <div className={styles.metadata}>
           <span className={styles.metadataItem}>
-            <span>{batch.provider}</span>
-            <span>•</span>
+            <ModelIcon model={batch.model} size={16} />
             <span>{batch.model}</span>
           </span>
           {batch.width && batch.height && (
@@ -374,20 +456,19 @@ const BatchItem = memo<{ batch: GenerationBatch }>(({ batch }) => {
       </div>
 
       <div className={styles.batchActions}>
-        <Tooltip title={t('generation.actions.reuseSettings')}>
-          <button className={styles.actionButton} onClick={handleBatchSettings} type="button">
-            <Icon icon={Settings} size={16} />
-          </button>
-        </Tooltip>
-        <Tooltip title={t('generation.actions.deleteBatch')}>
-          <button
-            className={`${styles.actionButton} delete-button`}
-            onClick={handleDeleteBatch}
-            type="button"
-          >
-            <Icon icon={Trash2} size={16} />
-          </button>
-        </Tooltip>
+        <ActionIcon
+          icon={Settings}
+          onClick={handleBatchSettings}
+          size={{ blockSize: 32, size: 16 }}
+          title={t('generation.actions.reuseSettings')}
+        />
+        <ActionIcon
+          className={styles.batchDeleteButton}
+          icon={Trash2}
+          onClick={handleDeleteBatch}
+          size={{ blockSize: 32, size: 16 }}
+          title={t('generation.actions.deleteBatch')}
+        />
       </div>
     </div>
   );

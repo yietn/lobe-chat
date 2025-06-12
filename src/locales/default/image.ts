@@ -40,6 +40,13 @@ export const image = {
     },
     actions: {
       delete: '删除',
+      download: '下载',
+      downloadFailed: '下载图片失败',
+      copySeed: '复制种子',
+      seedCopied: '种子已复制到剪贴板',
+      seedCopyFailed: '复制种子失败',
+      promptCopied: '提示词已复制到剪贴板',
+      promptCopyFailed: '复制提示词失败',
       reuseSettings: '复用设置',
       deleteBatch: '删除批次',
     },
