@@ -1,9 +1,11 @@
 ---
-description: 
+description: cursor rules writing and optimization guide
 globs: 
 alwaysApply: false
 ---
 当你编写或修改 Cursor Rule 时，请遵循以下准则：
+
+- 当你知道 rule 的文件名时，使用 `read_file` 而不是 `fetch_rules` 去读取它们，它们都在项目根目录的 `.cursor/rules/` 文件夹下。
 
 - 文件链接（`mdc:` 协议）
   - 仅在必要时为文件创建链接，滥用会浪费 token 并污染上下文。
