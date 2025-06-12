@@ -1,9 +1,8 @@
 import { Divider } from 'antd';
-import { Center, Flexbox } from 'react-layout-kit';
+import { Flexbox } from 'react-layout-kit';
 
 import ConfigPanel from '@/app/[variants]/(main)/image/features/ConfigPanel';
-import GenerationFeed from '@/app/[variants]/(main)/image/features/GenerationFeed';
-import PromptInput from '@/app/[variants]/(main)/image/features/PromptInput';
+import ImageWorkspace from '@/app/[variants]/(main)/image/features/ImageWorkspace';
 import Topics from '@/app/[variants]/(main)/image/features/Topics';
 import InitClientDB from '@/features/InitClientDB';
 
@@ -29,17 +28,7 @@ export default function AiImage() {
       <Divider style={{ height: '100%', margin: 0 }} type="vertical" />
 
       {/* 中间内容区域 */}
-      <Flexbox flex={1} height="100%">
-        {/* 生成结果展示区 */}
-        <Flexbox flex={1} padding={24} style={{ overflowY: 'auto' }}>
-          <GenerationFeed />
-        </Flexbox>
-
-        {/* 底部输入框 */}
-        <Center style={{ marginBottom: 64 }}>
-          <PromptInput />
-        </Center>
-      </Flexbox>
+      <ImageWorkspace />
 
       <Divider style={{ height: '100%', margin: 0 }} type="vertical" />
 
