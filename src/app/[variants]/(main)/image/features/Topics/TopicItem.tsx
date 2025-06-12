@@ -7,6 +7,8 @@ import { Trash } from 'lucide-react';
 import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useGlobalStore } from '@/store/global';
+import { globalGeneralSelectors } from '@/store/global/selectors';
 import { useImageStore } from '@/store/image';
 import { generationTopicSelectors } from '@/store/image/slices/generationTopic/selectors';
 import { ImageGenerationTopic } from '@/types/generation';
@@ -53,8 +55,8 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 }));
 
-const formatTime = (date: Date) => {
-  return new Intl.DateTimeFormat('zh-CN', {
+const formatTime = (date: Date, locale: string) => {
+  return new Intl.DateTimeFormat(locale, {
     month: 'long',
     day: 'numeric',
   }).format(new Date(date));
@@ -69,6 +71,7 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
   const { styles, cx } = useStyles();
   const { modal } = App.useApp();
   const [isHovered, setIsHovered] = useState(false);
+  const locale = useGlobalStore(globalGeneralSelectors.currentLanguage);
 
   // 检查当前 topic 是否在加载中
   const isLoading = useImageStore(generationTopicSelectors.isLoadingGenerationTopic(topic.id));
@@ -109,7 +112,7 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
     >
       <h4 className={styles.title}>{topic.title || t('topic.untitled')}</h4>
       <div className={styles.timeRow}>
-        <p className={styles.time}>{formatTime(topic.updatedAt)}</p>
+        <p className={styles.time}>{formatTime(topic.updatedAt, locale)}</p>
         <ActionIcon
           className={cx(styles.deleteButton, 'delete-button')}
           danger
