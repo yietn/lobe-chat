@@ -217,8 +217,43 @@ export const createGenerationTopicSlice: StateCreator<
   },
 
   removeGenerationTopic: async (id: string) => {
-    const { internal_removeGenerationTopic } = get();
+    const {
+      internal_removeGenerationTopic,
+      generationTopics,
+      activeGenerationTopicId,
+      switchGenerationTopic,
+      openNewGenerationTopic,
+    } = get();
+
+    const isRemovingActiveTopic = activeGenerationTopicId === id;
+    let topicIndexToRemove = -1;
+
+    if (isRemovingActiveTopic) {
+      topicIndexToRemove = generationTopics.findIndex((topic) => topic.id === id);
+    }
+
     await internal_removeGenerationTopic(id);
+
+    // if the active topic is the one being deleted, switch to the next topic
+    if (isRemovingActiveTopic) {
+      const newTopics = get().generationTopics;
+
+      if (newTopics.length > 0) {
+        // try to select the topic at the same index, if not, select the last one
+        const newActiveIndex = Math.min(topicIndexToRemove, newTopics.length - 1);
+        const newActiveTopic = newTopics[newActiveIndex];
+
+        if (newActiveTopic) {
+          switchGenerationTopic(newActiveTopic.id);
+        } else {
+          // fallback to open new topic, should not happen in this branch
+          openNewGenerationTopic();
+        }
+      } else {
+        // if no topics left, open a new one
+        openNewGenerationTopic();
+      }
+    }
   },
 
   internal_removeGenerationTopic: async (id: string) => {
