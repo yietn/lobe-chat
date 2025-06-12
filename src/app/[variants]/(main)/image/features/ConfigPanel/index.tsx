@@ -4,7 +4,6 @@ import { Form, FormItemProps } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Flexbox } from 'react-layout-kit';
 
 import { FORM_STYLE } from '@/const/layoutTokens';
 import { useUpdateActiveModelEffect } from '@/store/image/slices/generationConfig/hooks';
@@ -79,7 +78,7 @@ const ConfigPanel = memo(() => {
     .map((item) => ({ ...item, layout: 'vertical' as const }));
 
   return (
-    <Flexbox className={styles.container} gap={16}>
+    <aside className={styles.container}>
       <Form
         items={[
           {
@@ -91,7 +90,7 @@ const ConfigPanel = memo(() => {
         variant={'borderless'}
         {...FORM_STYLE}
       />
-    </Flexbox>
+    </aside>
   );
 });
 

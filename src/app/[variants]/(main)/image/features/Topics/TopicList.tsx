@@ -16,8 +16,8 @@ const TopicsList = memo(() => {
   const [parent] = useAutoAnimate();
   const generationTopics = useImageStore(generationTopicSelectors.generationTopics);
   const openNewGenerationTopic = useImageStore((s) => s.openNewGenerationTopic);
-  const isEmpty = !generationTopics || generationTopics.length === 0;
 
+  const isEmpty = !generationTopics || generationTopics.length === 0;
   if (isEmpty) {
     return null;
   }

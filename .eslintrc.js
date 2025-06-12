@@ -16,6 +16,7 @@ config.rules['unicorn/prefer-code-point'] = 0;
 config.rules['no-extra-boolean-cast'] = 0;
 config.rules['unicorn/no-useless-undefined'] = 0;
 config.rules['react/no-unknown-property'] = 0;
+config.rules['react/jsx-boolean-value'] = 2;
 config.rules['unicorn/prefer-ternary'] = 0;
 config.rules['unicorn/prefer-spread'] = 0;
 config.rules['unicorn/catch-error-name'] = 0;
