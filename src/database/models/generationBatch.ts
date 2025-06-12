@@ -77,7 +77,7 @@ export class GenerationBatchModel {
         eq(generationBatches.generationTopicId, topicId),
         eq(generationBatches.userId, this.userId),
       ),
-      orderBy: (table, { desc }) => [desc(table.createdAt)],
+      orderBy: (table, { asc }) => [asc(table.createdAt)],
       with: {
         generations: {
           orderBy: (table, { asc }) => [asc(table.createdAt), asc(table.id)],

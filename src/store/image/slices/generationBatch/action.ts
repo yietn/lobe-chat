@@ -191,6 +191,34 @@ export const createGenerationBatchSlice: StateCreator<
     }
   },
 
+  useFetchGenerationBatches: (topicId) =>
+    useClientDataSWR<GenerationBatchWithAsyncTaskId[]>(
+      topicId ? [SWR_USE_FETCH_GENERATION_BATCHES, topicId] : null,
+      async ([, topicId]: [string, string]) => {
+        return generationBatchService.getGenerationBatches(topicId);
+      },
+      {
+        suspense: true,
+        onSuccess: (data) => {
+          const nextMap = {
+            ...get().generationBatchesMap,
+            [topicId!]: data,
+          };
+
+          // no need to update map if the map is the same
+          if (isEqual(nextMap, get().generationBatchesMap)) return;
+
+          set(
+            {
+              generationBatchesMap: nextMap,
+            },
+            false,
+            n('useFetchGenerationBatches(success)', { topicId }),
+          );
+        },
+      },
+    ),
+
   useCheckGenerationStatus: (generationId, asyncTaskId, topicId, enable = true) =>
     useClientDataSWR(
       enable && generationId && asyncTaskId
@@ -255,34 +283,6 @@ export const createGenerationBatchSlice: StateCreator<
             // 在成功或失败后都要 refreshGenerationBatches
             await get().refreshGenerationBatches();
           }
-        },
-      },
-    ),
-
-  useFetchGenerationBatches: (topicId) =>
-    useClientDataSWR<GenerationBatchWithAsyncTaskId[]>(
-      topicId ? [SWR_USE_FETCH_GENERATION_BATCHES, topicId] : null,
-      async ([, topicId]: [string, string]) => {
-        return generationBatchService.getGenerationBatches(topicId);
-      },
-      {
-        suspense: true,
-        onSuccess: (data) => {
-          const nextMap = {
-            ...get().generationBatchesMap,
-            [topicId!]: data,
-          };
-
-          // no need to update map if the map is the same
-          if (isEqual(nextMap, get().generationBatchesMap)) return;
-
-          set(
-            {
-              generationBatchesMap: nextMap,
-            },
-            false,
-            n('useFetchGenerationBatches(success)', { topicId }),
-          );
         },
       },
     ),
