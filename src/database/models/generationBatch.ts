@@ -114,7 +114,7 @@ export class GenerationBatchModel {
     const result: GenerationBatch[] = await Promise.all(
       batchesWithGenerations.map(async (batch) => {
         const generations = await Promise.all(
-          batch.generations.map(this.generationModel.transformGeneration),
+          batch.generations.map((gen) => this.generationModel.transformGeneration(gen)),
         );
 
         return {

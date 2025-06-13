@@ -15,6 +15,10 @@ export class ServerService {
     return lambdaClient.generationTopic.updateTopic.mutate({ id, value: data });
   }
 
+  async updateTopicCover(id: string, coverUrl: string): Promise<ImageGenerationTopic> {
+    return lambdaClient.generationTopic.updateTopicCover.mutate({ id, coverUrl });
+  }
+
   async deleteTopic(id: string): Promise<ImageGenerationTopic> {
     return lambdaClient.generationTopic.deleteTopic.mutate({ id });
   }

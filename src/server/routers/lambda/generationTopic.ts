@@ -4,6 +4,7 @@ import { GenerationTopicModel } from '@/database/models/generationTopic';
 import { GenerationTopicItem } from '@/database/schemas/generation';
 import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
+import { createCoverFromUrl } from '@/server/services/generation';
 
 const generationTopicProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
@@ -22,6 +23,11 @@ const updateTopicSchema = z.object({
   }),
 });
 
+const updateTopicCoverSchema = z.object({
+  id: z.string(),
+  coverUrl: z.string(),
+});
+
 export const generationTopicRouter = router({
   createTopic: generationTopicProcedure.input(z.void()).mutation(async ({ ctx }) => {
     const data = await ctx.generationTopicModel.create('');
@@ -35,6 +41,15 @@ export const generationTopicRouter = router({
     .mutation(async ({ ctx, input }) => {
       return ctx.generationTopicModel.update(input.id, input.value as Partial<GenerationTopicItem>);
     }),
+  updateTopicCover: generationTopicProcedure
+    .input(updateTopicCoverSchema)
+    .mutation(async ({ ctx, input }) => {
+      // Process the cover image and get S3 key
+      const newCoverKey = await createCoverFromUrl(input.coverUrl);
+
+      // Update the topic with the new cover key
+      return ctx.generationTopicModel.update(input.id, { coverUrl: newCoverKey });
+    }),
   deleteTopic: generationTopicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -47,3 +62,4 @@ export type GenerationTopicRouter = typeof generationTopicRouter;
 // Export input types for client/server service consistency
 export type UpdateTopicInput = z.infer<typeof updateTopicSchema>;
 export type UpdateTopicValue = UpdateTopicInput['value'];
+export type UpdateTopicCoverInput = z.infer<typeof updateTopicCoverSchema>;

@@ -161,3 +161,51 @@ export async function uploadImageForGeneration(
     };
   }
 }
+
+/**
+ * Create a 256x256 cover image from a given URL and upload to S3
+ * @param coverUrl - The source image URL (can be base64 or HTTP URL)
+ * @returns The S3 key of the uploaded cover image
+ */
+export async function createCoverFromUrl(coverUrl: string): Promise<string> {
+  log('Creating cover image from URL:', coverUrl.startsWith('data:') ? 'base64 data' : coverUrl);
+
+  // Download the original image
+  let originalImageBuffer: Buffer;
+  if (coverUrl.startsWith('data:')) {
+    log('Processing base64 cover image data');
+    // Extract base64 data part
+    const [, base64Data] = coverUrl.split(',');
+    originalImageBuffer = Buffer.from(base64Data, 'base64');
+  } else {
+    log('Fetching cover image from URL:', coverUrl);
+    const response = await fetch(coverUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch cover image from ${coverUrl}: ${response.statusText}`);
+    }
+    originalImageBuffer = Buffer.from(await response.arrayBuffer());
+    log('Successfully fetched cover image, buffer size:', originalImageBuffer.length);
+  }
+
+  // Process image to 256x256 cover with webp format
+  log('Processing cover image to 256x256 webp format');
+  const coverBuffer = await sharp(originalImageBuffer)
+    .resize(256, 256, { fit: 'cover', position: 'center' })
+    .webp({ quality: 85 })
+    .toBuffer();
+
+  log('Cover image processed, final size:', coverBuffer.length);
+
+  // Upload to S3
+  const s3 = new S3();
+  const coverFolder = 'generations/covers';
+  const uuid = nanoid();
+  const dateTime = getYYYYmmddHHMMss(new Date());
+  const coverKey = `${coverFolder}/${uuid}_cover_${dateTime}.webp`;
+
+  log('Uploading cover image to S3:', coverKey);
+  await s3.uploadMedia(coverKey, coverBuffer);
+
+  log('Cover image uploaded successfully:', coverKey);
+  return coverKey;
+}

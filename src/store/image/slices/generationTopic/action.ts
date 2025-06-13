@@ -41,6 +41,7 @@ export interface GenerationTopicAction {
   internal_updateGenerationTopic: (id: string, data: UpdateTopicValue) => Promise<void>;
   internal_updateGenerationTopicTitleInSummary: (id: string, title: string) => void;
   internal_removeGenerationTopic: (id: string) => Promise<void>;
+  internal_updateGenerationTopicCover: (topicId: string, coverUrl: string) => Promise<void>;
 }
 
 export const createGenerationTopicSlice: StateCreator<
@@ -267,9 +268,35 @@ export const createGenerationTopicSlice: StateCreator<
   },
 
   updateGenerationTopicCover: async (topicId: string, coverUrl: string) => {
-    const { internal_updateGenerationTopic } = get();
+    const { internal_updateGenerationTopicCover } = get();
+    await internal_updateGenerationTopicCover(topicId, coverUrl);
+  },
 
-    console.log('updateGenerationTopicCover', topicId, coverUrl);
-    await internal_updateGenerationTopic(topicId, { coverUrl });
+  internal_updateGenerationTopicCover: async (topicId: string, coverUrl: string) => {
+    const {
+      internal_dispatchGenerationTopic,
+      internal_updateGenerationTopicLoading,
+      refreshGenerationTopics,
+    } = get();
+
+    // 1. Optimistic update - immediately show the new cover URL in UI
+    internal_dispatchGenerationTopic(
+      { type: 'updateTopic', id: topicId, value: { coverUrl } },
+      'internal_updateGenerationTopicCover/optimistic',
+    );
+
+    // 2. Set loading state
+    internal_updateGenerationTopicLoading(topicId, true);
+
+    try {
+      // 3. Call backend service to process and upload cover image
+      await generationTopicService.updateTopicCover(topicId, coverUrl);
+
+      // 4. Refresh data to get the final processed cover URL from S3
+      await refreshGenerationTopics();
+    } finally {
+      // 5. Clear loading state
+      internal_updateGenerationTopicLoading(topicId, false);
+    }
   },
 });
