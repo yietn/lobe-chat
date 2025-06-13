@@ -2,7 +2,7 @@
 
 import { ActionIcon, Avatar } from '@lobehub/ui';
 import { App } from 'antd';
-import { createStyles } from 'antd-style';
+import { createStyles, useTheme } from 'antd-style';
 import { Trash } from 'lucide-react';
 import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,6 +67,7 @@ interface TopicItemProps {
 }
 
 const TopicItem = memo<TopicItemProps>(({ topic }) => {
+  const theme = useTheme();
   const { t } = useTranslation('image');
   const { styles, cx } = useStyles();
   const { modal } = App.useApp();
@@ -132,7 +133,14 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
       onClick={handleClick}
       tooltip={tooltipContent}
     >
-      <Avatar avatar={topic.coverUrl} loading={isLoading} size={50} style={{ borderRadius: 6 }} />
+      <Avatar
+        avatar={topic.coverUrl ?? ''}
+        background={theme.colorBgElevated}
+        bordered={isActive}
+        loading={isLoading}
+        shape="square"
+        size={50}
+      />
     </TopicItemContainer>
   );
 });

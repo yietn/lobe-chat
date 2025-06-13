@@ -47,22 +47,12 @@ export const generationRouter = router({
       };
 
       if (asyncTask.status === AsyncTaskStatus.Success) {
-        const generation = await ctx.generationModel.findById(input.generationId);
+        const generation = await ctx.generationModel.findByIdAndTransform(input.generationId);
         if (!generation) {
           throw new TRPCError({ code: 'NOT_FOUND', message: 'Generation not found' });
         }
 
-        const generationWithAsyncTask: Generation = {
-          ...generation,
-          seed: generation.seed?.toString(),
-          task: {
-            id: asyncTask.id,
-            status: asyncTask.status as AsyncTaskStatus,
-            error: asyncTask.error as AsyncTaskError,
-          },
-        };
-
-        result.generation = generationWithAsyncTask;
+        result.generation = generation;
       } else if (asyncTask.status === AsyncTaskStatus.Error) {
         result.error = error as AsyncTaskError;
       }

@@ -17,8 +17,8 @@ const Topics = () => {
       align="center"
       style={{
         width: 80,
+        padding: '30px 10px 0',
         height: '100%',
-        paddingTop: 30,
         overflowY: 'auto',
       }}
     >

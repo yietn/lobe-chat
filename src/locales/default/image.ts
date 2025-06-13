@@ -58,7 +58,7 @@ export const image = {
     desc: '当前部署实例为客户端数据库模式，无法使用 AI 图像生成功能。请切换到<1>服务端数据库部署模式</1>，或直接使用 <3>LobeChat Cloud</3>',
     features: {
       multiProviders: {
-        desc: '支持多种 AI 绘画服务商，包括 OpenAI DALL-E、Google Imagen、FAL.ai 等，提供丰富的模型选择',
+        desc: '支持多种 AI 绘画服务商，包括 OpenAI gpt-image-1、Google Imagen、FAL.ai 等，提供丰富的模型选择',
         title: '多 Providers 支持',
       },
       fileIntegration: {

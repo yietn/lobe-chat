@@ -41,20 +41,23 @@ export interface GenerationConfig {
   cfg?: number;
 }
 
+export interface GenerationAsyncTask {
+  id: string;
+  status: AsyncTaskStatus;
+  error?: AsyncTaskError;
+}
+
 export interface Generation {
   id: string;
   /**
    * The asset associated with the generation, containing image URLs and dimensions.
    */
   asset?: GenerationAsset | null;
-  seed?: string | null;
+  seed?: number | null;
   createdAt: Date;
+  asyncTaskId: string | null;
 
-  task: {
-    id: string;
-    status: AsyncTaskStatus;
-    error?: AsyncTaskError;
-  };
+  task: GenerationAsyncTask;
 }
 
 export interface GenerationBatch {

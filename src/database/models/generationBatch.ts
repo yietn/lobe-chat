@@ -3,10 +3,15 @@ import { and, eq } from 'drizzle-orm';
 
 import { LobeChatDatabase } from '@/database/type';
 import { FileService } from '@/server/services/file';
-import { AsyncTaskStatus } from '@/types/asyncTask';
-import { Generation, GenerationAsset, GenerationBatch, GenerationConfig } from '@/types/generation';
+import { Generation, GenerationBatch, GenerationConfig } from '@/types/generation';
 
-import { GenerationBatchItem, NewGenerationBatch, generationBatches } from '../schemas/generation';
+import {
+  GenerationBatchItem,
+  GenerationBatchWithGenerations,
+  NewGenerationBatch,
+  generationBatches,
+} from '../schemas/generation';
+import { GenerationModel } from './generation';
 
 const log = debug('lobe-image:generation-batch-model');
 
@@ -14,11 +19,13 @@ export class GenerationBatchModel {
   private db: LobeChatDatabase;
   private userId: string;
   private fileService: FileService;
+  private generationModel: GenerationModel;
 
   constructor(db: LobeChatDatabase, userId: string) {
     this.db = db;
     this.userId = userId;
     this.fileService = new FileService(db, userId);
+    this.generationModel = new GenerationModel(db, userId);
   }
 
   async create(value: NewGenerationBatch): Promise<GenerationBatchItem> {
@@ -65,7 +72,7 @@ export class GenerationBatchModel {
   /**
    * Find batches with their associated generations using relations
    */
-  async findByTopicIdWithGenerations(topicId: string) {
+  async findByTopicIdWithGenerations(topicId: string): Promise<GenerationBatchWithGenerations[]> {
     log(
       'Finding generation batches with generations for topic ID: %s for user: %s',
       topicId,
@@ -89,12 +96,12 @@ export class GenerationBatchModel {
     });
 
     log('Found %d generation batches with generations for topic %s', results.length, topicId);
-    return results;
+    return results as GenerationBatchWithGenerations[];
   }
 
   async queryGenerationBatchesByTopicIdWithGenerations(
     topicId: string,
-  ): Promise<(GenerationBatch & { generations: (Generation & { asyncTaskId?: string })[] })[]> {
+  ): Promise<(GenerationBatch & { generations: Generation[] })[]> {
     log('Fetching generation batches for topic ID: %s for user: %s', topicId, this.userId);
 
     const batchesWithGenerations = await this.findByTopicIdWithGenerations(topicId);
@@ -107,30 +114,7 @@ export class GenerationBatchModel {
     const result: GenerationBatch[] = await Promise.all(
       batchesWithGenerations.map(async (batch) => {
         const generations = await Promise.all(
-          batch.generations.map(async (gen): Promise<Generation & { asyncTaskId?: string }> => {
-            const asset = gen.asset as GenerationAsset | null;
-            if (asset && asset.url && asset.thumbnailUrl) {
-              const [url, thumbnailUrl] = await Promise.all([
-                this.fileService.getFullFileUrl(asset.url),
-                this.fileService.getFullFileUrl(asset.thumbnailUrl),
-              ]);
-              asset.url = url;
-              asset.thumbnailUrl = thumbnailUrl;
-            }
-
-            return {
-              id: gen.id,
-              asset,
-              seed: gen.seed,
-              createdAt: gen.createdAt,
-              asyncTaskId: gen.asyncTaskId || undefined,
-              task: {
-                id: gen.asyncTaskId,
-                status: gen.asyncTask?.status as AsyncTaskStatus,
-                error: gen.asyncTask?.error ? gen.asyncTask.error : undefined,
-              },
-            };
-          }),
+          batch.generations.map(this.generationModel.transformGeneration),
         );
 
         return {

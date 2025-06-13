@@ -6,7 +6,7 @@ import { idGenerator } from '@/database/utils/idGenerator';
 import { GenerationAsset } from '@/types/generation';
 
 import { timestamps } from './_helpers';
-import { asyncTasks } from './asyncTask';
+import { AsyncTaskSelectItem, asyncTasks } from './asyncTask';
 import { files } from './file';
 import { users } from './user';
 
@@ -85,6 +85,9 @@ export const insertGenerationBatchSchema = createInsertSchema(generationBatches)
 
 export type NewGenerationBatch = typeof generationBatches.$inferInsert;
 export type GenerationBatchItem = typeof generationBatches.$inferSelect;
+export type GenerationBatchWithGenerations = GenerationBatchItem & {
+  generations: GenerationWithAsyncTask[];
+};
 
 /**
  *  存储单个 AI 生成信息
@@ -131,3 +134,4 @@ export const insertGenerationSchema = createInsertSchema(generations);
 
 export type NewGeneration = typeof generations.$inferInsert;
 export type GenerationItem = typeof generations.$inferSelect;
+export type GenerationWithAsyncTask = GenerationItem & { asyncTask?: AsyncTaskSelectItem };

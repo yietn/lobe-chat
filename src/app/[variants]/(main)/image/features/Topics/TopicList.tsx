@@ -23,19 +23,10 @@ const TopicsList = memo(() => {
   }
 
   return (
-    <Flexbox
-      align="center"
-      gap={8}
-      padding={12}
-      style={{
-        height: '100%',
-        overflowY: 'auto',
-        width: 60,
-      }}
-    >
+    <Flexbox align="center" gap={12}>
       <NewTopicButton onClick={openNewGenerationTopic} />
 
-      <Flexbox align="center" gap={6} ref={parent}>
+      <Flexbox align="center" gap={16} ref={parent}>
         {generationTopics.map((topic) => (
           <div key={topic.id}>
             <TopicItem topic={topic} />

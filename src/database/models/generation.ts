@@ -2,10 +2,17 @@ import debug from 'debug';
 import { and, eq } from 'drizzle-orm';
 
 import { LobeChatDatabase, Transaction } from '@/database/type';
-import { GenerationAsset } from '@/types/generation';
+import { FileService } from '@/server/services/file';
+import { AsyncTaskError, AsyncTaskStatus } from '@/types/asyncTask';
+import { Generation, GenerationAsset } from '@/types/generation';
 
 import { NewFile } from '../schemas';
-import { GenerationItem, NewGeneration, generations } from '../schemas/generation';
+import {
+  GenerationItem,
+  GenerationWithAsyncTask,
+  NewGeneration,
+  generations,
+} from '../schemas/generation';
 import { FileModel } from './file';
 
 // Create debug logger
@@ -15,11 +22,13 @@ export class GenerationModel {
   private db: LobeChatDatabase;
   private userId: string;
   private fileModel: FileModel;
+  private fileService: FileService;
 
   constructor(db: LobeChatDatabase, userId: string) {
     this.db = db;
     this.userId = userId;
     this.fileModel = new FileModel(db, userId);
+    this.fileService = new FileService(db, userId);
   }
 
   async create(value: NewGeneration): Promise<GenerationItem> {
@@ -159,5 +168,59 @@ export class GenerationModel {
         deletedFile,
       };
     });
+  }
+
+  /**
+   * Find generation by ID and transform it to frontend type
+   * This method uses findByIdWithAsyncTask and applies transformation
+   */
+  async findByIdAndTransform(id: string): Promise<Generation | null> {
+    log('Finding and transforming generation: %s', id);
+
+    const generation = await this.findByIdWithAsyncTask(id);
+    if (!generation) {
+      log('Generation %s not found', id);
+      return null;
+    }
+
+    return await this.transformGeneration(generation as any);
+  }
+
+  /**
+   * Transform a GenerationItem (database type) to Generation (frontend type)
+   * This method processes asset URLs and async task information
+   */
+  async transformGeneration(generation: GenerationWithAsyncTask): Promise<Generation> {
+    log('Transforming generation: %s', generation.id);
+
+    // Process asset URLs if they exist, following the same logic as in generationBatch.ts
+    const asset = generation.asset as GenerationAsset | null;
+    if (asset && asset.url && asset.thumbnailUrl) {
+      const [url, thumbnailUrl] = await Promise.all([
+        this.fileService.getFullFileUrl(asset.url),
+        this.fileService.getFullFileUrl(asset.thumbnailUrl),
+      ]);
+      asset.url = url;
+      asset.thumbnailUrl = thumbnailUrl;
+    }
+
+    // Build the Generation object following the same structure as in generationBatch.ts
+    const result: Generation = {
+      id: generation.id,
+      asset,
+      seed: generation.seed,
+      createdAt: generation.createdAt,
+      asyncTaskId: generation.asyncTaskId || null,
+      task: {
+        id: generation.asyncTaskId || '',
+        status: (generation.asyncTask?.status as AsyncTaskStatus) || 'pending',
+        error: generation.asyncTask?.error
+          ? (generation.asyncTask.error as AsyncTaskError)
+          : undefined,
+      },
+    };
+
+    log('Generation %s transformed successfully', generation.id);
+    return result;
   }
 }

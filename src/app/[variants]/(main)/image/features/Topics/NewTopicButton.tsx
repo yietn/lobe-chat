@@ -11,9 +11,6 @@ import TopicItemContainer from './TopicItemContainer';
 const useStyles = createStyles(({ css, token }) => ({
   button: css`
     border: 1px solid ${token.colorBorder};
-    margin-bottom: 8px;
-    width: 50px;
-    height: 50px;
   `,
 }));
 
