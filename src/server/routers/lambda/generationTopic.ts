@@ -4,13 +4,17 @@ import { GenerationTopicModel } from '@/database/models/generationTopic';
 import { GenerationTopicItem } from '@/database/schemas/generation';
 import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
+import { FileService } from '@/server/services/file';
 import { createCoverFromUrl } from '@/server/services/generation';
 
 const generationTopicProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
 
   return opts.next({
-    ctx: { generationTopicModel: new GenerationTopicModel(ctx.serverDB, ctx.userId) },
+    ctx: {
+      generationTopicModel: new GenerationTopicModel(ctx.serverDB, ctx.userId),
+      fileService: new FileService(ctx.serverDB, ctx.userId),
+    },
   });
 });
 
@@ -53,7 +57,15 @@ export const generationTopicRouter = router({
   deleteTopic: generationTopicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.generationTopicModel.delete(input.id);
+      // Delete the topic from database and get the deleted topic data
+      const deletedTopic = await ctx.generationTopicModel.delete(input.id);
+
+      // If topic had a cover image, delete it from S3
+      if (deletedTopic && deletedTopic.coverUrl) {
+        await ctx.fileService.deleteFile(deletedTopic.coverUrl);
+      }
+
+      return deletedTopic;
     }),
 });
 

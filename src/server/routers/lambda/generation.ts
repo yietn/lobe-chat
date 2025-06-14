@@ -63,14 +63,24 @@ export const generationRouter = router({
   deleteGeneration: generationProcedure
     .input(z.object({ generationId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const result = await ctx.generationModel.deleteGenerationAndFile(input.generationId);
+      // Delete the generation from database and get the deleted data
+      const deletedGeneration = await ctx.generationModel.delete(input.generationId);
 
-      if (!result) return;
+      if (!deletedGeneration) return;
 
-      // If there's an associated file that was deleted, also delete it from S3
-      if (result.deletedFile) {
-        await ctx.fileService.deleteFile(result.deletedFile.url!);
+      // If generation had a thumbnail, delete it from S3
+      // Note: Don't delete the main url as it's referenced by the file table, delete the related file will
+      // auto delete the file from s3
+      if (deletedGeneration.asset) {
+        const asset = deletedGeneration.asset as any;
+
+        // Only delete thumbnail URL if exists
+        if (asset.thumbnailUrl) {
+          await ctx.fileService.deleteFile(asset.thumbnailUrl);
+        }
       }
+
+      return deletedGeneration;
     }),
 });
 

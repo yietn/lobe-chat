@@ -41,18 +41,15 @@ export type GenerationTopicItem = typeof generationTopics.$inferSelect;
  * 生成批次表 - 存储一次生成请求的配置信息
  */
 export const generationBatches = pgTable('generation_batches', {
-  /** 批次 ID */
   id: text('id')
     .$defaultFn(() => idGenerator('generationBatches'))
     .notNull()
     .primaryKey(),
 
-  /** 用户 ID */
   userId: text('user_id')
     .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
 
-  /** 关联的生成主题 ID */
   generationTopicId: text('generation_topic_id')
     .notNull()
     .references(() => generationTopics.id, { onDelete: 'cascade' }),
@@ -102,7 +99,6 @@ export const generations = pgTable('generations', {
     .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
 
-  /** 关联的生成批次 ID */
   generationBatchId: varchar('generation_batch_id', { length: 64 })
     .notNull()
     .references(() => generationBatches.id, { onDelete: 'cascade' }),
@@ -115,16 +111,10 @@ export const generations = pgTable('generations', {
   /** 关联的生成文件 ID，删除文件时连带删除生成记录 */
   fileId: text('file_id').references(() => files.id, { onDelete: 'cascade' }),
 
-  /** 是否收藏 */
-  //   favorite: boolean('favorite').default(false).notNull(),
-
-  /** 是否发布到画廊 */
-  //   published: boolean('published').default(false).notNull(),
-
   /** 生成种子值 */
   seed: integer('seed'),
 
-  /** 生成的资源信息，包含 URL、尺寸等 */
+  /** 生成的资源信息，包含存储在 s3 上的 key, 图片实际宽高，缩略图 key 等 */
   asset: jsonb('asset').$type<GenerationAsset>(),
 
   ...timestamps,

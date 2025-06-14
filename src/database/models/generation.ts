@@ -126,48 +126,15 @@ export class GenerationModel {
     const executeDelete = async (tx: Transaction) => {
       return await tx
         .delete(generations)
-        .where(and(eq(generations.id, id), eq(generations.userId, this.userId)));
+        .where(and(eq(generations.id, id), eq(generations.userId, this.userId)))
+        .returning();
     };
 
     const result = await (trx ? executeDelete(trx) : this.db.transaction(executeDelete));
+    const deletedGeneration = result[0];
 
     log('Generation %s deleted successfully', id);
-    return result;
-  }
-
-  async deleteGenerationAndFile(id: string) {
-    log('Deleting generation and file with transaction: %s for user: %s', id, this.userId);
-
-    return await this.db.transaction(async (tx: Transaction) => {
-      // First, find the generation to get the associated file ID
-      const generation = await tx.query.generations.findFirst({
-        where: and(eq(generations.id, id), eq(generations.userId, this.userId)),
-      });
-
-      if (!generation) {
-        log('Generation %s not found', id);
-        return null;
-      }
-
-      // Delete the generation record using the transaction-aware delete method
-      await this.delete(id, tx);
-
-      let deletedFile = null;
-      // If there's an associated file, delete it as well
-      if (generation.fileId) {
-        log('Deleting associated file: %s for generation: %s', generation.fileId, id);
-
-        // Delete the file from database using transaction and get the file info for potential S3 cleanup
-        deletedFile = await this.fileModel.delete(generation.fileId, true, tx);
-
-        log('Associated file %s deleted for generation: %s', generation.fileId, id);
-      }
-
-      return {
-        generation,
-        deletedFile,
-      };
-    });
+    return deletedGeneration;
   }
 
   /**

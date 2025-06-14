@@ -4,7 +4,7 @@ import { ActionIcon, Avatar } from '@lobehub/ui';
 import { App } from 'antd';
 import { createStyles, useTheme } from 'antd-style';
 import { Trash } from 'lucide-react';
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useGlobalStore } from '@/store/global';
@@ -20,6 +20,7 @@ const useStyles = createStyles(({ css, token }) => ({
     overflow: hidden;
   `,
   deleteButton: css`
+    color: ${token.colorTextSecondary};
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
   `,
@@ -71,7 +72,6 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
   const { t } = useTranslation('image');
   const { styles, cx } = useStyles();
   const { modal } = App.useApp();
-  const [isHovered, setIsHovered] = useState(false);
   const locale = useGlobalStore(globalGeneralSelectors.currentLanguage);
 
   // 检查当前 topic 是否在加载中
@@ -106,11 +106,7 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
   };
 
   const tooltipContent = (
-    <div
-      className={cx(styles.tooltipContent, styles.tooltipContentHover)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className={cx(styles.tooltipContent, styles.tooltipContentHover)}>
       <h4 className={styles.title}>{topic.title || t('topic.untitled')}</h4>
       <div className={styles.timeRow}>
         <p className={styles.time}>{formatTime(topic.updatedAt, locale)}</p>
@@ -120,7 +116,6 @@ const TopicItem = memo<TopicItemProps>(({ topic }) => {
           icon={Trash}
           onClick={handleDelete}
           size="small"
-          style={{ opacity: isHovered ? 1 : 0 }}
         />
       </div>
     </div>
