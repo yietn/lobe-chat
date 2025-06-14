@@ -1,0 +1,51 @@
+---
+description: How to code review
+globs: 
+alwaysApply: false
+---
+## Before the Review
+
+- If the author has not provided a **Diff of Working State**, request it before proceeding.
+- If the change set is too large to digest comfortably, ask the author to split it into multiple smaller commits.
+
+## Code Style
+
+- Ensure that JSDoc comments accurately reflect the implementation; update them when necessary.
+- Write all comments and JSDoc in **English**.
+- Look for opportunities to simplify or modernize code with the latest JavaScript/TypeScript syntax and APIs.
+- Prefer `async` / `await` over callbacks or chained `.then` promises.
+- Use consistent, descriptive naming—avoid obscure abbreviations.
+- Replace magic numbers or strings with well-named constants.
+
+## Code Optimization
+
+- Prefer `for…of` loops to index-based `for` loops when possible.
+- Decide whether callbacks should be **debounced** or **throttled**.
+- Use components from `@lobehub/ui`, Ant Design, or existing design-system components instead of raw HTML tags (e.g., `Button` rather than `button`).
+- Leverage packages already listed in [package.json](mdc:package.json) (e.g., `lodash/omit`) to simplify code instead of reinventing the wheel.
+- Design for dark mode and mobile responsiveness:
+  - Use the Ant Design token system instead of hard-coded color values.
+  - Choose the appropriate component variants.
+- Performance considerations:
+  - Turn sequential asynchronous flows into concurrent ones with `Promise.all`, `Promise.race`, etc., where safe.
+  - Query only the required columns from the database instead of selecting entire rows.
+
+## Obvious Bugs
+
+- Do not silently swallow errors in `catch` blocks; log them at a minimum.
+- Revert any temporary code changes made solely for testing (e.g., debug logs, temporary configs).
+- Avoid leaving empty handlers (e.g., an empty `onClick` callback).
+- Confirm that the UI degrades gracefully for unauthenticated users.
+
+## Code Organization
+
+Before starting the review, check `agent_requestable_workspace_rules` and read [`rules-attach.mdc`](mdc:.cursor/rules/rules-attach.mdc) for additional context and best practices.
+
+## After the Review
+
+- Provide a brief summary of your review: what you did and why.
+- For each modified file (or logical group of files), summarize the changes.
+- Highlight the most critical issues you found.
+- List every issue you identified, ordered from most to least severe, and include a recommended fix for each.
+- Finish with a **git commit** command. If no issues were found, instruct the author to run the commit command.
+    - you can check previous commits to learn how to write commit message
