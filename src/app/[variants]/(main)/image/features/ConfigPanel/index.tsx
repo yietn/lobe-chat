@@ -11,17 +11,19 @@ import { imageGenerationConfigSelectors } from '@/store/image/slices/generationC
 import { useImageStore } from '@/store/image/store';
 
 import AspectRatioSelect from './AspectRatioSelect';
+import ImageUrlsUpload from './ImageUrlsUpload';
 import ModelSelect from './ModelSelect';
 import SeedNumberInput from './SeedNumberInput';
 import SizeSelect from './SizeSelect';
 import SizeSliderInput from './SizeSliderInput';
 import StepsSliderInput from './StepsSliderInput';
+import { CONFIG_PANEL_WIDTH } from './constants';
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`
     overflow-y: auto;
 
-    width: 260px;
+    width: ${CONFIG_PANEL_WIDTH}px;
     height: 100%;
     padding: 16px;
     border-inline-start: 1px solid ${token.colorBorderSecondary};
@@ -41,12 +43,17 @@ const ConfigPanel = memo(() => {
   const isSupportAspectRatio = useImageStore(isSupportParamSelector('aspectRatio'));
   const isSupportSeed = useImageStore(isSupportParamSelector('seed'));
   const isSupportSteps = useImageStore(isSupportParamSelector('steps'));
+  const isSupportImageUrls = useImageStore(isSupportParamSelector('imageUrls'));
 
   const configs = (
     [
       {
         label: t('config.model.label'),
         children: <ModelSelect />,
+      },
+      isSupportImageUrls && {
+        label: t('config.imageUrls.label'),
+        children: <ImageUrlsUpload />,
       },
       isSupportSize && {
         label: t('config.size.label'),

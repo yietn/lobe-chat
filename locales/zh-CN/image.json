@@ -24,6 +24,9 @@
     },
     "seed": {
       "label": "种子"
+    },
+    "imageUrls": {
+      "label": "参考图"
     }
   },
   "generation": {

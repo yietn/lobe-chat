@@ -73,6 +73,7 @@ const resources = {
 开发模式：
 
 一般情况下不需要你帮我跑自动翻译工具，跑一次很久，需要的时候我会自己跑。
+但是为了立马能看到效果，还是需要先翻译 `locales/zh-CN/namespace.json`
 
 生产模式：
 
@@ -145,6 +146,7 @@ const locale: Locales = "en-US";
 - setting: 配置和设置
 - error: 错误消息和处理
 - [feature]: 功能特定或页面特定的命名空间
+- components: 可复用组件文案
 
 ### 2. 键命名约定
 

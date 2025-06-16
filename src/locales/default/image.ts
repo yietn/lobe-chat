@@ -25,6 +25,9 @@ export const image = {
     seed: {
       label: '种子',
     },
+    imageUrls: {
+      label: '参考图',
+    },
   },
   topic: {
     createNew: '新建主题',

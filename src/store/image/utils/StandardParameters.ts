@@ -12,6 +12,13 @@ export const StdParamsZodSchema = z.object({
       description: z.string().optional(),
       default: z.string().optional().default(''),
     }),
+    imageUrls: z
+      .object({
+        type: z.literal('array').optional(),
+        default: z.array(z.string()),
+        description: z.string().optional(),
+      })
+      .optional(),
     width: z
       .object({
         type: z.literal('number').optional(),
@@ -98,14 +105,23 @@ type _StandardImageGenerationParameters<P extends keyof SchemaProperties = keyof
     [key in P]-?: TypeMapping<SchemaProperties[key]['type']>;
   };
 
-export type StdImageGenParams = _StandardImageGenerationParameters;
+export type _StdImageGenParams = _StandardImageGenerationParameters;
+export type StdImageGenParams = Omit<
+  Omit<_StdImageGenParams, 'imageUrls'> & {
+    imageUrls: string[];
+  },
+  never
+>;
 export type StdImageGenParamsKeys = keyof StdImageGenParams;
 // like:
 /*
-type StandardImageGenerationParameters = {
+type StdImageGenParams = {
     prompt: string;
+    imageUrls: string[];
     width: number;
     height: number;
+    size: string;
+    aspectRatio: string;
     seed: number | null;
     steps: number;
     cfg: number;
