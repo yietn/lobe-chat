@@ -1,5 +1,6 @@
 import debug from 'debug';
 import { sha256 } from 'js-sha256';
+import mime from 'mime';
 import { nanoid } from 'nanoid';
 import sharp from 'sharp';
 
@@ -85,12 +86,28 @@ export async function transformImageForGeneration(url: string): Promise<{
 
   log('Image transformation completed successfully');
 
+  // Determine extension without fallback
+  let extension: string;
+  if (url.startsWith('data:')) {
+    const mimeExtension = mime.getExtension(originalMimeType);
+    if (!mimeExtension) {
+      throw new Error(`Unable to determine file extension for MIME type: ${originalMimeType}`);
+    }
+    extension = mimeExtension;
+  } else {
+    const urlExtension = url.split('.').pop();
+    if (!urlExtension) {
+      throw new Error(`Unable to determine file extension from URL: ${url}`);
+    }
+    extension = urlExtension;
+  }
+
   return {
     image: {
       buffer: originalImageBuffer,
       width,
       height,
-      extension: url.split('.').pop() || format || 'jpg',
+      extension,
       mime: originalMimeType,
       size: originalImageBuffer.length,
       hash: originalHash,

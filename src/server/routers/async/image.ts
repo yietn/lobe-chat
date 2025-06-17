@@ -35,6 +35,7 @@ const createImageInputSchema = z.object({
   params: z
     .object({
       prompt: z.string(),
+      imageUrls: z.array(z.string()).optional(),
       width: z.number().optional(),
       height: z.number().optional(),
       seed: z.number().nullable().optional(),
@@ -88,7 +89,9 @@ export const imageRouter = router({
         }
 
         log('Image generation successful: %O', {
-          imageUrl: response.imageUrl,
+          imageUrl: response.imageUrl.startsWith('data:')
+            ? response.imageUrl.slice(0, 100) + '...'
+            : response.imageUrl,
           width: response.width,
           height: response.height,
         });

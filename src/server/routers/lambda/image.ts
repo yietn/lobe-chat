@@ -15,6 +15,7 @@ import {
 import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { keyVaults, serverDatabase } from '@/libs/trpc/lambda/middleware';
 import { createAsyncServerClient } from '@/server/routers/async';
+import { FileService } from '@/server/services/file';
 import {
   AsyncTaskError,
   AsyncTaskErrorType,
@@ -41,6 +42,7 @@ const imageProcedure = authedProcedure
     return opts.next({
       ctx: {
         asyncTaskModel: new AsyncTaskModel(ctx.serverDB, ctx.userId),
+        fileService: new FileService(ctx.serverDB, ctx.userId),
       },
     });
   });
@@ -52,6 +54,7 @@ const createImageInputSchema = z.object({
   params: z
     .object({
       prompt: z.string(),
+      imageUrls: z.array(z.string()).optional(),
       width: z.number().optional(),
       height: z.number().optional(),
       seed: z.number().nullable().optional(),
@@ -64,10 +67,34 @@ export type CreateImageServicePayload = z.infer<typeof createImageInputSchema>;
 
 export const imageRouter = router({
   createImage: imageProcedure.input(createImageInputSchema).mutation(async ({ input, ctx }) => {
-    const { userId, serverDB, asyncTaskModel } = ctx;
+    const { userId, serverDB, asyncTaskModel, fileService } = ctx;
     const { generationTopicId, provider, model, params } = input;
 
     log('Starting image creation process, input: %O', input);
+
+    // 如果 params 中包含 imageUrls，将它们转换为 S3 keys 用于数据库存储
+    let configForDatabase = { ...params };
+    if (Array.isArray(params.imageUrls) && params.imageUrls.length > 0) {
+      log('Converting imageUrls to S3 keys for database storage: %O', params.imageUrls);
+      try {
+        const imageKeys = params.imageUrls.map((url) => {
+          const key = fileService.getKeyFromFullUrl(url);
+          log('Converted URL %s to key %s', url, key);
+          return key;
+        });
+
+        // 将转换后的 keys 存储为数据库配置
+        configForDatabase = {
+          ...params,
+          imageUrls: imageKeys,
+        };
+        log('Successfully converted imageUrls to keys for database: %O', imageKeys);
+      } catch (error) {
+        log('Error converting imageUrls to keys: %O', error);
+        // 如果转换失败，保持原始 URLs（可能是本地文件或其他格式）
+        log('Keeping original imageUrls due to conversion error');
+      }
+    }
 
     // 步骤 1: 在事务中原子性地创建所有数据库记录
     const { batch: createdBatch, generationsWithTasks } = await serverDB.transaction(async (tx) => {
@@ -82,7 +109,7 @@ export const imageRouter = router({
         prompt: params.prompt,
         width: params.width,
         height: params.height,
-        config: params, // 将整个 params 作为 config 存储
+        config: configForDatabase, // 使用转换后的配置存储到数据库
       };
       log('Creating generation batch: %O', newBatch);
       const [batch] = await tx.insert(generationBatches).values(newBatch).returning();
@@ -168,7 +195,7 @@ export const imageRouter = router({
                 generationId: generation.id,
                 provider,
                 model,
-                params,
+                params, // 使用原始 params（包含完整 URLs）发送给异步任务
               });
 
               const end = performance.now();
