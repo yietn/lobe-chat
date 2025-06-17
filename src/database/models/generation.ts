@@ -158,8 +158,6 @@ export class GenerationModel {
    * This method processes asset URLs and async task information
    */
   async transformGeneration(generation: GenerationWithAsyncTask): Promise<Generation> {
-    log('Transforming generation: %s', generation.id);
-
     // Process asset URLs if they exist, following the same logic as in generationBatch.ts
     const asset = generation.asset as GenerationAsset | null;
     if (asset && asset.url && asset.thumbnailUrl) {
@@ -186,8 +184,6 @@ export class GenerationModel {
           : undefined,
       },
     };
-
-    log('Generation %s transformed successfully', generation.id);
     return result;
   }
 }

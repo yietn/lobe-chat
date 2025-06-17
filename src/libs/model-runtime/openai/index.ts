@@ -89,7 +89,6 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
   createImage: async (payload) => {
     const { model, params, client } = payload;
     log('Creating image with model: %s and params: %O', model, params);
-    log('client: %O', client);
 
     const defaultInput = {
       n: 1,
@@ -104,8 +103,9 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
       ]),
     );
 
+    const isImageEdit = Array.isArray(userInput.image) && userInput.image.length > 0;
     // 如果有 imageUrls 参数，将其转换为 File 对象
-    if (userInput.image && Array.isArray(userInput.image)) {
+    if (isImageEdit) {
       log('Converting imageUrls to File objects: %O', userInput.image);
       try {
         // 转换所有图片 URL 为 File 对象
@@ -121,6 +121,8 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
         log('Error converting imageUrls to File objects: %O', error);
         throw new Error(`Failed to convert image URLs to File objects: ${error}`);
       }
+    } else {
+      delete userInput.image;
     }
 
     if (userInput.size === 'auto') {
@@ -136,8 +138,7 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
     log('options: %O', options);
 
     // 判断是否为图片编辑操作
-    const isEditImage = userInput.image;
-    const img = isEditImage
+    const img = isImageEdit
       ? await client.images.edit(options)
       : await client.images.generate(options);
 

@@ -113,9 +113,22 @@ export class GenerationBatchModel {
     // Transform the database result to match our frontend types
     const result: GenerationBatch[] = await Promise.all(
       batchesWithGenerations.map(async (batch) => {
-        const generations = await Promise.all(
-          batch.generations.map((gen) => this.generationModel.transformGeneration(gen)),
-        );
+        const [generations, config] = await Promise.all([
+          // Transform generations
+          Promise.all(
+            batch.generations.map((gen) => this.generationModel.transformGeneration(gen)),
+          ),
+          // Transform config
+          (async () => {
+            const config = batch.config as GenerationConfig;
+            if (Array.isArray(config.imageUrls)) {
+              config.imageUrls = await Promise.all(
+                config.imageUrls.map((url) => this.fileService.getFullFileUrl(url)),
+              );
+            }
+            return config;
+          })(),
+        ]);
 
         return {
           id: batch.id,
@@ -124,7 +137,7 @@ export class GenerationBatchModel {
           prompt: batch.prompt,
           width: batch.width,
           height: batch.height,
-          config: batch.config as GenerationConfig,
+          config,
           createdAt: batch.createdAt,
           generations,
         };

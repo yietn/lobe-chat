@@ -52,6 +52,9 @@ export const image = {
       promptCopyFailed: '复制提示词失败',
       reuseSettings: '复用设置',
       deleteBatch: '删除批次',
+      copyError: '复制错误信息',
+      errorCopied: '错误信息已复制到剪贴板',
+      errorCopyFailed: '复制错误信息失败',
     },
     metadata: {
       count: '{{count}} 张图片',

@@ -3,11 +3,16 @@ import { StateCreator } from 'zustand';
 import { imageService } from '@/services/image';
 
 import { ImageStore } from '../../store';
+import { generationBatchSelectors } from '../generationBatch/selectors';
 
 // ====== action interface ====== //
 
 export interface CreateImageAction {
   createImage: () => Promise<void>;
+  /**
+   * eg: invalid api key, recreate image
+   */
+  recreateImage: (generationBatchId: string) => Promise<void>;
 }
 
 // ====== action implementation ====== //
@@ -49,5 +54,29 @@ export const createCreateImageSlice: StateCreator<
 
     // Refresh generation batches to show the new data
     await get().refreshGenerationBatches();
+  },
+
+  async recreateImage(generationBatchId: string) {
+    set({ isCreating: true }, false, 'recreateImage/startCreateImage');
+
+    const store = get();
+    const { activeGenerationTopicId, removeGenerationBatch: deleteGenerationBatch } = store;
+    const batch = generationBatchSelectors.getGenerationBatchByBatchId(generationBatchId)(store)!;
+
+    // 1. Delete generation batch
+    await deleteGenerationBatch(generationBatchId, activeGenerationTopicId!);
+
+    // 2. Create image
+    await imageService.createImage({
+      generationTopicId: activeGenerationTopicId!,
+      provider: batch.provider,
+      model: batch.model,
+      params: batch.config as any,
+    });
+
+    set({ isCreating: false }, false, 'recreateImage/endCreateImage');
+
+    // 3. Refresh generation batches to show the new data
+    await store.refreshGenerationBatches();
   },
 });

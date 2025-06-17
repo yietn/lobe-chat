@@ -12,8 +12,10 @@ import { Settings, Trash2 } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import InvalidAPIKey from '@/features/Conversation/Error/InvalidAPIKey';
 import { useImageStore } from '@/store/image';
 import { StdImageGenParams } from '@/store/image/utils/StandardParameters';
+import { AsyncTaskErrorType } from '@/types/asyncTask';
 import { GenerationBatch } from '@/types/generation';
 
 import { GenerationItem } from './GenerationItem';
@@ -97,11 +99,14 @@ interface GenerationBatchItemProps {
 export const GenerationBatchItem = memo<GenerationBatchItemProps>(({ batch }) => {
   const { styles } = useStyles();
   const { t } = useTranslation('image');
+  const { t: modelProviderT } = useTranslation('modelProvider');
+  const { t: errorT } = useTranslation('error');
   const { message } = App.useApp();
   const [imageGridRef] = useAutoAnimate();
 
   const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
-  const deleteGenerationBatch = useImageStore((s) => s.deleteGenerationBatch);
+  const removeGenerationBatch = useImageStore((s) => s.removeGenerationBatch);
+  const recreateImage = useImageStore((s) => s.recreateImage);
   const reuseSettings = useImageStore((s) => s.reuseSettings);
 
   const timeAgo = useMemo(() => {
@@ -118,7 +123,7 @@ export const GenerationBatchItem = memo<GenerationBatchItemProps>(({ batch }) =>
     }
   };
 
-  const handleBatchSettings = () => {
+  const handleReuseSettings = () => {
     reuseSettings(omit(batch.config as StdImageGenParams, ['seed']));
   };
 
@@ -126,7 +131,7 @@ export const GenerationBatchItem = memo<GenerationBatchItemProps>(({ batch }) =>
     if (!activeTopicId) return;
 
     try {
-      await deleteGenerationBatch(batch.id, activeTopicId);
+      await removeGenerationBatch(batch.id, activeTopicId);
     } catch (error) {
       console.error('Failed to delete batch:', error);
     }
@@ -134,6 +139,27 @@ export const GenerationBatchItem = memo<GenerationBatchItemProps>(({ batch }) =>
 
   if (batch.generations.length === 0) {
     return null;
+  }
+
+  const isInvalidApiKey = batch.generations.some(
+    (generation) => generation.task.error?.name === AsyncTaskErrorType.InvalidProviderAPIKey,
+  );
+
+  if (isInvalidApiKey) {
+    return (
+      <InvalidAPIKey
+        bedrockDescription={modelProviderT('bedrock.unlock.imageGenerationDescription')}
+        description={errorT('unlock.apiKey.imageGenerationDescription')}
+        id={batch.id}
+        onClose={() => {
+          removeGenerationBatch(batch.id, activeTopicId!);
+        }}
+        onRecreate={() => {
+          recreateImage(batch.id);
+        }}
+        provider={batch.provider}
+      />
+    );
   }
 
   return (
@@ -172,7 +198,7 @@ export const GenerationBatchItem = memo<GenerationBatchItemProps>(({ batch }) =>
       <div className={styles.batchActions}>
         <ActionIcon
           icon={Settings}
-          onClick={handleBatchSettings}
+          onClick={handleReuseSettings}
           size={{ blockSize: 32, size: 16 }}
           title={t('generation.actions.reuseSettings')}
         />

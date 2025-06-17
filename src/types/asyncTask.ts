@@ -13,6 +13,7 @@ export enum AsyncTaskStatus {
 
 export enum AsyncTaskErrorType {
   EmbeddingError = 'EmbeddingError',
+  InvalidProviderAPIKey = 'InvalidProviderAPIKey',
   /**
    * the chunk parse result it empty
    */

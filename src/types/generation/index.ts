@@ -33,6 +33,7 @@ export interface GenerationAsset {
 
 export interface GenerationConfig {
   prompt: string;
+  imageUrls?: string[];
   width?: number;
   height?: number;
   aspectRatio?: string;

@@ -5,14 +5,19 @@ import { generationTopicSelectors } from '../generationTopic/selectors';
 
 // ====== topic batch selectors ====== //
 
-const getGenerationBatchByTopicId = (topicId: string) => (s: ImageStoreState) => {
+const getGenerationBatchesByTopicId = (topicId: string) => (s: ImageStoreState) => {
   return s.generationBatchesMap[topicId] || [];
 };
 
 const currentGenerationBatches = (s: ImageStoreState): GenerationBatch[] => {
   const activeTopicId = generationTopicSelectors.activeGenerationTopicId(s);
   if (!activeTopicId) return [];
-  return getGenerationBatchByTopicId(activeTopicId)(s);
+  return getGenerationBatchesByTopicId(activeTopicId)(s);
+};
+
+const getGenerationBatchByBatchId = (batchId: string) => (s: ImageStoreState) => {
+  const batches = currentGenerationBatches(s);
+  return batches.find((batch) => batch.id === batchId);
 };
 
 const isGenerationBatchLoading =
@@ -31,8 +36,9 @@ const isCurrentGenerationBatchLoading = (s: ImageStoreState): boolean => {
 // ====== aggregate selectors ====== //
 
 export const generationBatchSelectors = {
-  getGenerationBatchByTopicId,
+  getGenerationBatchesByTopicId,
   currentGenerationBatches,
+  getGenerationBatchByBatchId,
   isGenerationBatchLoading,
   isCurrentGenerationBatchLoading,
 };

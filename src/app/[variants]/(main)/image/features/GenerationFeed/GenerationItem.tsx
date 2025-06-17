@@ -1,7 +1,7 @@
 'use client';
 
 import { ActionIcon, Icon } from '@lobehub/ui';
-import { App } from 'antd';
+import { App, Typography } from 'antd';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
 import { AlertTriangle, Dices, Download, Loader2, Trash2 } from 'lucide-react';
@@ -91,6 +91,18 @@ const useStyles = createStyles(({ css, token }) => ({
   errorIcon: css`
     color: ${token.colorError};
   `,
+  errorText: css`
+    font-size: 10px;
+    opacity: 0.8;
+    color: ${token.colorError} !important;
+    margin: 0 !important;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  `,
 }));
 
 interface GenerationItemProps {
@@ -103,7 +115,7 @@ export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt })
   const { t } = useTranslation('image');
   const { message } = App.useApp();
   const useCheckGenerationStatus = useImageStore((s) => s.useCheckGenerationStatus);
-  const deleteGeneration = useImageStore((s) => s.deleteGeneration);
+  const deleteGeneration = useImageStore((s) => s.removeGeneration);
   const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
 
   const isFinalized =
@@ -187,6 +199,23 @@ export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt })
     }
   };
 
+  const handleCopyError = async () => {
+    if (!generation.task.error) return;
+
+    const errorMessage =
+      typeof generation.task.error.body === 'string'
+        ? generation.task.error.body
+        : generation.task.error.body?.detail || generation.task.error.name || 'Unknown error';
+
+    try {
+      await navigator.clipboard.writeText(errorMessage);
+      message.success(t('generation.actions.errorCopied'));
+    } catch (error) {
+      console.error('Failed to copy error message:', error);
+      message.error(t('generation.actions.errorCopyFailed'));
+    }
+  };
+
   // 如果生成成功且有图片 URL，显示图片
   if (generation.task.status === AsyncTaskStatus.Success && generation.asset?.url) {
     return (
@@ -237,13 +266,18 @@ export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt })
           <Icon className={styles.errorIcon} icon={AlertTriangle} size={20} />
           <div>{t('generation.status.failed')}</div>
           {generation.task.error && (
-            <div style={{ fontSize: '10px', opacity: 0.8 }}>
+            <Typography.Paragraph
+              className={styles.errorText}
+              ellipsis={{ rows: 2 }}
+              onClick={handleCopyError}
+              title={t('generation.actions.copyError')}
+            >
               {typeof generation.task.error.body === 'string'
                 ? generation.task.error.body
                 : generation.task.error.body?.detail ||
                   generation.task.error.name ||
                   'Unknown error'}
-            </div>
+            </Typography.Paragraph>
           )}
         </div>
         <ActionIcon

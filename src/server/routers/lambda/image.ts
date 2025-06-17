@@ -197,7 +197,6 @@ export const imageRouter = router({
                 model,
                 params, // 使用原始 params（包含完整 URLs）发送给异步任务
               });
-
               const end = performance.now();
               log(
                 'Successfully triggered async task %s, cost: %ds',

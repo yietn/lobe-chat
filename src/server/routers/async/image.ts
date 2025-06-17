@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { ASYNC_TASK_TIMEOUT, AsyncTaskModel } from '@/database/models/asyncTask';
 import { FileModel } from '@/database/models/file';
 import { GenerationModel } from '@/database/models/generation';
+import { AgentRuntimeErrorType } from '@/libs/model-runtime/error';
 import { CreateImageParams } from '@/libs/model-runtime/types/image';
 import { asyncAuthedProcedure, asyncRouter as router } from '@/libs/trpc/async';
 import { initAgentRuntimeWithUserPayload } from '@/server/modules/AgentRuntime';
@@ -140,17 +141,28 @@ export const imageRouter = router({
 
       // Race between the image generation process and the timeout
       return await Promise.race([imageGenerationPromise(), timeoutPromise]);
-    } catch (e) {
+    } catch (e: any) {
       log('Async image generation failed: %O', {
         taskId,
         generationId,
-        error: (e as Error).message,
+        error: e,
       });
 
-      await ctx.asyncTaskModel.update(taskId, {
-        error: new AsyncTaskError((e as Error).name, (e as Error).message),
-        status: AsyncTaskStatus.Error,
-      });
+      // error from model runtime
+      if (e.errorType === AgentRuntimeErrorType.InvalidProviderAPIKey) {
+        await ctx.asyncTaskModel.update(taskId, {
+          error: new AsyncTaskError(
+            AsyncTaskErrorType.InvalidProviderAPIKey,
+            'Invalid provider API key, please check your API key',
+          ),
+          status: AsyncTaskStatus.Error,
+        });
+      } else {
+        await ctx.asyncTaskModel.update(taskId, {
+          error: new AsyncTaskError((e as Error).name, (e as Error).message),
+          status: AsyncTaskStatus.Error,
+        });
+      }
 
       log('Task status updated to Error: %s', taskId);
 

@@ -28,16 +28,16 @@ const SWR_USE_CHECK_GENERATION_STATUS = 'SWR_USE_CHECK_GENERATION_STATUS';
 // ====== action interface ====== //
 
 export interface GenerationBatchAction {
-  deleteGeneration: (generationId: string) => Promise<void>;
-  deleteGenerationBatch: (batchId: string, topicId: string) => Promise<void>;
-  internal_deleteGeneration: (generationId: string) => Promise<void>;
-  internal_deleteGenerationBatch: (batchId: string, topicId: string) => Promise<void>;
   internal_dispatchGenerationBatch: (
     topicId: string,
     payload: GenerationBatchDispatch,
     action?: string,
   ) => void;
   internal_toggleGenerationBatchLoading: (topicId: string, loading: boolean) => void;
+  removeGeneration: (generationId: string) => Promise<void>;
+  internal_deleteGeneration: (generationId: string) => Promise<void>;
+  removeGenerationBatch: (batchId: string, topicId: string) => Promise<void>;
+  internal_deleteGenerationBatch: (batchId: string, topicId: string) => Promise<void>;
   refreshGenerationBatches: () => Promise<void>;
   useCheckGenerationStatus: (
     generationId: string,
@@ -58,7 +58,7 @@ export const createGenerationBatchSlice: StateCreator<
   [],
   GenerationBatchAction
 > = (set, get) => ({
-  deleteGeneration: async (generationId: string) => {
+  removeGeneration: async (generationId: string) => {
     const { internal_deleteGeneration, activeGenerationTopicId, refreshGenerationBatches } = get();
 
     await internal_deleteGeneration(generationId);
@@ -78,11 +78,6 @@ export const createGenerationBatchSlice: StateCreator<
         await refreshGenerationBatches();
       }
     }
-  },
-
-  deleteGenerationBatch: async (batchId: string, topicId: string) => {
-    const { internal_deleteGenerationBatch } = get();
-    await internal_deleteGenerationBatch(batchId, topicId);
   },
 
   internal_deleteGeneration: async (generationId: string) => {
@@ -122,6 +117,11 @@ export const createGenerationBatchSlice: StateCreator<
       // 确保清除加载状态（无论成功或失败）
       get().internal_toggleGenerationBatchLoading(activeGenerationTopicId, false);
     }
+  },
+
+  removeGenerationBatch: async (batchId: string, topicId: string) => {
+    const { internal_deleteGenerationBatch } = get();
+    await internal_deleteGenerationBatch(batchId, topicId);
   },
 
   internal_deleteGenerationBatch: async (batchId: string, topicId: string) => {
