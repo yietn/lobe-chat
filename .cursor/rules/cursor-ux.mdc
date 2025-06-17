@@ -1,0 +1,45 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Guide to Optimize Output Rendering
+
+## File Path and Code Symbol Rendering
+
+- When rendering file paths (with or without line/column numbers), use backtick wrapping instead of markdown links so they can be parsed as clickable links in Cursor IDE
+
+    - Good: `src/components/Button.tsx:12:5`
+    - Bad: [src/components/Button.tsx:12:5](src/components/Button.tsx)
+
+- When rendering functions, variables, or other code symbols, use backtick wrapping so they can be parsed as navigable links in Cursor IDE
+    - Good: The `useState` hook in `MyComponent`
+    - Bad: The useState hook in MyComponent
+
+## Mermaid Syntax Checklist
+
+When generating Mermaid diagrams, please strictly adhere to the following core specifications. These rules are based on real-world tests in mainstream rendering environments to ensure correct syntax and reliable rendering.
+
+1.  **Edge labels must be plain text only.**
+
+    - **Rule**: This is the strictest syntax requirement. The label content within `|...|` must NOT contain any brackets (`()`, `[]`) or other special symbols, as this will cause a rendering failure.
+    - **Example**:
+        - ✅ **Do**: `A -->|Process Data| B`
+        - ❌ **Don't**: `A -->|Process Data (Transform)| B`
+
+2.  **Escape double quotes in text using `&quot;`.**
+
+    - **Rule**: To use a double quote `" ` inside a node's text `["..."]`, you must use the HTML entity `&quot;`. Using `\"` will cause a syntax error.
+    - **Example**:
+        - ✅ **Do**: `A["A node with &quot;quotes&quot;"]`
+        - ❌ **Don't**: `A["A node with \"quotes\""]`
+
+3.  **Prefer HTML tags for formatting; avoid inconsistent Markdown syntax.**
+    - **Rule**:
+        - **Line Breaks**: **You must use `<br>`**.
+        - **Formatting**: Use HTML tags like `<b>`, `<i>`, and `<code>` for predictable results.
+        - **Inconsistency**: Avoid using Markdown syntax. While `**bold**` might work in some environments, other syntax like `` `code` `` or `#` titles will almost certainly fail. Relying on HTML is the more reliable and portable choice.
+    - **Example**:
+        - ✅ **Do (Highly Reliable)**: `A["Use <b>Bold</b> and <code>Code</code> with HTML tags<br>This is a new line"]`
+        - ⚠️ **Warn (Inconsistent Results)**: `B["Some environments may render **Markdown bold**..."]`
+        - ❌ **Don't (Universally Fails)**: `C["...but they typically won't render `#`titles or` `inline code` `."]`
