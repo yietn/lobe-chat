@@ -12,8 +12,15 @@ const ImageWorkspaceContent = () => {
   const useFetchGenerationBatches = useImageStore((s) => s.useFetchGenerationBatches);
   const { data: currentBatches } = useFetchGenerationBatches(activeTopicId);
   const hasGenerations = currentBatches && currentBatches.length > 0;
+
   return (
-    <Flexbox flex={1} height="100%">
+    <Flexbox
+      flex={1}
+      height="100%"
+      style={{
+        overflow: 'hidden',
+      }}
+    >
       {hasGenerations ? (
         <>
           {/* 生成结果展示区 */}

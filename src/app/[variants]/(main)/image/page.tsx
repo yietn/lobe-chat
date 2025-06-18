@@ -14,9 +14,9 @@ export default function AiImage() {
       align="flex-start"
       horizontal
       style={{
+        width: '100%',
         height: '100vh',
         overflow: 'hidden',
-        width: '100%',
       }}
     >
       <InitClientDB bottom={100} />

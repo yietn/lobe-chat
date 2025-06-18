@@ -16,10 +16,11 @@ const Topics = () => {
     <Flexbox
       align="center"
       style={{
-        width: 80,
-        padding: '30px 10px 0',
-        height: '100%',
+        flexShrink: 0,
         overflowY: 'auto',
+        width: 80,
+        height: '100%',
+        padding: '30px 10px 0',
       }}
     >
       <TopicsList />
