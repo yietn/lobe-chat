@@ -17,7 +17,7 @@ Gather the modified code and context. Please strictly follow the process below:
 1. Use `read_file` to read [package.json](mdc:package.json)
 2. Use terminal to run command `git diff HEAD | cat` to obtain the diff and list the changed files. If you recieived empty result, run the same command once more.
 3. Use `read_file` to open each changed file.  
-4. Use `read_file` to read  [rules-attach.mdc](mdc:.cursor/rules/rules-attach.mdc)
+4. Use `read_file` to read  [rules-attach.mdc](mdc:.cursor/rules/rules-attach.mdc). Even if you think it's unnecessary, you must read it.
 5. combine changed files, step3 and `agent_requestable_workspace_rules`, list the rules which need to read 
 6. Use `read_file` to read the rules list in step 5
 
@@ -59,7 +59,8 @@ Gather the modified code and context. Please strictly follow the process below:
     - Summarize the changes for each modified file (or logical group).
 2. Comments Issues
     - List the most critical issues first.  
-    - For each issue:  
+    - Use an ordered list, which will be convenient for me to reference later.
+    - For each issue:
       - Mark severity tag (`❌ Must fix`, `⚠️ Should fix`, `💅 Nitpick`)  
       - Provode file path to the relevant line(s).
       - Provide recommended fix  

@@ -7,10 +7,12 @@ import { parseParamsSchema } from '../../utils/parseParamsSchema';
 
 export const DEFAULT_AI_IMAGE_PROVIDER = ModelProvider.Fal;
 export const DEFAULT_AI_IMAGE_MODEL = 'flux/schnell';
+export const DEFAULT_IMAGE_NUM = 4;
 
 export interface GenerationConfigState {
   model: string;
   provider: string;
+  imageNum: number;
   /**
    * store the params pass the generation api
    */
@@ -24,6 +26,7 @@ export const DEFAULT_IMAGE_GENERATION_PARAMETERS: Partial<StdImageGenParams> =
 export const initialGenerationConfigState: GenerationConfigState = {
   model: DEFAULT_AI_IMAGE_MODEL,
   provider: DEFAULT_AI_IMAGE_PROVIDER,
+  imageNum: 4,
   parameters: DEFAULT_IMAGE_GENERATION_PARAMETERS,
   parameterSchema: FluxSchnellSchema,
 };

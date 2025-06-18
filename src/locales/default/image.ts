@@ -4,6 +4,9 @@ export const image = {
     model: {
       label: '模型',
     },
+    imageNum: {
+      label: '图片数量',
+    },
     prompt: {
       placeholder: '描述你想要生成的内容',
     },

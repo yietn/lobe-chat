@@ -11,6 +11,7 @@ import { imageGenerationConfigSelectors } from '@/store/image/slices/generationC
 import { useImageStore } from '@/store/image/store';
 
 import AspectRatioSelect from './AspectRatioSelect';
+import ImageNum from './ImageNum';
 import ImageUrlsUpload from './ImageUrlsUpload';
 import ModelSelect from './ModelSelect';
 import SeedNumberInput from './SeedNumberInput';
@@ -78,6 +79,10 @@ const ConfigPanel = memo(() => {
       isSupportSeed && {
         label: t('config.seed.label'),
         children: <SeedNumberInput />,
+      },
+      {
+        label: t('config.imageNum.label'),
+        children: <ImageNum />,
       },
     ] satisfies Array<Partial<FormItemProps> | boolean>
   )

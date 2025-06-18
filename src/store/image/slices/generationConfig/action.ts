@@ -11,6 +11,8 @@ export interface GenerationConfigAction {
 
   setModelAndProviderOnSelect(model: string, provider: string): void;
 
+  setImageNum: (imageNum: number) => void;
+
   updateParamsWhenModelChange(model: AIImageModelCard): void;
 
   reuseSettings: (settings: Partial<StdImageGenParams>) => void;
@@ -37,6 +39,10 @@ export const createGenerationConfigSlice: StateCreator<
 
   setModelAndProviderOnSelect: (model, provider) => {
     set(() => ({ model, provider }), false, `setModelAndProviderOnSelect/${model}/${provider}`);
+  },
+
+  setImageNum: (imageNum) => {
+    set(() => ({ imageNum }), false, `setImageNum/${imageNum}`);
   },
 
   updateParamsWhenModelChange: (model: AIImageModelCard) => {
