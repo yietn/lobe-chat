@@ -51,6 +51,7 @@ const createImageInputSchema = z.object({
   generationTopicId: z.string(),
   provider: z.string(),
   model: z.string(),
+  imageNum: z.number(),
   params: z
     .object({
       prompt: z.string(),
@@ -68,7 +69,7 @@ export type CreateImageServicePayload = z.infer<typeof createImageInputSchema>;
 export const imageRouter = router({
   createImage: imageProcedure.input(createImageInputSchema).mutation(async ({ input, ctx }) => {
     const { userId, serverDB, asyncTaskModel, fileService } = ctx;
-    const { generationTopicId, provider, model, params } = input;
+    const { generationTopicId, provider, model, imageNum, params } = input;
 
     log('Starting image creation process, input: %O', input);
 
@@ -116,7 +117,6 @@ export const imageRouter = router({
       log('Generation batch created successfully: %s', batch.id);
 
       // 2. 创建 4 个 generation（一期固定生成 4 张）
-      const imageNum = 4;
       const seeds =
         'seed' in params
           ? generateUniqueSeeds(imageNum)

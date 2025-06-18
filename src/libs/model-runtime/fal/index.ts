@@ -42,6 +42,16 @@ export class LobeFalAI implements LobeRuntimeAI {
         value,
       ]),
     );
+
+    if ('width' in userInput && 'height' in userInput) {
+      userInput.image_size = {
+        width: userInput.width,
+        height: userInput.height,
+      };
+      delete userInput.width;
+      delete userInput.height;
+    }
+
     const endpoint = `fal-ai/${model}`;
     log('Calling fal.subscribe with endpoint: %s and input: %O', endpoint, {
       ...defaultInput,

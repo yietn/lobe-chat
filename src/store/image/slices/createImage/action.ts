@@ -4,6 +4,8 @@ import { imageService } from '@/services/image';
 
 import { ImageStore } from '../../store';
 import { generationBatchSelectors } from '../generationBatch/selectors';
+import { imageGenerationConfigSelectors } from '../generationConfig/selectors';
+import { generationTopicSelectors } from '../generationTopic';
 
 // ====== action interface ====== //
 
@@ -26,7 +28,14 @@ export const createCreateImageSlice: StateCreator<
   async createImage() {
     set({ isCreating: true }, false, 'createImage/startCreateImage');
 
-    const { activeGenerationTopicId, createGenerationTopic, provider, model, parameters } = get();
+    const store = get();
+    const imageNum = imageGenerationConfigSelectors.imageNum(store);
+    const parameters = imageGenerationConfigSelectors.parameters(store);
+    const provider = imageGenerationConfigSelectors.provider(store);
+    const model = imageGenerationConfigSelectors.model(store);
+    const activeGenerationTopicId = generationTopicSelectors.activeGenerationTopicId(store);
+    const { createGenerationTopic } = store;
+
     if (!parameters) {
       throw new TypeError('parameters is not initialized');
     }
@@ -47,6 +56,7 @@ export const createCreateImageSlice: StateCreator<
       generationTopicId,
       provider,
       model,
+      imageNum,
       params: parameters as any,
     });
 
@@ -60,17 +70,20 @@ export const createCreateImageSlice: StateCreator<
     set({ isCreating: true }, false, 'recreateImage/startCreateImage');
 
     const store = get();
-    const { activeGenerationTopicId, removeGenerationBatch: deleteGenerationBatch } = store;
+    const imageNum = imageGenerationConfigSelectors.imageNum(store);
+    const activeGenerationTopicId = generationTopicSelectors.activeGenerationTopicId(store);
     const batch = generationBatchSelectors.getGenerationBatchByBatchId(generationBatchId)(store)!;
+    const { removeGenerationBatch } = store;
 
     // 1. Delete generation batch
-    await deleteGenerationBatch(generationBatchId, activeGenerationTopicId!);
+    await removeGenerationBatch(generationBatchId, activeGenerationTopicId!);
 
     // 2. Create image
     await imageService.createImage({
       generationTopicId: activeGenerationTopicId!,
       provider: batch.provider,
       model: batch.model,
+      imageNum,
       params: batch.config as any,
     });
 
