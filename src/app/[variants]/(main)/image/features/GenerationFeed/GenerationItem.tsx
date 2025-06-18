@@ -32,7 +32,7 @@ const useStyles = createStyles(({ css, token }) => ({
     position: absolute;
     right: 8px;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity ${token.motionDurationMid} ${token.motionEaseInOut};
     background: ${token.colorBgContainer} !important;
     border: 1px solid ${token.colorBorderSecondary};
     box-shadow: ${token.boxShadow};

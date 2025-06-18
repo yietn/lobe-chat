@@ -67,9 +67,9 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
   imageGrid: css`
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     width: 100%;
-    overflow-x: auto;
 
     /* Hide scrollbar for webkit browsers */
     &::-webkit-scrollbar {

@@ -33,7 +33,7 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 }));
 
-interface FileItemProps {
+interface ImageItemProps {
   alt?: string;
   alwaysShowClose?: boolean;
   className?: string;
@@ -46,8 +46,8 @@ interface FileItemProps {
   preview?: ImageProps['preview'];
 }
 
-const FileItem = memo<FileItemProps>(
-  ({ editable, alt, onRemove, url, loading, alwaysShowClose, preview }) => {
+const ImageItem = memo<ImageItemProps>(
+  ({ className, style, editable, alt, onRemove, url, loading, alwaysShowClose, preview }) => {
     const IMAGE_SIZE = editable ? MIN_IMAGE_SIZE : '100%';
     const { styles, cx } = useStyles();
     const { isSafari } = usePlatform();
@@ -70,16 +70,17 @@ const FileItem = memo<FileItemProps>(
         }
         alt={alt || ''}
         alwaysShowActions={alwaysShowClose}
+        className={className}
         height={isSafari ? 'auto' : '100%'}
         isLoading={loading}
         preview={preview}
         size={IMAGE_SIZE as any}
         src={url}
-        style={{ height: isSafari ? 'auto' : '100%' }}
+        style={{ height: isSafari ? 'auto' : '100%', ...style }}
         wrapperClassName={cx(styles.image, editable && styles.editableImage)}
       />
     );
   },
 );
 
-export default FileItem;
+export default ImageItem;
