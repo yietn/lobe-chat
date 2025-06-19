@@ -6,7 +6,7 @@ import { FileService } from '@/server/services/file';
 import { AsyncTaskError, AsyncTaskStatus } from '@/types/asyncTask';
 import { Generation, GenerationAsset } from '@/types/generation';
 
-import { NewFile } from '../schemas';
+import { FileSource, NewFile } from '../schemas';
 import {
   GenerationItem,
   GenerationWithAsyncTask,
@@ -100,7 +100,14 @@ export class GenerationModel {
     return await this.db.transaction(async (tx: Transaction) => {
       // Create file first using transaction
       // Since duplicates are very rare, we always create globalFile - checking existence first would be wasteful
-      const newFile = await this.fileModel.create(file, true, tx);
+      const newFile = await this.fileModel.create(
+        {
+          ...file,
+          source: FileSource.ImageGeneration,
+        },
+        true,
+        tx,
+      );
 
       // Update generation with asset and fileId using the transaction-aware update method
       await this.update(
