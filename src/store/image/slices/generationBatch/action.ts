@@ -188,7 +188,7 @@ export const createGenerationBatchSlice: StateCreator<
   useFetchGenerationBatches: (topicId) =>
     useClientDataSWR<GenerationBatch[]>(
       topicId ? [SWR_USE_FETCH_GENERATION_BATCHES, topicId] : null,
-      async (topicId: string) => {
+      async ([, topicId]: [string, string]) => {
         return generationBatchService.getGenerationBatches(topicId);
       },
       {
