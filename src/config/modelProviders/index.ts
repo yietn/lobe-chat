@@ -109,7 +109,6 @@ export const LOBE_DEFAULT_MODEL_LIST: ChatModelCard[] = [
 ].flat();
 
 export const DEFAULT_MODEL_PROVIDER_LIST = [
-  FalProvider,
   OpenAIProvider,
   { ...AzureProvider, chatModels: [] },
   AzureAIProvider,
@@ -124,6 +123,7 @@ export const DEFAULT_MODEL_PROVIDER_LIST = [
   PPIOProvider,
   HuggingFaceProvider,
   OpenRouterProvider,
+  FalProvider,
   CloudflareProvider,
   GithubProvider,
   NovitaProvider,
