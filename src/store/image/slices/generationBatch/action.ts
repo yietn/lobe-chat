@@ -8,16 +8,12 @@ import { generationService } from '@/services/generation';
 import { generationBatchService } from '@/services/generationBatch';
 import { toggleBooleanList } from '@/store/chat/utils';
 import { AsyncTaskStatus } from '@/types/asyncTask';
-import { Generation, GenerationBatch } from '@/types/generation';
+import { GenerationBatch } from '@/types/generation';
 import { setNamespace } from '@/utils/storeDebug';
 
 import { ImageStore } from '../../store';
 import { generationTopicSelectors } from '../generationTopic/selectors';
 import { GenerationBatchDispatch, generationBatchReducer } from './reducer';
-
-type GenerationBatchWithAsyncTaskId = GenerationBatch & {
-  generations: (Generation & { asyncTaskId?: string })[];
-};
 
 const n = setNamespace('generationBatch');
 
@@ -45,9 +41,7 @@ export interface GenerationBatchAction {
     topicId: string,
     enable?: boolean,
   ) => SWRResponse<GetGenerationStatusResult>;
-  useFetchGenerationBatches: (
-    topicId?: string | null,
-  ) => SWRResponse<GenerationBatchWithAsyncTaskId[]>;
+  useFetchGenerationBatches: (topicId?: string | null) => SWRResponse<GenerationBatch[]>;
 }
 
 // ====== action implementation ====== //
@@ -192,9 +186,9 @@ export const createGenerationBatchSlice: StateCreator<
   },
 
   useFetchGenerationBatches: (topicId) =>
-    useClientDataSWR<GenerationBatchWithAsyncTaskId[]>(
+    useClientDataSWR<GenerationBatch[]>(
       topicId ? [SWR_USE_FETCH_GENERATION_BATCHES, topicId] : null,
-      async ([, topicId]: [string, string]) => {
+      async (topicId: string) => {
         return generationBatchService.getGenerationBatches(topicId);
       },
       {

@@ -8,7 +8,7 @@ class GenerationService {
   /**
    * Delete a single generation
    */
-  async deleteGeneration(generationId: string): Promise<void> {
+  async deleteGeneration(generationId: string) {
     return lambdaClient.generation.deleteGeneration.mutate({ generationId });
   }
 }
