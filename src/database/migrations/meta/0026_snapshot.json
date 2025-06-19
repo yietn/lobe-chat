@@ -1,5 +1,5 @@
 {
-  "id": "94662a26-e764-4cac-834c-03f779eb362b",
+  "id": "c3a9a859-bd9e-470d-84b7-2f9d2579c98b",
   "prevId": "5023d4c4-0eab-4f55-9399-ff599bda5ab8",
   "version": "7",
   "dialect": "postgresql",
@@ -1140,6 +1140,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'upload'"
+        },
         "client_id": {
           "name": "client_id",
           "type": "text",
@@ -1793,6 +1800,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "file_id": {
+          "name": "file_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "seed": {
           "name": "seed",
           "type": "integer",
@@ -1866,6 +1879,19 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "generations_file_id_files_id_fk": {
+          "name": "generations_file_id_files_id_fk",
+          "tableFrom": "generations",
+          "tableTo": "files",
+          "columnsFrom": [
+            "file_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

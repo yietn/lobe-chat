@@ -163,6 +163,7 @@ table files {
   name text [not null]
   size integer [not null]
   url text [not null]
+  source text [not null, default: 'upload']
   client_id text
   metadata jsonb
   chunk_task_id uuid
