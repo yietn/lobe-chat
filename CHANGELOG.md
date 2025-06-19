@@ -2,6 +2,391 @@
 
 # Changelog
 
+### [Version 1.94.13](https://github.com/lobehub/lobe-chat/compare/v1.94.12...v1.94.13)
+
+<sup>Released on **2025-06-18**</sup>
+
+#### 💄 Styles
+
+- **misc**: Update Gemini 2.5 Pro, Flash GA models. Add Gemini 2.5 Flash-Lite Preview model.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Update Gemini 2.5 Pro, Flash GA models. Add Gemini 2.5 Flash-Lite Preview model, closes [#8213](https://github.com/lobehub/lobe-chat/issues/8213) ([39ef8be](https://github.com/lobehub/lobe-chat/commit/39ef8be))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.12](https://github.com/lobehub/lobe-chat/compare/v1.94.11...v1.94.12)
+
+<sup>Released on **2025-06-18**</sup>
+
+#### 💄 Styles
+
+- **misc**: Add MiniMax-M1 model.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Add MiniMax-M1 model, closes [#8209](https://github.com/lobehub/lobe-chat/issues/8209) ([41a0178](https://github.com/lobehub/lobe-chat/commit/41a0178))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.11](https://github.com/lobehub/lobe-chat/compare/v1.94.10...v1.94.11)
+
+<sup>Released on **2025-06-17**</sup>
+
+#### 🐛 Bug Fixes
+
+- **misc**: Enhance the multi-display window opening experience.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's fixed
+
+- **misc**: Enhance the multi-display window opening experience, closes [#8176](https://github.com/lobehub/lobe-chat/issues/8176) ([b132e66](https://github.com/lobehub/lobe-chat/commit/b132e66))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.10](https://github.com/lobehub/lobe-chat/compare/v1.94.9...v1.94.10)
+
+<sup>Released on **2025-06-15**</sup>
+
+#### 🐛 Bug Fixes
+
+- **misc**: Improve chat selectors and enhance topic handling logic.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's fixed
+
+- **misc**: Improve chat selectors and enhance topic handling logic, closes [#8133](https://github.com/lobehub/lobe-chat/issues/8133) [#8117](https://github.com/lobehub/lobe-chat/issues/8117) ([15b24f1](https://github.com/lobehub/lobe-chat/commit/15b24f1))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.9](https://github.com/lobehub/lobe-chat/compare/v1.94.8...v1.94.9)
+
+<sup>Released on **2025-06-15**</sup>
+
+#### 💄 Styles
+
+- **misc**: Add `kimi-thinking-preview` model from Moonshot.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Add `kimi-thinking-preview` model from Moonshot, closes [#8171](https://github.com/lobehub/lobe-chat/issues/8171) ([93d677c](https://github.com/lobehub/lobe-chat/commit/93d677c))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.8](https://github.com/lobehub/lobe-chat/compare/v1.94.7...v1.94.8)
+
+<sup>Released on **2025-06-15**</sup>
+
+#### 🐛 Bug Fixes
+
+- **misc**: Correctly handle `reasoning_effort`.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's fixed
+
+- **misc**: Correctly handle `reasoning_effort`, closes [#8180](https://github.com/lobehub/lobe-chat/issues/8180) ([1c04736](https://github.com/lobehub/lobe-chat/commit/1c04736))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.7](https://github.com/lobehub/lobe-chat/compare/v1.94.6...v1.94.7)
+
+<sup>Released on **2025-06-12**</sup>
+
+#### 💄 Styles
+
+- **misc**: Add Doubao Seed 1.6 model.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Add Doubao Seed 1.6 model, closes [#8167](https://github.com/lobehub/lobe-chat/issues/8167) ([bdfa44b](https://github.com/lobehub/lobe-chat/commit/bdfa44b))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.6](https://github.com/lobehub/lobe-chat/compare/v1.94.5...v1.94.6)
+
+<sup>Released on **2025-06-12**</sup>
+
+#### 🐛 Bug Fixes
+
+- **misc**: Abort the Gemini request correctly & Add openai o3-pro.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's fixed
+
+- **misc**: Abort the Gemini request correctly & Add openai o3-pro, closes [#8135](https://github.com/lobehub/lobe-chat/issues/8135) ([c79f1b9](https://github.com/lobehub/lobe-chat/commit/c79f1b9))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.5](https://github.com/lobehub/lobe-chat/compare/v1.94.4...v1.94.5)
+
+<sup>Released on **2025-06-12**</sup>
+
+#### 🐛 Bug Fixes
+
+- **chat**: Improve response animation merging logic.
+
+#### 💄 Styles
+
+- **misc**: Support `web_search_preview` & fix some bug form OpenAI Response API.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's fixed
+
+- **chat**: Improve response animation merging logic, closes [#8160](https://github.com/lobehub/lobe-chat/issues/8160) ([9d81cdc](https://github.com/lobehub/lobe-chat/commit/9d81cdc))
+
+#### Styles
+
+- **misc**: Support `web_search_preview` & fix some bug form OpenAI Response API, closes [#8131](https://github.com/lobehub/lobe-chat/issues/8131) ([b2983f0](https://github.com/lobehub/lobe-chat/commit/b2983f0))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.4](https://github.com/lobehub/lobe-chat/compare/v1.94.3...v1.94.4)
+
+<sup>Released on **2025-06-11**</sup>
+
+#### 💄 Styles
+
+- **misc**: Transition animation switch.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **misc**: Transition animation switch, closes [#7981](https://github.com/lobehub/lobe-chat/issues/7981) ([dd4ab3f](https://github.com/lobehub/lobe-chat/commit/dd4ab3f))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.3](https://github.com/lobehub/lobe-chat/compare/v1.94.2...v1.94.3)
+
+<sup>Released on **2025-06-11**</sup>
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.2](https://github.com/lobehub/lobe-chat/compare/v1.94.1...v1.94.2)
+
+<sup>Released on **2025-06-11**</sup>
+
+#### 🐛 Bug Fixes
+
+- **misc**: Update Gemini range of thinkingBudget.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's fixed
+
+- **misc**: Update Gemini range of thinkingBudget, closes [#8122](https://github.com/lobehub/lobe-chat/issues/8122) ([7331e8a](https://github.com/lobehub/lobe-chat/commit/7331e8a))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.94.1](https://github.com/lobehub/lobe-chat/compare/v1.94.0...v1.94.1)
+
+<sup>Released on **2025-06-10**</sup>
+
+#### 💄 Styles
+
+- **ModelSelect**: Improve mobile layout and text overflow handling.
+- **misc**: Update pplx abilities tags, support `vision`.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Styles
+
+- **ModelSelect**: Improve mobile layout and text overflow handling, closes [#8118](https://github.com/lobehub/lobe-chat/issues/8118) ([d97aa49](https://github.com/lobehub/lobe-chat/commit/d97aa49))
+- **misc**: Update pplx abilities tags, support `vision`, closes [#8119](https://github.com/lobehub/lobe-chat/issues/8119) ([5c2e5f7](https://github.com/lobehub/lobe-chat/commit/5c2e5f7))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+## [Version 1.94.0](https://github.com/lobehub/lobe-chat/compare/v1.93.3...v1.94.0)
+
+<sup>Released on **2025-06-10**</sup>
+
+#### ✨ Features
+
+- **misc**: Support google sso as auth provider.
+
+#### 🐛 Bug Fixes
+
+- **misc**: Restore reasoningEffort in setting.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### What's improved
+
+- **misc**: Support google sso as auth provider, closes [#8074](https://github.com/lobehub/lobe-chat/issues/8074) ([43ab03a](https://github.com/lobehub/lobe-chat/commit/43ab03a))
+
+#### What's fixed
+
+- **misc**: Restore reasoningEffort in setting, closes [#8123](https://github.com/lobehub/lobe-chat/issues/8123) ([3be609c](https://github.com/lobehub/lobe-chat/commit/3be609c))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
+### [Version 1.93.3](https://github.com/lobehub/lobe-chat/compare/v1.93.2...v1.93.3)
+
+<sup>Released on **2025-06-10**</sup>
+
+#### ♻ Code Refactoring
+
+- **misc**: Refactor branding info.
+
+<br/>
+
+<details>
+<summary><kbd>Improvements and Fixes</kbd></summary>
+
+#### Code refactoring
+
+- **misc**: Refactor branding info, closes [#8134](https://github.com/lobehub/lobe-chat/issues/8134) ([3baa966](https://github.com/lobehub/lobe-chat/commit/3baa966))
+
+</details>
+
+<div align="right">
+
+[![](https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square)](#readme-top)
+
+</div>
+
 ### [Version 1.93.2](https://github.com/lobehub/lobe-chat/compare/v1.93.1...v1.93.2)
 
 <sup>Released on **2025-06-09**</sup>
