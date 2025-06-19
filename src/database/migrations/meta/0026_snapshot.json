@@ -1,5 +1,5 @@
 {
-  "id": "c3a9a859-bd9e-470d-84b7-2f9d2579c98b",
+  "id": "6c541ea2-e8ad-423d-8a51-f5bb887a8e41",
   "prevId": "5023d4c4-0eab-4f55-9399-ff599bda5ab8",
   "version": "7",
   "dialect": "postgresql",
@@ -1144,8 +1144,7 @@
           "name": "source",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'upload'"
+          "notNull": false
         },
         "client_id": {
           "name": "client_id",

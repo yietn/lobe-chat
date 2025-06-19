@@ -527,7 +527,7 @@
       "CREATE TABLE \"generation_batches\" (\n\t\"id\" text PRIMARY KEY NOT NULL,\n\t\"user_id\" text NOT NULL,\n\t\"generation_topic_id\" text NOT NULL,\n\t\"provider\" text NOT NULL,\n\t\"model\" text NOT NULL,\n\t\"prompt\" text NOT NULL,\n\t\"width\" integer,\n\t\"height\" integer,\n\t\"ratio\" varchar(64),\n\t\"config\" jsonb,\n\t\"accessed_at\" timestamp with time zone DEFAULT now() NOT NULL,\n\t\"created_at\" timestamp with time zone DEFAULT now() NOT NULL,\n\t\"updated_at\" timestamp with time zone DEFAULT now() NOT NULL\n);\n",
       "\nCREATE TABLE \"generation_topics\" (\n\t\"id\" text PRIMARY KEY NOT NULL,\n\t\"user_id\" text NOT NULL,\n\t\"title\" text,\n\t\"cover_url\" text,\n\t\"accessed_at\" timestamp with time zone DEFAULT now() NOT NULL,\n\t\"created_at\" timestamp with time zone DEFAULT now() NOT NULL,\n\t\"updated_at\" timestamp with time zone DEFAULT now() NOT NULL\n);\n",
       "\nCREATE TABLE \"generations\" (\n\t\"id\" text PRIMARY KEY NOT NULL,\n\t\"user_id\" text NOT NULL,\n\t\"generation_batch_id\" varchar(64) NOT NULL,\n\t\"async_task_id\" uuid,\n\t\"file_id\" text,\n\t\"seed\" integer,\n\t\"asset\" jsonb,\n\t\"accessed_at\" timestamp with time zone DEFAULT now() NOT NULL,\n\t\"created_at\" timestamp with time zone DEFAULT now() NOT NULL,\n\t\"updated_at\" timestamp with time zone DEFAULT now() NOT NULL\n);\n",
-      "\nALTER TABLE \"files\" ADD COLUMN \"source\" text DEFAULT 'upload' NOT NULL;",
+      "\nALTER TABLE \"files\" ADD COLUMN \"source\" text;",
       "\nALTER TABLE \"generation_batches\" ADD CONSTRAINT \"generation_batches_user_id_users_id_fk\" FOREIGN KEY (\"user_id\") REFERENCES \"public\".\"users\"(\"id\") ON DELETE cascade ON UPDATE no action;",
       "\nALTER TABLE \"generation_batches\" ADD CONSTRAINT \"generation_batches_generation_topic_id_generation_topics_id_fk\" FOREIGN KEY (\"generation_topic_id\") REFERENCES \"public\".\"generation_topics\"(\"id\") ON DELETE cascade ON UPDATE no action;",
       "\nALTER TABLE \"generation_topics\" ADD CONSTRAINT \"generation_topics_user_id_users_id_fk\" FOREIGN KEY (\"user_id\") REFERENCES \"public\".\"users\"(\"id\") ON DELETE cascade ON UPDATE no action;",
@@ -537,7 +537,7 @@
       "\nALTER TABLE \"generations\" ADD CONSTRAINT \"generations_file_id_files_id_fk\" FOREIGN KEY (\"file_id\") REFERENCES \"public\".\"files\"(\"id\") ON DELETE cascade ON UPDATE no action;"
     ],
     "bps": true,
-    "folderMillis": 1750298909507,
-    "hash": "cd5fbd8745f951aaad48b88c4eed6671dc7098ddd8ffad56b4a9da658ca02b36"
+    "folderMillis": 1750303625758,
+    "hash": "abed92b1356df6d7eb35c03f47fbbdcdaf25aefda750dc3e4963c1c2a0d38b54"
   }
 ]

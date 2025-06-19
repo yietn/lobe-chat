@@ -37,7 +37,6 @@ export type NewGlobalFile = typeof globalFiles.$inferInsert;
 export type GlobalFileItem = typeof globalFiles.$inferSelect;
 
 export enum FileSource {
-  Upload = 'upload',
   ImageGeneration = 'image_generation',
 }
 const fileSourceValues = Object.values(FileSource) as UnionToTuple<`${FileSource}`>;
@@ -65,7 +64,7 @@ export const files = pgTable(
     name: text('name').notNull(),
     size: integer('size').notNull(),
     url: text('url').notNull(),
-    source: text('source', { enum: fileSourceValues }).default(FileSource.Upload).notNull(),
+    source: text('source', { enum: fileSourceValues }),
 
     clientId: text('client_id'),
     metadata: jsonb('metadata'),
