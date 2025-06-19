@@ -6,19 +6,21 @@ import { ClientOptions } from 'openai';
 import { StdImageGenParamsKeys } from '@/store/image/utils/StandardParameters';
 
 import { LobeRuntimeAI } from '../BaseAI';
+import { AgentRuntimeErrorType } from '../error';
 import { CreateImagePayload, CreateImageResponse } from '../types/image';
+import { AgentRuntimeError } from '../utils/createError';
 
 // Create debug logger
 const log = debug('lobe-image:fal');
 
 type FluxDevOutput = Awaited<ReturnType<typeof fal.subscribe<'fal-ai/flux/dev'>>>['data'];
 
-const DEFAULT_API_KEY = 'Not set api key for fal, bro!';
-
 export class LobeFalAI implements LobeRuntimeAI {
   constructor({ apiKey }: ClientOptions = {}) {
+    if (!apiKey) throw AgentRuntimeError.createError(AgentRuntimeErrorType.InvalidProviderAPIKey);
+
     fal.config({
-      credentials: apiKey ?? DEFAULT_API_KEY,
+      credentials: apiKey,
     });
     log('FalAI initialized with apiKey: %s', apiKey ? '*****' : 'Not set');
   }
