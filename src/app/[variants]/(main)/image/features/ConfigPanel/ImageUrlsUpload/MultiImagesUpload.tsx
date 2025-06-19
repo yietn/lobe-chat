@@ -3,7 +3,7 @@
 // Removed Image import - using img tags instead
 import { createStyles, useTheme } from 'antd-style';
 import { Image as ImageIcon, X } from 'lucide-react';
-import React, { type FC, memo, useRef, useState } from 'react';
+import React, { type FC, memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Center } from 'react-layout-kit';
 
@@ -227,6 +227,15 @@ const useStyles = createStyles(({ css, token }) => {
     `,
   };
 });
+
+// ======== Utils ======== //
+
+/**
+ * Check if a URL is a local blob URL
+ * @param url - The URL to check
+ * @returns true if the URL is a blob URL
+ */
+const isLocalBlobUrl = (url: string): boolean => url.startsWith('blob:');
 
 // ======== Sub-Components ======== //
 
@@ -488,6 +497,18 @@ const MultiImagesUpload: FC<MultiImagesUploadProps> = memo(
     const [displayItems, setDisplayItems] = useState<DisplayItem[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
 
+    // Cleanup blob URLs to prevent memory leaks
+    useEffect(() => {
+      return () => {
+        // Cleanup function: revoke all blob URLs when component unmounts or displayItems change
+        displayItems.forEach((item) => {
+          if (item.file && isLocalBlobUrl(item.url)) {
+            URL.revokeObjectURL(item.url);
+          }
+        });
+      };
+    }, [displayItems]);
+
     const handlePlaceholderClick = () => {
       inputRef.current?.click();
     };
@@ -553,8 +574,9 @@ const MultiImagesUpload: FC<MultiImagesUploadProps> = memo(
       const successfulUrls: string[] = [];
 
       uploadResults.forEach((result, index) => {
+        const displayItem = newDisplayItems[index];
+
         if (result.status === 'fulfilled' && result.value) {
-          const displayItem = newDisplayItems[index];
           successfulUrls.push(result.value.url);
 
           // Update display item with final URL and success status
@@ -571,8 +593,24 @@ const MultiImagesUpload: FC<MultiImagesUploadProps> = memo(
                 : item,
             ),
           );
+        } else {
+          // Handle upload failure
+          setDisplayItems((prev) =>
+            prev.map((item) =>
+              item.id === displayItem.id
+                ? {
+                    ...item,
+                    status: 'error',
+                    progress: 0,
+                    error: 'Upload failed',
+                  }
+                : item,
+            ),
+          );
+        }
 
-          // Clean up blob URL
+        // Clean up blob URL regardless of success or failure
+        if (isLocalBlobUrl(displayItem.url)) {
           URL.revokeObjectURL(displayItem.url);
         }
       });

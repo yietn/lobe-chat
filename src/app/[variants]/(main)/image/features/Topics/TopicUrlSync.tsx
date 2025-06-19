@@ -19,7 +19,7 @@ const TopicUrlSync = () => {
     const unsubscribeTopic = useImageStore.subscribe(
       (s) => s.activeGenerationTopicId,
       (state) => {
-        setTopic(!state ? null : state);
+        setTopic(state || null);
       },
     );
 

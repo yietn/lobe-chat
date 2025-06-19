@@ -61,7 +61,7 @@ export class S3StaticFileImpl implements FileServiceImpl {
   getKeyFromFullUrl(url: string): string {
     try {
       const urlObject = new URL(url);
-      const pathname = urlObject.pathname;
+      const { pathname } = urlObject;
 
       let key: string;
 

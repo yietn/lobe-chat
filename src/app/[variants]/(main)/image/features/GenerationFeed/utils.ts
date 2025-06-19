@@ -2,7 +2,7 @@ import { Generation } from '@/types/generation';
 
 // 计算图片的显示尺寸，保持原图比例
 export const calculateImageSize = (generation: Generation) => {
-  const asset = generation.asset;
+  const { asset } = generation;
   if (!asset?.width || !asset?.height) {
     // 如果没有尺寸信息，使用默认尺寸
     return { width: 200, height: 200 };

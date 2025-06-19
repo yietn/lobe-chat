@@ -12,12 +12,14 @@ import { useTranslation } from 'react-i18next';
  * 统一的图片项数据结构
  * - url: 现有图片的远程URL
  * - file: 新选择的文件，需要上传
+ * - previewUrl: 本地文件的预览URL（blob URL）
  * 有url的是现有图片，有file的是待上传文件
  */
 export interface ImageItem {
   id: string;
   url?: string; // 现有图片的URL
   file?: File; // 新选择的文件
+  previewUrl?: string; // 本地文件的预览URL，仅在file存在时使用
 }
 
 interface ImageManageModalProps {
@@ -217,22 +219,40 @@ const ImageManageModal: FC<ImageManageModalProps> = memo(
       }
     }, [open, images]);
 
-    // Modal 关闭时清理blob URL
+    // Cleanup blob URLs to prevent memory leaks
+    useEffect(() => {
+      return () => {
+        // Cleanup function: revoke all blob URLs when component unmounts or imageItems change
+        imageItems.forEach((item) => {
+          if (item.previewUrl) {
+            URL.revokeObjectURL(item.previewUrl);
+          }
+        });
+      };
+    }, [imageItems]);
+
+    // Additional cleanup when modal closes
     useEffect(() => {
       if (!open) {
         imageItems.forEach((item) => {
-          if (item.file) {
-            // 清理新上传文件的预览URL
-            const previewUrl = URL.createObjectURL(item.file);
-            URL.revokeObjectURL(previewUrl);
+          if (item.previewUrl) {
+            URL.revokeObjectURL(item.previewUrl);
           }
         });
+        setImageItems([]); // Clear items when modal closes
       }
-    }, [open, imageItems]);
+    }, [open]);
 
     const selectedItem = imageItems[selectedIndex];
 
     const handleDelete = (index: number) => {
+      const itemToDelete = imageItems[index];
+
+      // Clean up blob URL for the deleted item
+      if (itemToDelete?.previewUrl) {
+        URL.revokeObjectURL(itemToDelete.previewUrl);
+      }
+
       const newItems = imageItems.filter((_, i) => i !== index);
       setImageItems(newItems);
 
@@ -255,10 +275,11 @@ const ImageManageModal: FC<ImageManageModalProps> = memo(
       const files = event.target.files;
       if (!files || files.length === 0) return;
 
-      // 创建新的ImageItem，只有file没有url
+      // 创建新的ImageItem，为每个文件生成一次性的预览URL
       const newItems: ImageItem[] = Array.from(files).map((file) => ({
         id: generateId(),
         file,
+        previewUrl: URL.createObjectURL(file), // 只创建一次
       }));
 
       setImageItems((prev) => [...prev, ...newItems]);
@@ -273,8 +294,8 @@ const ImageManageModal: FC<ImageManageModalProps> = memo(
     const getDisplayUrl = (item: ImageItem): string => {
       if (item.url) {
         return item.url;
-      } else if (item.file) {
-        return URL.createObjectURL(item.file);
+      } else if (item.previewUrl) {
+        return item.previewUrl;
       }
       return '';
     };

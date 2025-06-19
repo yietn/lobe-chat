@@ -5,6 +5,7 @@ import { App, Typography } from 'antd';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
 import { AlertTriangle, Dices, Download, Loader2, Trash2 } from 'lucide-react';
+import mime from 'mime';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -123,6 +124,43 @@ interface GenerationItemProps {
   prompt: string;
 }
 
+/**
+ * Get file extension from blob MIME type or URL fallback
+ * @param blob - The blob object from fetch response
+ * @param fallbackUrl - The original URL to extract extension from as fallback
+ * @returns file extension without dot (e.g., 'jpg', 'png', 'webp')
+ */
+const getFileExtension = (blob: Blob, fallbackUrl: string): string => {
+  // First try to get extension from blob MIME type
+  const mimeType = blob.type;
+  if (mimeType) {
+    const extension = mime.getExtension(mimeType);
+    if (extension) {
+      return extension;
+    }
+  }
+
+  // Fallback: extract extension from URL
+  try {
+    const url = new URL(fallbackUrl);
+    const pathname = url.pathname.toLowerCase();
+
+    // Common image extensions
+    if (pathname.includes('.webp')) return 'webp';
+    if (pathname.includes('.jpg') || pathname.includes('.jpeg')) return 'jpg';
+    if (pathname.includes('.png')) return 'png';
+    if (pathname.includes('.gif')) return 'gif';
+    if (pathname.includes('.bmp')) return 'bmp';
+    if (pathname.includes('.svg')) return 'svg';
+    if (pathname.includes('.tiff') || pathname.includes('.tif')) return 'tiff';
+  } catch {
+    // Invalid URL, ignore
+  }
+
+  // Default fallback
+  return 'png';
+};
+
 export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt }) => {
   const { styles } = useStyles();
   const { t } = useTranslation('image');
@@ -179,12 +217,7 @@ export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt })
         .trim();
 
       // Detect file extension from URL
-      const imageUrl = generation.asset.url.toLowerCase();
-      const fileExtension = imageUrl.includes('.webp')
-        ? 'webp'
-        : imageUrl.includes('.jpg') || imageUrl.includes('.jpeg')
-          ? 'jpg'
-          : 'png';
+      const fileExtension = getFileExtension(blob, generation.asset.url);
       link.download = `${safePrompt}_${timestamp}.${fileExtension}`;
 
       // Trigger download

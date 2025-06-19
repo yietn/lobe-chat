@@ -27,7 +27,7 @@ export const createGenerationConfigSlice: StateCreator<
   setParamOnInput: (paramName, value) => {
     set(
       (state) => {
-        const parameters = state.parameters;
+        const { parameters } = state;
         if (!parameters) throw new Error('parameters is not initialized');
 
         return { parameters: { ...parameters, [paramName]: value } };
