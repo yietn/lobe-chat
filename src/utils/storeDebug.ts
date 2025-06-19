@@ -11,3 +11,10 @@ export const setNamespace = (namespace: string) => {
     ) as P extends undefined ? string : { type: string; payload: P };
   };
 };
+
+export type Action =
+  | string
+  | {
+      type: string;
+      [x: string | number | symbol]: unknown;
+    };

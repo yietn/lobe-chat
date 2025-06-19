@@ -65,7 +65,7 @@ class ModelRuntime {
    * ```
    */
   async chat(payload: ChatStreamPayload, options?: ChatMethodOptions) {
-    return this._runtime.chat?.(payload, options);
+    return this._runtime.chat!(payload, options);
   }
 
   async textToImage(payload: TextToImagePayload) {
