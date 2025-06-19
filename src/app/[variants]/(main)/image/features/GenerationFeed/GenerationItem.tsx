@@ -19,9 +19,9 @@ import { calculateImageSize } from './utils';
 const useStyles = createStyles(({ css, token }) => ({
   imageContainer: css`
     position: relative;
+    overflow: hidden;
     flex-shrink: 0;
     border-radius: ${token.borderRadius}px;
-    overflow: hidden;
 
     &:hover .generation-action-button {
       opacity: 1;
@@ -30,36 +30,42 @@ const useStyles = createStyles(({ css, token }) => ({
   // 图片操作按钮的公共样式
   generationActionButton: css`
     position: absolute;
-    right: 8px;
-    opacity: 0;
-    transition: opacity ${token.motionDurationMid} ${token.motionEaseInOut};
-    background: ${token.colorBgContainer} !important;
+    inset-inline-end: 8px;
+
     border: 1px solid ${token.colorBorderSecondary};
+
+    opacity: 0;
+    background: ${token.colorBgContainer} !important;
     box-shadow: ${token.boxShadow};
+
+    transition: opacity ${token.motionDurationMid} ${token.motionEaseInOut};
 
     &:hover {
       background: ${token.colorBgContainer} !important;
     }
   `,
   generationDelete: css`
-    top: 8px;
+    inset-block-start: 8px;
   `,
   generationDownload: css`
-    top: 40px;
+    inset-block-start: 40px;
   `,
   generationCopySeed: css`
-    top: 72px;
+    inset-block-start: 72px;
   `,
   placeholderContainer: css`
     position: relative;
-    flex-shrink: 0;
-    border-radius: ${token.borderRadius}px;
+
     overflow: hidden;
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    background: ${token.colorFillSecondary};
+
     border: 1px solid ${token.colorBorder};
+    border-radius: ${token.borderRadius}px;
+
+    background: ${token.colorFillSecondary};
 
     &:hover .generation-action-button {
       opacity: 1;
@@ -68,22 +74,25 @@ const useStyles = createStyles(({ css, token }) => ({
   loadingContent: css`
     display: flex;
     flex-direction: column;
+    gap: 8px;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    color: ${token.colorTextTertiary};
+
     font-size: 12px;
+    color: ${token.colorTextTertiary};
   `,
   errorContent: css`
     display: flex;
     flex-direction: column;
+    gap: 8px;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    color: ${token.colorError};
-    font-size: 12px;
-    text-align: center;
+
     padding: 8px;
+
+    font-size: 12px;
+    color: ${token.colorError};
+    text-align: center;
   `,
   spinIcon: css`
     color: ${token.colorPrimary};
@@ -92,11 +101,15 @@ const useStyles = createStyles(({ css, token }) => ({
     color: ${token.colorError};
   `,
   errorText: css`
-    font-size: 10px;
-    opacity: 0.8;
-    color: ${token.colorError} !important;
-    margin: 0 !important;
     cursor: pointer;
+
+    margin: 0 !important;
+
+    font-size: 10px;
+    color: ${token.colorError} !important;
+
+    opacity: 0.8;
+
     transition: opacity 0.2s ease;
 
     &:hover {

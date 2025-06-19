@@ -45,14 +45,15 @@ const useStyles = createStyles(({ css, token }) => {
   return {
     placeholder: css`
       cursor: pointer;
-      transition: all 0.2s ease;
 
       width: 100%;
       height: 120px;
-
       border: 2px dashed ${token.colorBorder};
       border-radius: ${token.borderRadiusLG}px;
+
       background: ${token.colorFillAlter};
+
+      transition: all 0.2s ease;
 
       &:hover {
         border-color: ${token.colorPrimary};
@@ -61,39 +62,43 @@ const useStyles = createStyles(({ css, token }) => {
     `,
     progress: css`
       cursor: pointer;
-      transition: all 0.2s ease;
+
+      position: relative;
+
+      overflow: hidden;
 
       width: 100%;
       height: 120px;
-
       border: 2px solid ${token.colorPrimary};
       border-radius: ${token.borderRadiusLG}px;
+
       background: ${token.colorFillSecondary};
 
-      position: relative;
-      overflow: hidden;
+      transition: all 0.2s ease;
     `,
     // Image thumbnails styles
     imageThumbnails: css`
       cursor: pointer;
 
-      width: 100%;
-      height: ${thumbnailSize}px;
-
-      padding: 0;
       display: flex;
       gap: 8px;
+
+      width: 100%;
+      height: ${thumbnailSize}px;
+      padding: 0;
     `,
     // Single image display styles
     singleImageDisplay: css`
       cursor: pointer;
+
       position: relative;
 
-      width: 100%;
-      height: 160px; // Larger height for single image
-
-      border-radius: ${token.borderRadiusLG}px;
       overflow: hidden;
+
+      width: 100%;
+      height: 160px;
+      border-radius: ${token.borderRadiusLG}px;
+
       background: ${token.colorBgContainer};
 
       &:hover .upload-more-overlay {
@@ -106,43 +111,49 @@ const useStyles = createStyles(({ css, token }) => {
     `,
     uploadMoreOverlay: css`
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      z-index: 5;
+      inset-block: 0 0;
+      inset-inline: 0 0;
 
-      background: ${token.colorBgMask};
       display: flex;
       align-items: center;
       justify-content: center;
 
       opacity: 0;
+      background: ${token.colorBgMask};
+
       transition: opacity 0.2s ease;
-      z-index: 5;
     `,
     uploadMoreButton: css`
-      padding: 8px 16px;
-      border-radius: ${token.borderRadius}px;
-      background: ${token.colorBgContainer};
-      color: ${token.colorText};
-      border: 1px solid ${token.colorBorder};
       cursor: pointer;
+
+      padding-block: 8px;
+      padding-inline: 16px;
+      border: 1px solid ${token.colorBorder};
+      border-radius: ${token.borderRadius}px;
+
       font-size: 12px;
       font-weight: 500;
+      color: ${token.colorText};
+
+      background: ${token.colorBgContainer};
       box-shadow: ${token.boxShadowSecondary};
 
       &:hover {
-        background: ${token.colorBgElevated};
         border-color: ${token.colorPrimary};
         color: ${token.colorPrimary};
+        background: ${token.colorBgElevated};
       }
     `,
     imageItem: css`
       position: relative;
-      width: ${thumbnailSize}px;
-      height: ${thumbnailSize}px; // Square thumbnails
-      border-radius: ${token.borderRadius}px;
+
       overflow: hidden;
+
+      width: ${thumbnailSize}px;
+      height: ${thumbnailSize}px;
+      border-radius: ${token.borderRadius}px;
+
       background: ${token.colorBgContainer};
 
       &:hover .delete-icon {
@@ -150,63 +161,66 @@ const useStyles = createStyles(({ css, token }) => {
       }
     `,
     deleteIcon: css`
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      width: 20px;
-      height: 20px;
+      cursor: pointer;
 
-      background: ${token.colorBgMask};
-      border-radius: 50%;
+      position: absolute;
+      z-index: 10;
+      inset-block-start: 4px;
+      inset-inline-end: 4px;
+
       display: flex;
       align-items: center;
       justify-content: center;
 
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+
       color: ${token.colorTextLightSolid};
+
       opacity: 0;
+      background: ${token.colorBgMask};
+
       transition: opacity 0.2s ease;
-      cursor: pointer;
-      z-index: 10;
 
       &:hover {
-        background: ${token.colorErrorBg};
         color: ${token.colorError};
+        background: ${token.colorErrorBg};
       }
     `,
     moreOverlay: css`
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset-block: 0 0;
+      inset-inline: 0 0;
 
-      background: ${token.colorBgMask};
       display: flex;
       align-items: center;
       justify-content: center;
 
-      color: ${token.colorTextLightSolid};
       font-size: 16px;
       font-weight: 600;
+      color: ${token.colorTextLightSolid};
+
+      background: ${token.colorBgMask};
     `,
     placeholderText: css`
-      color: ${token.colorTextSecondary};
       font-size: 12px; /* Made smaller than default token.fontSize (14px) */
-      text-align: center;
       line-height: 1.4;
+      color: ${token.colorTextSecondary};
+      text-align: center;
     `,
     progressText: css`
-      color: ${token.colorText};
       font-size: 12px;
-      text-align: center;
-      line-height: 1.4;
       font-weight: 500;
+      line-height: 1.4;
+      color: ${token.colorText};
+      text-align: center;
     `,
     progressPrimary: css`
+      margin-block-end: 4px;
       font-size: 14px;
       font-weight: 600;
       color: ${token.colorPrimary};
-      margin-bottom: 4px;
     `,
     placeholderIcon: css`
       color: ${token.colorTextTertiary};

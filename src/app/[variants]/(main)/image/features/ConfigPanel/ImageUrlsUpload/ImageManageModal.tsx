@@ -46,8 +46,8 @@ const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 11
 const useStyles = createStyles(({ css, token }) => ({
   modal: css`
     .ant-modal-content {
-      padding: 0;
       overflow: hidden;
+      padding: 0;
     }
   `,
   content: css`
@@ -56,10 +56,12 @@ const useStyles = createStyles(({ css, token }) => ({
     background: ${token.colorBgContainer};
   `,
   sidebar: css`
-    width: 200px;
-    border-right: 1px solid ${token.colorBorderSecondary};
-    padding: 16px;
     overflow-y: auto;
+
+    width: 200px;
+    padding: 16px;
+    border-inline-end: 1px solid ${token.colorBorderSecondary};
+
     background: ${token.colorBgLayout};
   `,
   thumbnailList: css`
@@ -68,13 +70,17 @@ const useStyles = createStyles(({ css, token }) => ({
     gap: 8px;
   `,
   thumbnail: css`
+    cursor: pointer;
+
     position: relative;
+
+    overflow: hidden;
+
     width: 100%;
     height: 120px;
-    border-radius: ${token.borderRadius}px;
-    overflow: hidden;
-    cursor: pointer;
     border: 2px solid transparent;
+    border-radius: ${token.borderRadius}px;
+
     transition: border-color 0.2s ease;
 
     &:hover {
@@ -90,56 +96,66 @@ const useStyles = createStyles(({ css, token }) => ({
     }
 
     img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
     }
   `,
   thumbnailDelete: css`
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
+    cursor: pointer;
 
-    background: ${token.colorBgMask};
-    border-radius: 50%;
+    position: absolute;
+    z-index: 10;
+    inset-block-start: 4px;
+    inset-inline-end: 4px;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+
     color: ${token.colorTextLightSolid};
+
     opacity: 0;
+    background: ${token.colorBgMask};
+
     transition: opacity 0.2s ease;
-    cursor: pointer;
-    z-index: 10;
 
     &:hover {
-      background: ${token.colorErrorBg};
       color: ${token.colorError};
+      background: ${token.colorErrorBg};
     }
   `,
   newFileIndicator: css`
     position: absolute;
-    top: 4px;
-    left: 4px;
-    padding: 2px 6px;
+    z-index: 5;
+    inset-block-start: 4px;
+    inset-inline-start: 4px;
+
+    padding-block: 2px;
+    padding-inline: 6px;
     border-radius: ${token.borderRadiusSM}px;
-    background: ${token.colorSuccess};
-    color: ${token.colorWhite};
+
     font-size: 10px;
     font-weight: 500;
-    z-index: 5;
+    color: ${token.colorWhite};
+
+    background: ${token.colorSuccess};
   `,
   previewArea: css`
-    flex: 1;
-    padding: 24px;
+    position: relative;
+
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
+
+    padding: 24px;
   `,
   previewImage: css`
     max-width: 100%;
@@ -148,25 +164,31 @@ const useStyles = createStyles(({ css, token }) => ({
     box-shadow: ${token.boxShadowSecondary};
   `,
   previewEmpty: css`
-    color: ${token.colorTextSecondary};
     font-size: 16px;
+    color: ${token.colorTextSecondary};
   `,
   fileName: css`
-    margin-top: 16px;
-    padding: 8px 12px;
-    background: ${token.colorFillSecondary};
+    margin-block-start: 16px;
+    padding-block: 8px;
+    padding-inline: 12px;
     border-radius: ${token.borderRadius}px;
-    color: ${token.colorTextSecondary};
-    font-size: 12px;
+
     font-family: ${token.fontFamilyCode};
+    font-size: 12px;
+    color: ${token.colorTextSecondary};
+
+    background: ${token.colorFillSecondary};
   `,
   footer: css`
-    padding: 16px 24px;
-    border-top: 1px solid ${token.colorBorderSecondary};
-    background: ${token.colorBgContainer};
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+
+    padding-block: 16px;
+    padding-inline: 24px;
+    border-block-start: 1px solid ${token.colorBorderSecondary};
+
+    background: ${token.colorBgContainer};
   `,
 }));
 

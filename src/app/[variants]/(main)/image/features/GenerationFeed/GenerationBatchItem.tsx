@@ -23,23 +23,28 @@ import { GenerationItem } from './GenerationItem';
 const useStyles = createStyles(({ css, token }) => ({
   batchContainer: css`
     position: relative;
+
     padding: 16px;
-    border-radius: ${token.borderRadiusLG}px;
-    background: ${token.colorBgContainer};
     border: 1px solid ${token.colorBorderSecondary};
+    border-radius: ${token.borderRadiusLG}px;
+
+    background: ${token.colorBgContainer};
   `,
   batchHeader: css`
-    margin-bottom: 12px;
+    margin-block-end: 12px;
   `,
   prompt: css`
-    font-weight: 500;
-    color: ${token.colorText};
-    margin-bottom: 4px;
-    word-break: break-word;
-    line-height: 1.4;
     cursor: pointer;
+
+    margin-block-end: 4px;
     padding: 8px;
     border-radius: ${token.borderRadius}px;
+
+    font-weight: 500;
+    line-height: 1.4;
+    color: ${token.colorText};
+    word-break: break-word;
+
     transition: background-color 0.2s ease;
 
     &:hover {
@@ -47,44 +52,47 @@ const useStyles = createStyles(({ css, token }) => ({
     }
   `,
   metadata: css`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+
     font-size: 12px;
     color: ${token.colorTextSecondary};
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
   `,
   metadataItem: css`
     display: flex;
-    align-items: center;
     gap: 4px;
+    align-items: center;
   `,
   batchActions: css`
     display: flex;
     gap: 8px;
-    margin-top: 12px;
     justify-content: flex-start;
+    margin-block-start: 12px;
   `,
   imageGrid: css`
+    scrollbar-width: none;
+
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+
     width: 100%;
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none;
 
     /* Hide scrollbar for webkit browsers */
     &::-webkit-scrollbar {
       display: none;
     }
-
-    /* Hide scrollbar for IE, Edge and Firefox */
-    -ms-overflow-style: none;
-    scrollbar-width: none;
   `,
   batchDeleteButton: css`
     &:hover {
-      background: ${token.colorErrorBg} !important;
-      color: ${token.colorError} !important;
       border-color: ${token.colorError} !important;
+      color: ${token.colorError} !important;
+      background: ${token.colorErrorBg} !important;
     }
   `,
 }));

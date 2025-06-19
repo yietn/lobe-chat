@@ -7,8 +7,8 @@ import { Center, CenterProps } from 'react-layout-kit';
 
 const useStyles = createStyles(({ css, token }) => ({
   activeContainer: css`
-    background: ${token.colorPrimaryBg};
     border: 2px solid ${token.colorPrimary};
+    background: ${token.colorPrimaryBg};
 
     &:hover {
       background: ${token.colorPrimaryBgHover};
@@ -16,13 +16,33 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
   container: css`
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    border-radius: 6px;
+
     position: relative;
-    background: transparent;
+
+    flex: none;
+
     width: 50px;
     height: 50px;
-    flex: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    transition: all 0.2s ease-in-out;
+
+    &::before {
+      pointer-events: none;
+      content: '';
+
+      position: absolute;
+      inset: 0;
+
+      border-radius: 6px;
+
+      opacity: 0;
+      background: radial-gradient(circle at center, ${token.colorPrimary}20 0%, transparent 70%);
+
+      transition: opacity 0.3s ease;
+    }
 
     &:hover {
       transform: scale(1.05);
@@ -32,20 +52,6 @@ const useStyles = createStyles(({ css, token }) => ({
     &:active {
       transform: scale(0.98);
       background: ${token.colorFillTertiary};
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at center, ${token.colorPrimary}20 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      border-radius: 6px;
     }
 
     &:active::before {

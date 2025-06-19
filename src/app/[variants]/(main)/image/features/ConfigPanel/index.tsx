@@ -22,8 +22,8 @@ import { CONFIG_PANEL_WIDTH } from './constants';
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`
-    flex-shrink: 0;
     overflow-y: auto;
+    flex-shrink: 0;
 
     width: ${CONFIG_PANEL_WIDTH}px;
     height: 100%;

@@ -17,20 +17,26 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 
   button: css`
-    min-width: 40px;
-    height: 32px;
-    padding: 0 12px;
-    border: 1px solid ${token.colorBorder};
-    border-radius: ${token.borderRadius}px;
-    background: ${token.colorBgContainer};
-    color: ${token.colorText};
-    font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    min-width: 40px;
+    height: 32px;
+    padding-block: 0;
+    padding-inline: 12px;
+    border: 1px solid ${token.colorBorder};
+    border-radius: ${token.borderRadius}px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: ${token.colorText};
+
+    background: ${token.colorBgContainer};
+
+    transition: all 0.2s ease;
 
     &:hover {
       border-color: ${token.colorPrimary};
@@ -49,14 +55,14 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 
   selectedButton: css`
-    background: ${token.colorPrimaryBg};
-    color: ${token.colorPrimary};
     border-color: ${token.colorPrimary};
+    color: ${token.colorPrimary};
+    background: ${token.colorPrimaryBg};
 
     &:hover {
-      background: ${token.colorPrimaryBgHover};
-      color: ${token.colorPrimary};
       border-color: ${token.colorPrimary};
+      color: ${token.colorPrimary};
+      background: ${token.colorPrimaryBgHover};
     }
   `,
 
@@ -72,8 +78,8 @@ const useStyles = createStyles(({ css, token }) => ({
     min-width: 80px;
 
     .ant-input {
-      text-align: center;
       font-weight: 500;
+      text-align: center;
     }
   `,
 
@@ -82,23 +88,23 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 
   confirmButton: css`
-    color: ${token.colorSuccess};
     border-color: ${token.colorSuccess};
+    color: ${token.colorSuccess};
 
     &:hover {
-      color: ${token.colorSuccessHover};
       border-color: ${token.colorSuccessHover};
+      color: ${token.colorSuccessHover};
       background: ${token.colorSuccessBg};
     }
   `,
 
   cancelButton: css`
-    color: ${token.colorTextTertiary};
     border-color: ${token.colorBorder};
+    color: ${token.colorTextTertiary};
 
     &:hover {
-      color: ${token.colorText};
       border-color: ${token.colorBorderSecondary};
+      color: ${token.colorText};
       background: ${token.colorBgTextHover};
     }
   `,

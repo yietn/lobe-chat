@@ -25,28 +25,30 @@ const useStyles = createStyles(({ css, token }) => ({
     transition: opacity 0.2s ease-in-out;
   `,
   time: css`
+    flex: 1;
+    margin: 0;
     font-size: 12px;
     color: ${token.colorTextSecondary};
-    margin: 0;
-    flex: 1;
   `,
   timeRow: css`
     display: flex;
+    gap: 8px;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
   `,
   title: css`
+    margin: 0;
     font-size: 14px;
     font-weight: 500;
-    margin: 0;
   `,
   tooltipContent: css`
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 8px 12px;
+
     min-width: 150px;
+    padding-block: 8px;
+    padding-inline: 12px;
     border-radius: ${token.borderRadius}px;
   `,
   tooltipContentHover: css`

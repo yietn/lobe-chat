@@ -8,29 +8,33 @@ import { Flexbox } from 'react-layout-kit';
 const useStyles = createStyles(({ css, token }) => ({
   skeletonContainer: css`
     padding: 16px;
+    border: 1px solid ${token.colorBorderSecondary};
     border-radius: ${token.borderRadiusLG}px;
     background: ${token.colorBgContainer};
-    border: 1px solid ${token.colorBorderSecondary};
   `,
   imageGrid: css`
+    overflow-x: hidden;
     display: flex;
     gap: 8px;
     width: 100%;
-    overflow-x: hidden;
   `,
   imageGridItem: css`
+    position: relative;
+
+    overflow: hidden;
     flex-shrink: 0;
+
     width: 200px;
     height: 200px;
-    background: ${token.colorFillContent};
     border-radius: ${token.borderRadius}px;
-    overflow: hidden;
-    position: relative;
+
+    background: ${token.colorFillContent};
   `,
   skeletonFill: css`
     position: absolute;
-    top: 0;
-    left: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+
     width: 100%;
     height: 100%;
   `,

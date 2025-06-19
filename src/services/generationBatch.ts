@@ -2,7 +2,7 @@ import { lambdaClient } from '@/libs/trpc/client';
 import { Generation, GenerationBatch } from '@/types/generation';
 
 type GenerationBatchWithAsyncTaskId = GenerationBatch & {
-  generations: (Generation & { asyncTaskId?: string })[];
+  generations: (Generation & { asyncTaskId?: string | null })[];
 };
 
 class GenerationBatchService {
