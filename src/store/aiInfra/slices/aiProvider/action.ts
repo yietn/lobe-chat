@@ -15,6 +15,7 @@ import {
   AiProviderSortMap,
   AiProviderSourceEnum,
   CreateAiProviderParams,
+  EnabledProvider,
   UpdateAiProviderConfigParams,
   UpdateAiProviderParams,
 } from '@/types/aiProvider';
@@ -175,11 +176,20 @@ export const createAiProviderSlice: StateCreator<
         if (isLogin) return aiProviderService.getAiProviderRuntimeState();
 
         const { LOBE_DEFAULT_MODEL_LIST } = await import('@/config/aiModels');
+        const enabledAiProviders: EnabledProvider[] = DEFAULT_MODEL_PROVIDER_LIST.filter(
+          (provider) => provider.enabled,
+        ).map((item) => ({ id: item.id, name: item.name, source: 'builtin' }));
+        const allModels = LOBE_DEFAULT_MODEL_LIST;
         return {
-          enabledAiModels: LOBE_DEFAULT_MODEL_LIST.filter((m) => m.enabled),
-          enabledAiProviders: DEFAULT_MODEL_PROVIDER_LIST.filter(
-            (provider) => provider.enabled,
-          ).map((item) => ({ id: item.id, name: item.name, source: 'builtin' })),
+          enabledAiModels: allModels.filter((m) => m.enabled),
+          enabledAiProviders: enabledAiProviders,
+          enabledImageAiProviders: enabledAiProviders
+            .filter((provider) => {
+              return allModels.some(
+                (model) => model.providerId === provider.id && model.type === 'image',
+              );
+            })
+            .map((item) => ({ id: item.id, name: item.name, source: 'builtin' })),
           runtimeConfig: {},
         };
       },
@@ -211,7 +221,7 @@ export const createAiProviderSlice: StateCreator<
             name: provider.name || provider.id,
           }));
 
-          const enabledImageModelList = data.enabledAiProviders.map((provider) => ({
+          const enabledImageModelList = data.enabledImageAiProviders.map((provider) => ({
             ...provider,
             children: getModelListByType(provider.id, 'image'),
             name: provider.name || provider.id,

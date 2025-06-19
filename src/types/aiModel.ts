@@ -300,6 +300,7 @@ export interface AiProviderModelListItem {
   settings?: AiModelSettings;
   source?: AiModelSourceType;
   type: AiModelType;
+  parameters?: Record<string, any>;
 }
 
 // Update
@@ -350,4 +351,5 @@ export interface EnabledAiModel {
   settings?: AiModelSettings;
   sort?: number;
   type: AiModelType;
+  parameters?: Record<string, any>;
 }
