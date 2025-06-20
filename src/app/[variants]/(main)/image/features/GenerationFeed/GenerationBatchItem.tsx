@@ -157,7 +157,9 @@ export const GenerationBatchItem = memo<GenerationBatchItemProps>(({ batch }) =>
     return (
       <InvalidAPIKey
         bedrockDescription={modelProviderT('bedrock.unlock.imageGenerationDescription')}
-        description={errorT('unlock.apiKey.imageGenerationDescription')}
+        description={errorT('unlock.apiKey.imageGenerationDescription', {
+          name: batch.provider,
+        })}
         id={batch.id}
         onClose={() => {
           removeGenerationBatch(batch.id, activeTopicId!);

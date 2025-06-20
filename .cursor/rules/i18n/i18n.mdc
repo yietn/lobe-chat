@@ -73,7 +73,7 @@ const resources = {
 开发模式：
 
 一般情况下不需要你帮我跑自动翻译工具，跑一次很久，需要的时候我会自己跑。
-但是为了立马能看到效果，还是需要先翻译 `locales/zh-CN/namespace.json`
+但是为了立马能看到效果，还是需要先翻译 `locales/zh-CN/namespace.json`，不需要翻译其它语言。
 
 生产模式：
 

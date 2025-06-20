@@ -4,6 +4,7 @@ import { TextArea } from '@lobehub/ui';
 import { useTheme } from 'antd-style';
 import { motion } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
+import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
@@ -20,6 +21,15 @@ const PromptInput = () => {
 
   const handleGenerate = async () => {
     await createImage();
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!isCreating && value.trim()) {
+        handleGenerate();
+      }
+    }
   };
 
   return (
@@ -52,6 +62,7 @@ const PromptInput = () => {
         <TextArea
           className="resize-textarea"
           onChange={(e) => setValue(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={t('config.prompt.placeholder')}
           resize
           rows={3}
