@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Zaad toepassen",
       "copyError": "Foutmelding kopiëren",
       "copySeed": "Zaad kopiëren",
       "delete": "Verwijderen",
@@ -45,6 +46,8 @@
       "promptCopied": "Prompt gekopieerd naar klembord",
       "promptCopyFailed": "Prompt kopiëren mislukt",
       "reuseSettings": "Instellingen hergebruiken",
+      "seedApplied": "Zaad is toegepast op de configuratie",
+      "seedApplyFailed": "Toepassen van zaad mislukt",
       "seedCopied": "Zaad gekopieerd naar klembord",
       "seedCopyFailed": "Zaad kopiëren mislukt"
     },

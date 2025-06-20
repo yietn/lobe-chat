@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "應用種子",
       "copyError": "複製錯誤訊息",
       "copySeed": "複製種子",
       "delete": "刪除",
@@ -45,6 +46,8 @@
       "promptCopied": "提示詞已複製到剪貼簿",
       "promptCopyFailed": "複製提示詞失敗",
       "reuseSettings": "重用設定",
+      "seedApplied": "種子已應用到配置",
+      "seedApplyFailed": "應用種子失敗",
       "seedCopied": "種子已複製到剪貼簿",
       "seedCopyFailed": "複製種子失敗"
     },

@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Tohum Uygula",
       "copyError": "Hata Mesajını Kopyala",
       "copySeed": "Tohumu Kopyala",
       "delete": "Sil",
@@ -45,6 +46,8 @@
       "promptCopied": "İpucu panoya kopyalandı",
       "promptCopyFailed": "İpucu kopyalanamadı",
       "reuseSettings": "Ayarları Yeniden Kullan",
+      "seedApplied": "Tohum yapılandırmaya uygulandı",
+      "seedApplyFailed": "Tohum uygulama başarısız oldu",
       "seedCopied": "Tohum panoya kopyalandı",
       "seedCopyFailed": "Tohum kopyalanamadı"
     },

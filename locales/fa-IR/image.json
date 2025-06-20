@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "اعمال بذر",
       "copyError": "کپی خطا",
       "copySeed": "کپی بذر",
       "delete": "حذف",
@@ -45,6 +46,8 @@
       "promptCopied": "عبارت راهنما به کلیپ‌بورد کپی شد",
       "promptCopyFailed": "کپی عبارت راهنما ناموفق بود",
       "reuseSettings": "استفاده مجدد از تنظیمات",
+      "seedApplied": "بذر به پیکربندی اعمال شد",
+      "seedApplyFailed": "اعمال بذر ناموفق بود",
       "seedCopied": "بذر به کلیپ‌بورد کپی شد",
       "seedCopyFailed": "کپی بذر ناموفق بود"
     },

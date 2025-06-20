@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Aplicar semilla",
       "copyError": "Copiar mensaje de error",
       "copySeed": "Copiar semilla",
       "delete": "Eliminar",
@@ -45,6 +46,8 @@
       "promptCopied": "Texto de indicación copiado al portapapeles",
       "promptCopyFailed": "Error al copiar el texto de indicación",
       "reuseSettings": "Reutilizar configuración",
+      "seedApplied": "Semilla aplicada a la configuración",
+      "seedApplyFailed": "Error al aplicar la semilla",
       "seedCopied": "Semilla copiada al portapapeles",
       "seedCopyFailed": "Error al copiar la semilla"
     },

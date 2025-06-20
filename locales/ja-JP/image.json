@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "シードを適用する",
       "copyError": "エラー情報をコピー",
       "copySeed": "シードをコピー",
       "delete": "削除",
@@ -45,6 +46,8 @@
       "promptCopied": "プロンプトがクリップボードにコピーされました",
       "promptCopyFailed": "プロンプトのコピーに失敗しました",
       "reuseSettings": "設定を再利用",
+      "seedApplied": "シードが設定に適用されました",
+      "seedApplyFailed": "シードの適用に失敗しました",
       "seedCopied": "シードがクリップボードにコピーされました",
       "seedCopyFailed": "シードのコピーに失敗しました"
     },

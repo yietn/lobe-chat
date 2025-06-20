@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Zastosuj nasiono",
       "copyError": "Kopiuj błąd",
       "copySeed": "Kopiuj ziarno",
       "delete": "Usuń",
@@ -45,6 +46,8 @@
       "promptCopied": "Tekst podpowiedzi skopiowany do schowka",
       "promptCopyFailed": "Kopiowanie tekstu podpowiedzi nie powiodło się",
       "reuseSettings": "Użyj ponownie ustawień",
+      "seedApplied": "Nasiono zostało zastosowane w konfiguracji",
+      "seedApplyFailed": "Nie udało się zastosować nasiona",
       "seedCopied": "Ziarno skopiowane do schowka",
       "seedCopyFailed": "Kopiowanie ziarna nie powiodło się"
     },

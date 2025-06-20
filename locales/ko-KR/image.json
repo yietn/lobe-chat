@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "시드 적용",
       "copyError": "오류 정보 복사",
       "copySeed": "시드 복사",
       "delete": "삭제",
@@ -45,6 +46,8 @@
       "promptCopied": "프롬프트가 클립보드에 복사되었습니다",
       "promptCopyFailed": "프롬프트 복사 실패",
       "reuseSettings": "설정 재사용",
+      "seedApplied": "시드가 설정에 적용되었습니다",
+      "seedApplyFailed": "시드 적용 실패",
       "seedCopied": "시드가 클립보드에 복사되었습니다",
       "seedCopyFailed": "시드 복사 실패"
     },

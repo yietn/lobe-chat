@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "تطبيق البذرة",
       "copyError": "نسخ رسالة الخطأ",
       "copySeed": "نسخ البذرة",
       "delete": "حذف",
@@ -45,6 +46,8 @@
       "promptCopied": "تم نسخ النص التوجيهي إلى الحافظة",
       "promptCopyFailed": "فشل نسخ النص التوجيهي",
       "reuseSettings": "إعادة استخدام الإعدادات",
+      "seedApplied": "تم تطبيق البذرة على الإعدادات",
+      "seedApplyFailed": "فشل في تطبيق البذرة",
       "seedCopied": "تم نسخ البذرة إلى الحافظة",
       "seedCopyFailed": "فشل نسخ البذرة"
     },

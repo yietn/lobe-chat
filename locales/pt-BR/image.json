@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Aplicar semente",
       "copyError": "Copiar erro",
       "copySeed": "Copiar semente",
       "delete": "Excluir",
@@ -45,6 +46,8 @@
       "promptCopied": "Prompt copiado para a área de transferência",
       "promptCopyFailed": "Falha ao copiar o prompt",
       "reuseSettings": "Reutilizar configurações",
+      "seedApplied": "Semente aplicada à configuração",
+      "seedApplyFailed": "Falha ao aplicar a semente",
       "seedCopied": "Semente copiada para a área de transferência",
       "seedCopyFailed": "Falha ao copiar a semente"
     },

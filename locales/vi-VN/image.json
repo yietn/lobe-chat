@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Áp dụng hạt giống",
       "copyError": "Sao chép lỗi",
       "copySeed": "Sao chép hạt giống",
       "delete": "Xóa",
@@ -45,6 +46,8 @@
       "promptCopied": "Từ khóa đã được sao chép vào bộ nhớ tạm",
       "promptCopyFailed": "Sao chép từ khóa thất bại",
       "reuseSettings": "Tái sử dụng cài đặt",
+      "seedApplied": "Hạt giống đã được áp dụng vào cấu hình",
+      "seedApplyFailed": "Áp dụng hạt giống thất bại",
       "seedCopied": "Hạt giống đã được sao chép vào bộ nhớ tạm",
       "seedCopyFailed": "Sao chép hạt giống thất bại"
     },

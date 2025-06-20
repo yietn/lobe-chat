@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Appliquer la graine",
       "copyError": "Copier l'erreur",
       "copySeed": "Copier la graine",
       "delete": "Supprimer",
@@ -45,6 +46,8 @@
       "promptCopied": "Invite copiée dans le presse-papiers",
       "promptCopyFailed": "Échec de la copie de l'invite",
       "reuseSettings": "Réutiliser les paramètres",
+      "seedApplied": "Graine appliquée à la configuration",
+      "seedApplyFailed": "Échec de l'application de la graine",
       "seedCopied": "Graine copiée dans le presse-papiers",
       "seedCopyFailed": "Échec de la copie de la graine"
     },

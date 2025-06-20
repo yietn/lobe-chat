@@ -34,6 +34,7 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Saatgut anwenden",
       "copyError": "Fehlermeldung kopieren",
       "copySeed": "Seed kopieren",
       "delete": "Löschen",
@@ -45,6 +46,8 @@
       "promptCopied": "Prompt wurde in die Zwischenablage kopiert",
       "promptCopyFailed": "Prompt-Kopieren fehlgeschlagen",
       "reuseSettings": "Einstellungen wiederverwenden",
+      "seedApplied": "Saatgut wurde auf die Konfiguration angewendet",
+      "seedApplyFailed": "Anwenden des Saatguts fehlgeschlagen",
       "seedCopied": "Seed wurde in die Zwischenablage kopiert",
       "seedCopyFailed": "Seed-Kopieren fehlgeschlagen"
     },

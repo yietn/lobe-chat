@@ -34,9 +34,9 @@
   },
   "generation": {
     "actions": {
+      "applySeed": "Apply Seed",
       "copyError": "Copy Error Message",
       "copySeed": "Copy Seed",
-      "applySeed": "Apply Seed",
       "delete": "Delete",
       "deleteBatch": "Delete Batch",
       "download": "Download",
