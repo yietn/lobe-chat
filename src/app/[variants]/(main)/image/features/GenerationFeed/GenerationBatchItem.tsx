@@ -132,7 +132,7 @@ export const GenerationBatchItem = memo<GenerationBatchItemProps>(({ batch }) =>
   };
 
   const handleReuseSettings = () => {
-    reuseSettings(omit(batch.config as StdImageGenParams, ['seed']));
+    reuseSettings(batch.model, batch.provider, omit(batch.config as StdImageGenParams, ['seed']));
   };
 
   const handleDeleteBatch = async () => {

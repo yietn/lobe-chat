@@ -1,8 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
-
-import { useAiInfraStore } from '@/store/aiInfra';
-import { aiProviderSelectors } from '@/store/aiInfra/slices/aiProvider/selectors';
-import { AIImageModelCard } from '@/types/aiModel';
+import { useCallback, useMemo } from 'react';
 
 import { useImageStore } from '../../store';
 import { StdImageGenParams, StdImageGenParamsKeys } from '../../utils/StandardParameters';
@@ -46,21 +42,4 @@ export function useGenerationConfigParam<N extends StdImageGenParamsKeys>(paramN
     setValue,
     ...paramConstraints,
   };
-}
-
-export function useUpdateActiveModelEffect() {
-  const modelId = useImageStore(imageGenerationConfigSelectors.model);
-  const providerId = useImageStore(imageGenerationConfigSelectors.provider);
-  const enabledImageModelList = useAiInfraStore(aiProviderSelectors.enabledImageModelList);
-  const updateParamsWhenModelChange = useImageStore((s) => s.updateParamsWhenModelChange);
-
-  useEffect(() => {
-    const activeModel = enabledImageModelList
-      .find((provider) => provider.id === providerId)
-      ?.children.find((model) => model.id === modelId) as unknown as AIImageModelCard | undefined;
-
-    if (activeModel) {
-      updateParamsWhenModelChange(activeModel);
-    }
-  }, [modelId, providerId, enabledImageModelList]);
 }

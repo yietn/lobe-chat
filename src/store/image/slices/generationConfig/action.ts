@@ -1,5 +1,6 @@
 import { StateCreator } from 'zustand/vanilla';
 
+import { aiProviderSelectors, getAiInfraStoreState } from '@/store/aiInfra';
 import { AIImageModelCard } from '@/types/aiModel';
 
 import type { ImageStore } from '../../store';
@@ -13,9 +14,20 @@ export interface GenerationConfigAction {
 
   setImageNum: (imageNum: number) => void;
 
-  updateParamsWhenModelChange(model: AIImageModelCard): void;
+  reuseSettings: (model: string, provider: string, settings: Partial<StdImageGenParams>) => void;
+  reuseSeed: (seed: number) => void;
+}
 
-  reuseSettings: (settings: Partial<StdImageGenParams>) => void;
+// helper function to extract common logic
+function getModelAndDefaults(model: string, provider: string) {
+  const enabledImageModelList = aiProviderSelectors.enabledImageModelList(getAiInfraStoreState());
+  const activeModel = enabledImageModelList
+    .find((providerItem) => providerItem.id === provider)
+    ?.children.find((modelItem) => modelItem.id === model) as unknown as AIImageModelCard;
+
+  const { defaultValues } = parseParamsSchema(activeModel.parameters!);
+
+  return { defaultValues, activeModel };
 }
 
 export const createGenerationConfigSlice: StateCreator<
@@ -38,23 +50,38 @@ export const createGenerationConfigSlice: StateCreator<
   },
 
   setModelAndProviderOnSelect: (model, provider) => {
-    set(() => ({ model, provider }), false, `setModelAndProviderOnSelect/${model}/${provider}`);
+    const { defaultValues, activeModel } = getModelAndDefaults(model, provider);
+    set(
+      () => ({
+        model,
+        provider,
+        parameters: defaultValues,
+        parameterSchema: activeModel.parameters,
+      }),
+      false,
+      `setModelAndProviderOnSelect/${model}/${provider}`,
+    );
   },
 
   setImageNum: (imageNum) => {
     set(() => ({ imageNum }), false, `setImageNum/${imageNum}`);
   },
 
-  updateParamsWhenModelChange: (model: AIImageModelCard) => {
-    const { defaultValues } = parseParamsSchema(model.parameters!);
+  reuseSettings: (model: string, provider: string, settings: Partial<StdImageGenParams>) => {
+    const { defaultValues, activeModel } = getModelAndDefaults(model, provider);
     set(
-      () => ({ parameters: defaultValues, parameterSchema: model.parameters }),
+      () => ({
+        model,
+        provider,
+        parameters: { ...defaultValues, ...settings },
+        parameterSchema: activeModel.parameters,
+      }),
       false,
-      `updateParamsWhenModelChange/${model.id}`,
+      `reuseSettings/${model}/${provider}`,
     );
   },
 
-  reuseSettings: (settings: Partial<StdImageGenParams>) => {
-    set(() => ({ parameters: { ...settings } }), false, `reuseSettings`);
+  reuseSeed: (seed: number) => {
+    set((state) => ({ parameters: { ...state.parameters, seed } }), false, `reuseSeed/${seed}`);
   },
 });

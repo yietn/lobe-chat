@@ -47,9 +47,12 @@ export const image = {
     actions: {
       delete: '删除',
       download: '下载',
-      downloadFailed: '下载图片失败',
+      downloadFailed: '下载图片失败，请检查网络连接或 S3 存储服务的跨域配置',
       copySeed: '复制种子',
+      applySeed: '应用种子',
       seedCopied: '种子已复制到剪贴板',
+      seedApplied: '种子已应用到配置',
+      seedApplyFailed: '应用种子失败',
       seedCopyFailed: '复制种子失败',
       promptCopied: '提示词已复制到剪贴板',
       promptCopyFailed: '复制提示词失败',

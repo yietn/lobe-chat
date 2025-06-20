@@ -5,14 +5,16 @@ import { App, Typography } from 'antd';
 import { createStyles } from 'antd-style';
 import dayjs from 'dayjs';
 import { AlertTriangle, Dices, Download, Loader2, Trash2 } from 'lucide-react';
-import mime from 'mime';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ImageItem from '@/components/ImageItem';
+import { useDownloadImage } from '@/hooks/useDownloadImage';
 import { useImageStore } from '@/store/image';
+import { imageGenerationConfigSelectors } from '@/store/image/slices/generationConfig/selectors';
 import { AsyncTaskStatus } from '@/types/asyncTask';
 import { Generation } from '@/types/generation';
+import { getFileExtensionFromUrl } from '@/utils/url';
 
 import { ElapsedTime } from './ElapsedTime';
 import { calculateImageSize } from './utils';
@@ -124,42 +126,7 @@ interface GenerationItemProps {
   prompt: string;
 }
 
-/**
- * Get file extension from blob MIME type or URL fallback
- * @param blob - The blob object from fetch response
- * @param fallbackUrl - The original URL to extract extension from as fallback
- * @returns file extension without dot (e.g., 'jpg', 'png', 'webp')
- */
-const getFileExtension = (blob: Blob, fallbackUrl: string): string => {
-  // First try to get extension from blob MIME type
-  const mimeType = blob.type;
-  if (mimeType) {
-    const extension = mime.getExtension(mimeType);
-    if (extension) {
-      return extension;
-    }
-  }
-
-  // Fallback: extract extension from URL
-  try {
-    const url = new URL(fallbackUrl);
-    const pathname = url.pathname.toLowerCase();
-
-    // Common image extensions
-    if (pathname.includes('.webp')) return 'webp';
-    if (pathname.includes('.jpg') || pathname.includes('.jpeg')) return 'jpg';
-    if (pathname.includes('.png')) return 'png';
-    if (pathname.includes('.gif')) return 'gif';
-    if (pathname.includes('.bmp')) return 'bmp';
-    if (pathname.includes('.svg')) return 'svg';
-    if (pathname.includes('.tiff') || pathname.includes('.tif')) return 'tiff';
-  } catch {
-    // Invalid URL, ignore
-  }
-
-  // Default fallback
-  return 'png';
-};
+const isSupportParamSelector = imageGenerationConfigSelectors.isSupportParam;
 
 export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt }) => {
   const { styles } = useStyles();
@@ -167,7 +134,10 @@ export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt })
   const { message } = App.useApp();
   const useCheckGenerationStatus = useImageStore((s) => s.useCheckGenerationStatus);
   const deleteGeneration = useImageStore((s) => s.removeGeneration);
+  const reuseSeed = useImageStore((s) => s.reuseSeed);
   const activeTopicId = useImageStore((s) => s.activeGenerationTopicId);
+  const isSupportSeed = useImageStore(isSupportParamSelector('seed'));
+  const { downloadImage } = useDownloadImage();
 
   const isFinalized =
     generation.task.status === AsyncTaskStatus.Success ||
@@ -189,59 +159,41 @@ export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt })
   const handleDownloadImage = async () => {
     if (!generation.asset?.url) return;
 
-    try {
-      // Use better CORS handling similar to download-image.ts
-      const response = await fetch(generation.asset.url, {
-        mode: 'cors',
-        credentials: 'omit',
-        // Avoid image disk cache which can cause incorrect CORS headers
-        cache: 'no-store',
-      });
+    // Generate filename with prompt and timestamp
+    const timestamp = dayjs(generation.createdAt).format('YYYY-MM-DD_HH-mm-ss');
+    const safePrompt = prompt
+      .slice(0, 30)
+      .replaceAll(/[^\s\w-]/g, '')
+      .trim();
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
-      }
+    // Detect file extension from URL
+    const fileExtension = getFileExtensionFromUrl(generation.asset.url);
+    const fileName = `${safePrompt}_${timestamp}.${fileExtension}`;
 
-      const blob = await response.blob();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-
-      // Generate filename with prompt and timestamp
-      const timestamp = dayjs(generation.createdAt).format('YYYY-MM-DD_HH-mm-ss');
-      const safePrompt = prompt
-        .slice(0, 30)
-        .replaceAll(/[^\s\w-]/g, '')
-        .trim();
-
-      // Detect file extension from URL
-      const fileExtension = getFileExtension(blob, generation.asset.url);
-      link.download = `${safePrompt}_${timestamp}.${fileExtension}`;
-
-      // Trigger download
-      document.body.append(link);
-      link.click();
-
-      // Cleanup
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Failed to download image:', error);
-      message.error(t('generation.actions.downloadFailed'));
-    }
+    await downloadImage(generation.asset.url, fileName);
   };
 
   const handleCopySeed = async () => {
     if (!generation.seed) return;
 
-    try {
-      await navigator.clipboard.writeText(generation.seed.toString());
-      message.success(t('generation.actions.seedCopied'));
-    } catch (error) {
-      console.error('Failed to copy seed:', error);
-      message.error(t('generation.actions.seedCopyFailed'));
+    // If current model supports seed parameter, apply it directly to configuration
+    if (isSupportSeed) {
+      try {
+        reuseSeed(generation.seed);
+        message.success(t('generation.actions.seedApplied'));
+      } catch (error) {
+        console.error('Failed to apply seed:', error);
+        message.error(t('generation.actions.seedApplyFailed'));
+      }
+    } else {
+      // If current model doesn't support seed parameter, copy to clipboard
+      try {
+        await navigator.clipboard.writeText(generation.seed.toString());
+        message.success(t('generation.actions.seedCopied'));
+      } catch (error) {
+        console.error('Failed to copy seed:', error);
+        message.error(t('generation.actions.seedCopyFailed'));
+      }
     }
   };
 
@@ -296,7 +248,9 @@ export const GenerationItem = memo<GenerationItemProps>(({ generation, prompt })
             icon={Dices}
             onClick={handleCopySeed}
             size={{ blockSize: 24, size: 14 }}
-            title={t('generation.actions.copySeed')}
+            title={
+              isSupportSeed ? t('generation.actions.applySeed') : t('generation.actions.copySeed')
+            }
             tooltipProps={{ placement: 'right' }}
           />
         )}
