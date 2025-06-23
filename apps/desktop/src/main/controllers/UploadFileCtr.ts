@@ -1,14 +1,9 @@
+import { UploadFileParams } from '@lobechat/electron-client-ipc';
+import { CreateFileParams } from '@lobechat/electron-server-ipc';
+
 import FileService from '@/services/fileSrv';
 
 import { ControllerModule, ipcClientEvent, ipcServerEvent } from './index';
-
-interface UploadFileParams {
-  content: ArrayBuffer;
-  filename: string;
-  hash: string;
-  path: string;
-  type: string;
-}
 
 export default class UploadFileCtr extends ControllerModule {
   private get fileService() {
@@ -33,7 +28,7 @@ export default class UploadFileCtr extends ControllerModule {
   }
 
   @ipcServerEvent('createFile')
-  async uploadMedia(params: UploadFileParams) {
+  async createFile(params: CreateFileParams) {
     return this.fileService.uploadFile(params);
   }
 }

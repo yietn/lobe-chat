@@ -17,7 +17,7 @@ const unlinkPromise = promisify(fs.unlink);
 const logger = createLogger('services:FileService');
 
 interface UploadFileParams {
-  content: ArrayBuffer;
+  content: ArrayBuffer | string; // ArrayBuffer from browser or Base64 string from server
   filename: string;
   hash: string;
   path: string;
@@ -68,9 +68,17 @@ export default class FileService extends ServiceModule {
       const savedPath = join(dirname, savedFilename);
       logger.debug(`Generated file save path: ${savedPath}`);
 
-      // 写入文件内容
-      const buffer = Buffer.from(content);
-      logger.debug(`Writing file content, size: ${buffer.length} bytes`);
+      // 根据 content 类型创建 Buffer
+      let buffer: Buffer;
+      if (typeof content === 'string') {
+        // 来自服务端的 Base64 字符串
+        buffer = Buffer.from(content, 'base64');
+        logger.debug(`Creating buffer from Base64 string, size: ${buffer.length} bytes`);
+      } else {
+        // 来自浏览器端的 ArrayBuffer
+        buffer = Buffer.from(content);
+        logger.debug(`Creating buffer from ArrayBuffer, size: ${buffer.length} bytes`);
+      }
       await writeFile(savedPath, buffer);
 
       // 写入元数据文件
@@ -142,7 +150,9 @@ export default class FileService extends ServiceModule {
         mimeType = metadata.type || mimeType;
         logger.debug(`Got MIME type from metadata: ${mimeType}`);
       } catch (metaError) {
-        logger.warn(`Failed to read metadata file: ${(metaError as Error).message}, using default MIME type`);
+        logger.warn(
+          `Failed to read metadata file: ${(metaError as Error).message}, using default MIME type`,
+        );
         // 如果元数据文件不存在，尝试从文件扩展名猜测MIME类型
         const ext = path.split('.').pop()?.toLowerCase();
         if (ext) {
@@ -270,7 +280,9 @@ export default class FileService extends ServiceModule {
     });
 
     const success = errors.length === 0;
-    logger.info(`Batch deletion operation complete, success: ${success}, error count: ${errors.length}`);
+    logger.info(
+      `Batch deletion operation complete, success: ${success}, error count: ${errors.length}`,
+    );
     return {
       success,
       ...(errors.length > 0 && { errors }),

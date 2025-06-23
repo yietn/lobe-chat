@@ -1,4 +1,4 @@
-import { ElectronIpcClient, FileMetadata, UploadFileParams } from '@lobechat/electron-server-ipc';
+import { CreateFileParams, ElectronIpcClient, FileMetadata } from '@lobechat/electron-server-ipc';
 
 import packageJSON from '@/../apps/desktop/package.json';
 
@@ -34,7 +34,7 @@ class LobeHubElectronIpcClient extends ElectronIpcClient {
     );
   };
 
-  createFile = async (params: UploadFileParams) => {
+  createFile = async (params: CreateFileParams) => {
     return this.sendRequest<{ metadata: FileMetadata; success: boolean }>('createFile', params);
   };
 }

@@ -197,11 +197,8 @@ export class DesktopLocalFileImpl implements FileServiceImpl {
    */
   async uploadMedia(key: string, buffer: Buffer): Promise<{ key: string }> {
     try {
-      // 将 Buffer 转换为 ArrayBuffer
-      const content = buffer.buffer.slice(
-        buffer.byteOffset,
-        buffer.byteOffset + buffer.byteLength,
-      ) as ArrayBuffer;
+      // 将 Buffer 转换为 Base64 字符串
+      const content = buffer.toString('base64');
 
       // 从 key 中提取文件名
       const filename = path.basename(key);
@@ -229,7 +226,7 @@ export class DesktopLocalFileImpl implements FileServiceImpl {
       }
 
       console.log('[DesktopLocalFileImpl] File uploaded successfully:', result.metadata);
-      return { key };
+      return { key: result.metadata.path };
     } catch (error) {
       console.error('[DesktopLocalFileImpl] Failed to upload media file:', error);
       throw error;
