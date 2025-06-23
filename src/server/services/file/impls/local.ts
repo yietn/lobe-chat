@@ -1,7 +1,9 @@
+import { sha256 } from 'js-sha256';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { electronIpcClient } from '@/server/modules/ElectronIPCClient';
+import { inferContentTypeFromImageUrl } from '@/utils/url';
 
 import { FileServiceImpl } from './type';
 
@@ -188,5 +190,49 @@ export class DesktopLocalFileImpl implements FileServiceImpl {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getKeyFromFullUrl(_url: string): string {
     throw new Error('getKeyFromFullUrl should not be called in local file implementation');
+  }
+
+  /**
+   * 上传媒体文件
+   */
+  async uploadMedia(key: string, buffer: Buffer): Promise<{ key: string }> {
+    try {
+      // 将 Buffer 转换为 ArrayBuffer
+      const content = buffer.buffer.slice(
+        buffer.byteOffset,
+        buffer.byteOffset + buffer.byteLength,
+      ) as ArrayBuffer;
+
+      // 从 key 中提取文件名
+      const filename = path.basename(key);
+
+      // 计算文件的 SHA256 hash
+      const hash = sha256(buffer);
+
+      // 根据文件URL推断 MIME 类型
+      const type = inferContentTypeFromImageUrl(key)!;
+
+      // 构造上传参数
+      const uploadParams = {
+        content,
+        filename,
+        hash,
+        path: key,
+        type,
+      };
+
+      // 调用 electronIpcClient 上传文件
+      const result = await electronIpcClient.createFile(uploadParams);
+
+      if (!result.success) {
+        throw new Error('Failed to upload file via Electron IPC');
+      }
+
+      console.log('[DesktopLocalFileImpl] File uploaded successfully:', result.metadata);
+      return { key };
+    } catch (error) {
+      console.error('[DesktopLocalFileImpl] Failed to upload media file:', error);
+      throw error;
+    }
   }
 }

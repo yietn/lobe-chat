@@ -92,4 +92,9 @@ export class S3StaticFileImpl implements FileServiceImpl {
       return url;
     }
   }
+
+  async uploadMedia(key: string, buffer: Buffer): Promise<{ key: string }> {
+    await this.s3.uploadMedia(key, buffer);
+    return { key };
+  }
 }

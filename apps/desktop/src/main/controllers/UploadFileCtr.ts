@@ -31,4 +31,9 @@ export default class UploadFileCtr extends ControllerModule {
   async deleteFiles(paths: string[]) {
     return this.fileService.deleteFiles(paths);
   }
+
+  @ipcServerEvent('createFile')
+  async uploadMedia(params: UploadFileParams) {
+    return this.fileService.uploadFile(params);
+  }
 }

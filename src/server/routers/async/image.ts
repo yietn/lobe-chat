@@ -8,10 +8,7 @@ import { AgentRuntimeErrorType } from '@/libs/model-runtime/error';
 import { CreateImageParams } from '@/libs/model-runtime/types/image';
 import { asyncAuthedProcedure, asyncRouter as router } from '@/libs/trpc/async';
 import { initAgentRuntimeWithUserPayload } from '@/server/modules/AgentRuntime';
-import {
-  transformImageForGeneration,
-  uploadImageForGeneration,
-} from '@/server/services/generation';
+import { GenerationService } from '@/server/services/generation';
 import { AsyncTaskError, AsyncTaskErrorType, AsyncTaskStatus } from '@/types/asyncTask';
 
 const log = debug('lobe-image:async');
@@ -24,6 +21,7 @@ const imageProcedure = asyncAuthedProcedure.use(async (opts) => {
       asyncTaskModel: new AsyncTaskModel(ctx.serverDB, ctx.userId),
       generationModel: new GenerationModel(ctx.serverDB, ctx.userId),
       fileModel: new FileModel(ctx.serverDB, ctx.userId),
+      generationService: new GenerationService(ctx.serverDB, ctx.userId),
     },
   });
 });
@@ -99,12 +97,11 @@ export const imageRouter = router({
 
         log('Transforming image for generation');
         const { imageUrl, width, height } = response;
-        const { image, thumbnailImage } = await transformImageForGeneration(imageUrl);
+        const { image, thumbnailImage } =
+          await ctx.generationService.transformImageForGeneration(imageUrl);
         log('Uploading image for generation');
-        const { imageUrl: uploadedImageUrl, thumbnailImageUrl } = await uploadImageForGeneration(
-          image,
-          thumbnailImage,
-        );
+        const { imageUrl: uploadedImageUrl, thumbnailImageUrl } =
+          await ctx.generationService.uploadImageForGeneration(image, thumbnailImage);
 
         log('Updating generation asset and file');
         await ctx.generationModel.updateAssetAndFile(

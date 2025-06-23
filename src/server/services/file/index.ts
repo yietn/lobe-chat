@@ -87,6 +87,13 @@ export class FileService {
     return this.impl.getKeyFromFullUrl(url);
   }
 
+  /**
+   * 上传媒体文件
+   */
+  public async uploadMedia(key: string, buffer: Buffer): Promise<{ key: string }> {
+    return this.impl.uploadMedia(key, buffer);
+  }
+
   async downloadFileToLocal(
     fileId: string,
   ): Promise<{ cleanup: () => void; file: FileItem; filePath: string }> {

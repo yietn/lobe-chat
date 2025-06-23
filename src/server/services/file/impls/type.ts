@@ -46,4 +46,9 @@ export interface FileServiceImpl {
    * 从完整URL中提取key
    */
   getKeyFromFullUrl(url: string): string;
+
+  /**
+   * 上传媒体文件
+   */
+  uploadMedia(key: string, buffer: Buffer): Promise<{ key: string }>;
 }

@@ -5,7 +5,7 @@ import { GenerationTopicItem } from '@/database/schemas/generation';
 import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
 import { FileService } from '@/server/services/file';
-import { createCoverFromUrl } from '@/server/services/generation';
+import { GenerationService } from '@/server/services/generation';
 
 const generationTopicProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
@@ -14,6 +14,7 @@ const generationTopicProcedure = authedProcedure.use(serverDatabase).use(async (
     ctx: {
       generationTopicModel: new GenerationTopicModel(ctx.serverDB, ctx.userId),
       fileService: new FileService(ctx.serverDB, ctx.userId),
+      generationService: new GenerationService(ctx.serverDB, ctx.userId),
     },
   });
 });
@@ -48,8 +49,8 @@ export const generationTopicRouter = router({
   updateTopicCover: generationTopicProcedure
     .input(updateTopicCoverSchema)
     .mutation(async ({ ctx, input }) => {
-      // Process the cover image and get S3 key
-      const newCoverKey = await createCoverFromUrl(input.coverUrl);
+      // Process the cover image and get key
+      const newCoverKey = await ctx.generationService.createCoverFromUrl(input.coverUrl);
 
       // Update the topic with the new cover key
       return ctx.generationTopicModel.update(input.id, { coverUrl: newCoverKey });
