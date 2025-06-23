@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 
 import { serverDBEnv } from '@/config/db';
 import { UserModel } from '@/database/models/user';
-import { serverDB } from '@/database/server';
+import { LobeChatDatabase } from '@/database/type';
 
 import { asyncTrpc } from './init';
 
@@ -13,7 +13,7 @@ export const asyncAuth = asyncTrpc.middleware(async (opts) => {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
 
-  const result = await UserModel.findById(serverDB, ctx.userId);
+  const result = await UserModel.findById(ctx.serverDB as LobeChatDatabase, ctx.userId);
 
   if (!result) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'user is invalid' });

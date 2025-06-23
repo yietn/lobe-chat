@@ -7,14 +7,14 @@ export const publicProcedure = asyncTrpc.procedure;
 
 export const asyncRouter = asyncTrpc.router;
 
-export const asyncAuthedProcedure = asyncTrpc.procedure.use(asyncAuth).use(
-  asyncTrpc.middleware(async (opts) => {
-    const serverDB = await getServerDB();
+const dbMiddleware = asyncTrpc.middleware(async (opts) => {
+  const serverDB = await getServerDB();
 
-    return opts.next({
-      ctx: { serverDB },
-    });
-  }),
-);
+  return opts.next({
+    ctx: { serverDB },
+  });
+});
+
+export const asyncAuthedProcedure = asyncTrpc.procedure.use(dbMiddleware).use(asyncAuth);
 
 export const createAsyncCallerFactory = asyncTrpc.createCallerFactory;

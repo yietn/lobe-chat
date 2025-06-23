@@ -60,18 +60,28 @@ export class LobeFalAI implements LobeRuntimeAI {
       ...userInput,
     });
 
-    const { data } = await fal.subscribe(endpoint, {
-      input: {
-        ...defaultInput,
-        ...userInput,
-      },
-    });
-    const image = (data as FluxDevOutput).images[0];
-    log('Received image data: %O', image);
+    try {
+      const { data } = await fal.subscribe(endpoint, {
+        input: {
+          ...defaultInput,
+          ...userInput,
+        },
+      });
+      const image = (data as FluxDevOutput).images[0];
+      log('Received image data: %O', image);
 
-    return {
-      imageUrl: image.url,
-      ...pick(image, ['width', 'height']),
-    };
+      return {
+        imageUrl: image.url,
+        ...pick(image, ['width', 'height']),
+      };
+    } catch (error) {
+      if (error instanceof Error && 'status' in error && (error as any).status === 401) {
+        throw AgentRuntimeError.createError(AgentRuntimeErrorType.InvalidProviderAPIKey, {
+          error,
+        });
+      }
+
+      throw AgentRuntimeError.createError(AgentRuntimeErrorType.ProviderBizError, { error });
+    }
   }
 }

@@ -1,11 +1,13 @@
 import { NextRequest } from 'next/server';
 
 import { JWTPayload, LOBE_CHAT_AUTH_HEADER } from '@/const/auth';
+import { LobeChatDatabase } from '@/database/type';
 import { KeyVaultsGateKeeper } from '@/server/modules/KeyVaultsEncrypt';
 
 export interface AsyncAuthContext {
   jwtPayload: JWTPayload;
   secret: string;
+  serverDB?: LobeChatDatabase;
   userId?: string | null;
 }
 
