@@ -15,6 +15,10 @@ alwaysApply: true
 - When rendering functions, variables, or other code symbols, use backtick wrapping so they can be parsed as navigable links in Cursor IDE
     - Good: The `useState` hook in `MyComponent`
     - Bad: The useState hook in MyComponent
+     
+## Markdown Render
+
+- don't use br tag to wrap in table cell
 
 ## Mermaid Diagram Generation: Strict Syntax Validation Checklist
 
@@ -38,6 +42,7 @@ Before producing any Mermaid diagram, you **must** compare your final code line-
 
 -   **✅ Do:** `A -->|Process plain text data| B`
 -   **❌ Don't:** `A -->|1. Ordered list item| B`    (No numbered lists)
+-   **❌ Don't:** `CC --"1. fetch('/api/...')"--> API`   (No square brackets)
 -   **❌ Don't:** `A -->|- Unordered list item| B`   (No hyphen lists)
 -   **❌ Don't:** `A -->|Transform (important)| B`   (No parentheses)
 -   **❌ Don't:** `A -->|Transform [important]| B`   (No square brackets)
