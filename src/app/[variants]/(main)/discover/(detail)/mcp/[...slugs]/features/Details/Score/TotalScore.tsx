@@ -115,7 +115,7 @@ const TotalScore = memo<TotalScoreProps>(({ scoreResult, scoreItems = [], isVali
     // 绿色 (80-100%)
     A_COLOR: theme.colorSuccess,
 
-    // 黄色 (60-85%)
+    // 黄色 (60-80%)
     B_COLOR: theme.colorWarning,
 
     // 红色 (0-60%)

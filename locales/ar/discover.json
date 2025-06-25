@@ -147,6 +147,9 @@
     "featuredTools": "إضافات مميزة",
     "more": "اكتشف المزيد"
   },
+  "isClaimed": "تم المطالبة",
+  "isFeatured": "مميز",
+  "isOfficial": "معتمد رسميًا",
   "like": "أحب",
   "mcp": {
     "categories": {

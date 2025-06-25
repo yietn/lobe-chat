@@ -1,12 +1,13 @@
 'use client';
 
 import { Github } from '@lobehub/icons';
-import { ActionIcon, Avatar, Button, Icon, Text } from '@lobehub/ui';
+import { ActionIcon, Avatar, Button, Icon, Tag, Text, Tooltip } from '@lobehub/ui';
 import { createStyles, useResponsive } from 'antd-style';
-import { CircleIcon, DotIcon, DownloadIcon, ScaleIcon, StarIcon } from 'lucide-react';
+import { BadgeCheck, CircleIcon, DotIcon, DownloadIcon, ScaleIcon, StarIcon } from 'lucide-react';
 import Link from 'next/link';
 import qs from 'query-string';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
 import { useCategory } from '../../../../(list)/mcp/features/Category/useCategory';
@@ -51,9 +52,11 @@ const Header = memo<{ inModal?: boolean; mobile?: boolean }>(({ mobile: isMobile
     installCount,
     overview,
     isClaimed,
+    isOfficial,
   } = useDetailContext();
   const { styles, theme } = useStyles();
   const { mobile = isMobile } = useResponsive();
+  const { t } = useTranslation('discover');
 
   const recommendedDeployment = getRecommendedDeployment(deploymentOptions);
   const categories = useCategory();
@@ -125,6 +128,11 @@ const Header = memo<{ inModal?: boolean; mobile?: boolean }>(({ mobile: isMobile
               >
                 {name}
               </Text>
+              {isOfficial && (
+                <Tooltip title={t('isOfficial')}>
+                  <Icon color={theme.colorSuccess} icon={BadgeCheck} size={16} />
+                </Tooltip>
+              )}
               {!mobile && scores}
             </Flexbox>
             <Flexbox align={'center'} gap={6} horizontal>
@@ -148,6 +156,7 @@ const Header = memo<{ inModal?: boolean; mobile?: boolean }>(({ mobile: isMobile
             ) : (
               <span>{author?.name}</span>
             )}
+            {isClaimed && <Tag size={'small'}>{t('isClaimed')}</Tag>}
             <Icon icon={DotIcon} />
             <PublishedTime
               className={styles.time}

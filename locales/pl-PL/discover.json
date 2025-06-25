@@ -147,6 +147,9 @@
     "featuredTools": "Polecane wtyczki",
     "more": "Odkryj więcej"
   },
+  "isClaimed": "Zgłoszono",
+  "isFeatured": "Polecane",
+  "isOfficial": "Oficjalne",
   "like": "Lubię",
   "mcp": {
     "categories": {

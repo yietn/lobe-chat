@@ -45,6 +45,5 @@ export type McpQueryParams = PluginQueryParams;
 export type McpListResponse = PluginListResponse;
 
 export interface DiscoverMcpDetail extends PluginItemDetail {
-  isClaimed?: boolean;
   related: DiscoverMcpItem[];
 }

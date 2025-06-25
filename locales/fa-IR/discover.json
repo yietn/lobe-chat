@@ -147,6 +147,9 @@
     "featuredTools": "افزونه‌های پیشنهادی",
     "more": "کشف بیشتر"
   },
+  "isClaimed": "ادعا شده",
+  "isFeatured": "پیشنهاد شده",
+  "isOfficial": "تأیید شده رسمی",
   "like": "دوست داشتن",
   "mcp": {
     "categories": {

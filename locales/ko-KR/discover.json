@@ -147,6 +147,9 @@
     "featuredTools": "추천 플러그인",
     "more": "더 많은 발견"
   },
+  "isClaimed": "인증됨",
+  "isFeatured": "추천",
+  "isOfficial": "공식 인증",
   "like": "좋아요",
   "mcp": {
     "categories": {

@@ -147,6 +147,9 @@
     "featuredTools": "Plugins Recomendados",
     "more": "Descubra Mais"
   },
+  "isClaimed": "Reivindicado",
+  "isFeatured": "Destaque",
+  "isOfficial": "Certificado Oficial",
   "like": "Gosto",
   "mcp": {
     "categories": {

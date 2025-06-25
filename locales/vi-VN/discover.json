@@ -147,6 +147,9 @@
     "featuredTools": "Plugin nổi bật",
     "more": "Khám phá thêm"
   },
+  "isClaimed": "Đã được nhận",
+  "isFeatured": "Đề xuất",
+  "isOfficial": "Chính thức xác nhận",
   "like": "Thích",
   "mcp": {
     "categories": {

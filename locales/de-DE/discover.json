@@ -147,6 +147,9 @@
     "featuredTools": "Empfohlene Plugins",
     "more": "Mehr entdecken"
   },
+  "isClaimed": "Beansprucht",
+  "isFeatured": "Empfohlen",
+  "isOfficial": "Offiziell bestätigt",
   "like": "Mögen",
   "mcp": {
     "categories": {

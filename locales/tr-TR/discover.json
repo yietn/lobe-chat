@@ -147,6 +147,9 @@
     "featuredTools": "Öne Çıkan Araçlar",
     "more": "Daha Fazla Keşfet"
   },
+  "isClaimed": "Talep Edildi",
+  "isFeatured": "Öne Çıkan",
+  "isOfficial": "Resmi Onaylı",
   "like": "Beğendim",
   "mcp": {
     "categories": {

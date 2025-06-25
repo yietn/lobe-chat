@@ -1,10 +1,10 @@
 'use client';
 
 import { Github } from '@lobehub/icons';
-import { ActionIcon, Avatar, Block, Icon, Text } from '@lobehub/ui';
+import { ActionIcon, Avatar, Block, Icon, Tag, Text, Tooltip } from '@lobehub/ui';
 import { Spotlight } from '@lobehub/ui/awesome';
 import { createStyles } from 'antd-style';
-import { ClockIcon, StarIcon } from 'lucide-react';
+import { BadgeCheck, ClockIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'nextjs-toploader/app';
 import { memo } from 'react';
@@ -64,6 +64,8 @@ const McpItem = memo<DiscoverMcpItem>(
     category,
     isValidated,
     isFeatured,
+    isClaimed,
+    isOfficial,
     toolsCount,
     updatedAt,
     installationMethods,
@@ -130,7 +132,11 @@ const McpItem = memo<DiscoverMcpItem>(
                     {name}
                   </Text>
                 </Link>
-                {isFeatured && <Icon color={theme.gold} fill={theme.gold} icon={StarIcon} />}
+                {isOfficial && (
+                  <Tooltip title={t('isOfficial')}>
+                    <Icon color={theme.colorSuccess} icon={BadgeCheck} size={16} />
+                  </Tooltip>
+                )}
               </Flexbox>
               {author && <div className={styles.author}>{author}</div>}
             </Flexbox>
@@ -149,6 +155,7 @@ const McpItem = memo<DiscoverMcpItem>(
             github={github}
             identifier={identifier}
             installationMethods={installationMethods}
+            isClaimed={isClaimed}
             isValidated={isValidated}
             overview={{ readme: github?.url }}
             promptsCount={promptsCount}
@@ -178,7 +185,21 @@ const McpItem = memo<DiscoverMcpItem>(
                 template={'MMM DD, YYYY'}
               />
             </Flexbox>
-            {t(`mcp.categories.${category}.name` as any)}
+            <Flexbox align={'center'} gap={8} horizontal>
+              {t(`mcp.categories.${category}.name` as any)}
+              {isFeatured && (
+                <Tag
+                  size={'small'}
+                  style={{
+                    color: 'inherit',
+                    fontSize: 'inherit',
+                  }}
+                  variant={'outlined'}
+                >
+                  {t('isFeatured')}
+                </Tag>
+              )}
+            </Flexbox>
           </Flexbox>
         </Flexbox>
         <Flexbox

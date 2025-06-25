@@ -147,6 +147,9 @@
     "featuredTools": "推薦插件",
     "more": "發現更多"
   },
+  "isClaimed": "已認領",
+  "isFeatured": "推薦",
+  "isOfficial": "官方認證",
   "like": "喜歡",
   "mcp": {
     "categories": {
