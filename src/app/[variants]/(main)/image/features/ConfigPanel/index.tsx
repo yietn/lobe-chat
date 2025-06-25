@@ -2,11 +2,10 @@
 
 import { Form, FormItemProps } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
-import { memo, useEffect } from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FORM_STYLE } from '@/const/layoutTokens';
-import { saveImageGenerationConfig } from '@/store/image/slices/generationConfig/initialState';
 import { imageGenerationConfigSelectors } from '@/store/image/slices/generationConfig/selectors';
 import { useImageStore } from '@/store/image/store';
 
@@ -37,16 +36,16 @@ const ConfigPanel = memo(() => {
   const { styles } = useStyles();
   const { t } = useTranslation('image');
 
-  // Get current model and provider
-  const model = useImageStore(imageGenerationConfigSelectors.model);
-  const provider = useImageStore(imageGenerationConfigSelectors.provider);
+  // // Get current model and provider
+  // const model = useImageStore(imageGenerationConfigSelectors.model);
+  // const provider = useImageStore(imageGenerationConfigSelectors.provider);
 
-  // Save to localStorage when model or provider changes
-  useEffect(() => {
-    if (model && provider) {
-      saveImageGenerationConfig(model, provider);
-    }
-  }, [model, provider]);
+  // // Save to localStorage when model or provider changes
+  // useEffect(() => {
+  //   if (model && provider) {
+  //     saveImageGenerationConfig(model, provider);
+  //   }
+  // }, [model, provider]);
 
   const isSupportWidth = useImageStore(isSupportParamSelector('width'));
   const isSupportHeight = useImageStore(isSupportParamSelector('height'));
