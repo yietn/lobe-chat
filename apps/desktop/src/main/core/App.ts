@@ -19,7 +19,7 @@ import { I18nManager } from './I18nManager';
 import { IoCContainer } from './IoCContainer';
 import MenuManager from './MenuManager';
 import { ShortcutManager } from './ShortcutManager';
-import { StaticFileManager } from './StaticFileManager';
+import { StaticFileServerManager } from './StaticFileServerManager';
 import { StoreManager } from './StoreManager';
 import TrayManager from './TrayManager';
 import { UpdaterManager } from './UpdaterManager';
@@ -43,7 +43,7 @@ export class App {
   updaterManager: UpdaterManager;
   shortcutManager: ShortcutManager;
   trayManager: TrayManager;
-  staticFileManager: StaticFileManager;
+  staticFileServerManager: StaticFileServerManager;
   chromeFlags: string[] = ['OverlayScrollbar', 'FluentOverlayScrollbar', 'FluentScrollbar'];
 
   /**
@@ -100,7 +100,7 @@ export class App {
     this.updaterManager = new UpdaterManager(this);
     this.shortcutManager = new ShortcutManager(this);
     this.trayManager = new TrayManager(this);
-    this.staticFileManager = new StaticFileManager(this);
+    this.staticFileServerManager = new StaticFileServerManager(this);
 
     // register the schema to interceptor url
     // it should register before app ready
@@ -135,7 +135,7 @@ export class App {
     this.menuManager.initialize();
 
     // Initialize static file manager
-    await this.staticFileManager.initialize();
+    await this.staticFileServerManager.initialize();
 
     // Initialize global shortcuts: globalShortcut must be called after app.whenReady()
     this.shortcutManager.initialize();
@@ -406,7 +406,7 @@ export class App {
     }
 
     // 执行清理操作
-    this.staticFileManager.destroy();
+    this.staticFileServerManager.destroy();
     this.unregisterAllRequestHandlers();
   };
 }

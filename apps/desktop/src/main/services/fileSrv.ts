@@ -472,8 +472,8 @@ export default class FileService extends ServiceModule {
     // 解析路径：从 desktop://path/to/file.png 中提取 path/to/file.png
     const relativePath = normalizedPath.replace('desktop://', '');
 
-    // 使用 StaticFileManager 获取文件服务器域名，然后构建完整 URL
-    const serverDomain = this.app.staticFileManager.getFileServerDomain();
+    // 使用 StaticFileServerManager 获取文件服务器域名，然后构建完整 URL
+    const serverDomain = this.app.staticFileServerManager.getFileServerDomain();
     const httpURL = `${serverDomain}${LOCAL_STORAGE_URL_PREFIX}/${relativePath}`;
     logger.debug(`Generated HTTP URL: ${httpURL}`);
     return httpURL;

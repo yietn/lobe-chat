@@ -7,9 +7,9 @@ import { createLogger } from '@/utils/logger';
 
 import type { App } from './App';
 
-const logger = createLogger('core:StaticFileManager');
+const logger = createLogger('core:StaticFileServerManager');
 
-export class StaticFileManager {
+export class StaticFileServerManager {
   private app: App;
   private fileService: FileService;
   private httpServer: any = null;
@@ -19,7 +19,7 @@ export class StaticFileManager {
   constructor(app: App) {
     this.app = app;
     this.fileService = app.getService(FileService);
-    logger.debug('StaticFileManager initialized');
+    logger.debug('StaticFileServerManager initialized');
   }
 
   /**
@@ -27,11 +27,11 @@ export class StaticFileManager {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      logger.warn('StaticFileManager already initialized');
+      logger.warn('StaticFileServerManager already initialized');
       return;
     }
 
-    logger.info('Initializing StaticFileManager');
+    logger.info('Initializing StaticFileServerManager');
 
     try {
       // 启动 HTTP 文件服务器
@@ -39,10 +39,10 @@ export class StaticFileManager {
 
       this.isInitialized = true;
       logger.info(
-        `StaticFileManager initialization completed, server running on port ${this.serverPort}`,
+        `StaticFileServerManager initialization completed, server running on port ${this.serverPort}`,
       );
     } catch (error) {
-      logger.error('Failed to initialize StaticFileManager:', error);
+      logger.error('Failed to initialize StaticFileServerManager:', error);
       throw error;
     }
   }
@@ -193,7 +193,7 @@ export class StaticFileManager {
    */
   getFileServerDomain(): string {
     if (!this.isInitialized || !this.serverPort) {
-      throw new Error('StaticFileManager not initialized or server not started');
+      throw new Error('StaticFileServerManager not initialized or server not started');
     }
 
     const serverDomain = `http://127.0.0.1:${this.serverPort}`;
@@ -205,7 +205,7 @@ export class StaticFileManager {
    * 销毁静态文件管理器
    */
   destroy() {
-    logger.info('Destroying StaticFileManager');
+    logger.info('Destroying StaticFileServerManager');
 
     if (this.httpServer) {
       logger.debug('Closing HTTP file server');
@@ -217,6 +217,6 @@ export class StaticFileManager {
     }
 
     this.isInitialized = false;
-    logger.info('StaticFileManager destroyed');
+    logger.info('StaticFileServerManager destroyed');
   }
 }
