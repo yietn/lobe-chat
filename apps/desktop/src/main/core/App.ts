@@ -11,7 +11,6 @@ import { IControlModule } from '@/controllers';
 import { IServiceModule } from '@/services';
 import FileService from '@/services/fileSrv';
 import { IpcClientEventSender } from '@/types/ipcClientEvent';
-import { createDesktopFileHandler } from '@/utils/desktopFileHandler';
 import { createLogger } from '@/utils/logger';
 import { CustomRequestHandler, createHandler } from '@/utils/next-electron-rsc';
 
@@ -20,6 +19,7 @@ import { I18nManager } from './I18nManager';
 import { IoCContainer } from './IoCContainer';
 import MenuManager from './MenuManager';
 import { ShortcutManager } from './ShortcutManager';
+import { StaticFileManager } from './StaticFileManager';
 import { StoreManager } from './StoreManager';
 import TrayManager from './TrayManager';
 import { UpdaterManager } from './UpdaterManager';
@@ -43,6 +43,7 @@ export class App {
   updaterManager: UpdaterManager;
   shortcutManager: ShortcutManager;
   trayManager: TrayManager;
+  staticFileManager: StaticFileManager;
   chromeFlags: string[] = ['OverlayScrollbar', 'FluentOverlayScrollbar', 'FluentScrollbar'];
 
   /**
@@ -99,6 +100,7 @@ export class App {
     this.updaterManager = new UpdaterManager(this);
     this.shortcutManager = new ShortcutManager(this);
     this.trayManager = new TrayManager(this);
+    this.staticFileManager = new StaticFileManager(this);
 
     // register the schema to interceptor url
     // it should register before app ready
@@ -131,6 +133,9 @@ export class App {
     // Initialize i18n. Note: app.getLocale() must be called after app.whenReady() to get the correct value
     await this.i18n.init();
     this.menuManager.initialize();
+
+    // Initialize static file manager
+    await this.staticFileManager.initialize();
 
     // Initialize global shortcuts: globalShortcut must be called after app.whenReady()
     this.shortcutManager.initialize();
@@ -347,11 +352,6 @@ export class App {
     if (handler.registerCustomHandler) {
       this.registerCustomHandlerFn = handler.registerCustomHandler;
       logger.debug('Custom request handler registration is available');
-
-      // 注册桌面文件处理器
-      const fileService = this.getService(FileService);
-      const desktopFileHandler = createDesktopFileHandler(fileService);
-      this.registerRequestHandler(desktopFileHandler);
     } else {
       logger.warn('Custom request handler registration is not available');
     }
@@ -406,6 +406,7 @@ export class App {
     }
 
     // 执行清理操作
+    this.staticFileManager.destroy();
     this.unregisterAllRequestHandlers();
   };
 }

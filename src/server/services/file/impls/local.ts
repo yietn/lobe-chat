@@ -6,7 +6,6 @@ import { electronIpcClient } from '@/server/modules/ElectronIPCClient';
 import { inferContentTypeFromImageUrl } from '@/utils/url';
 
 import { FileServiceImpl } from './type';
-import { isLocalUrl } from './utils';
 
 /**
  * 桌面应用本地文件服务实现
@@ -168,7 +167,6 @@ export class DesktopLocalFileImpl implements FileServiceImpl {
    * 从完整URL中提取key
    * 从 HTTP URL 中提取 desktop:// 格式的路径
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getKeyFromFullUrl(url: string): string {
     try {
       const urlObj = new URL(url);
@@ -226,51 +224,6 @@ export class DesktopLocalFileImpl implements FileServiceImpl {
     } catch (error) {
       console.error('[DesktopLocalFileImpl] Failed to upload media file:', error);
       throw error;
-    }
-  }
-
-  /**
-   * 从完整URL获取文件内容和类型
-   */
-  async fetchFileFromFullUrl(url: string): Promise<{ buffer: Buffer; contentType: string }> {
-    try {
-      // 检查是否为 localhost URL
-      if (isLocalUrl(url)) {
-        // localhost URL: 使用本地文件系统
-        const key = this.getKeyFromFullUrl(url);
-        if (!key) {
-          throw new Error(`Failed to extract key from URL: ${url}`);
-        }
-
-        // 使用 getFileBuffer 获取文件内容
-        const buffer = await this.getFileBuffer(key);
-        if (buffer.length === 0) {
-          throw new Error(`File not found or empty: ${key}`);
-        }
-
-        // 使用 inferContentTypeFromImageUrl 推断 content type
-        const contentType = inferContentTypeFromImageUrl(key) || 'application/octet-stream';
-
-        return { buffer, contentType };
-      } else {
-        // 非 localhost URL: 使用 fetch 获取
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch file from ${url}: ${response.status} ${response.statusText}`,
-          );
-        }
-
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const contentType = response.headers.get('content-type') || 'application/octet-stream';
-
-        return { buffer, contentType };
-      }
-    } catch (error) {
-      throw new Error(
-        `Failed to fetch file from ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
     }
   }
 }

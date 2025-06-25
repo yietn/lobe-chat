@@ -29,4 +29,4 @@ export const FILE_STORAGE_DIR = 'file-storage';
 export const INSTALL_PLUGINS_DIR = 'plugins';
 
 // Desktop file service
-export const LOCAL_STORAGE_URL_PREFIX = '/local-storage';
+export const LOCAL_STORAGE_URL_PREFIX = '/lobe-desktop-file';

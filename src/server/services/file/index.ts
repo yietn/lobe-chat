@@ -129,11 +129,4 @@ export class FileService {
     const filePath = await tempManager.writeTempFile(content, file.name);
     return { cleanup: () => tempManager.cleanup(), file, filePath };
   }
-
-  /**
-   * 从完整URL获取文件内容和类型
-   */
-  public async fetchFileFromFullUrl(url: string): Promise<{ buffer: Buffer; contentType: string }> {
-    return this.impl.fetchFileFromFullUrl(url);
-  }
 }

@@ -11,6 +11,7 @@ import { parse } from 'node:url';
 import resolve from 'resolve';
 import { parse as parseCookie, splitCookiesString } from 'set-cookie-parser';
 
+import { LOCAL_STORAGE_URL_PREFIX } from '@/const/dir';
 import { isDev } from '@/const/env';
 import { createLogger } from '@/utils/logger';
 
@@ -226,6 +227,14 @@ export function createHandler({
     socket: Socket,
   ): Promise<Response> => {
     try {
+      // 检查是否是本地文件服务请求，如果是则跳过处理
+      const url = new URL(request.url);
+      if (url.pathname.startsWith(LOCAL_STORAGE_URL_PREFIX + '/')) {
+        if (debug) logger.debug(`Skipping local file service request: ${request.url}`);
+        // 直接使用 fetch 转发请求到本地文件服务
+        return fetch(request);
+      }
+
       // 先尝试使用自定义处理器处理请求
       for (const customHandler of customHandlers) {
         try {

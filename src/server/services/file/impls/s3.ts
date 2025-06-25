@@ -101,25 +101,4 @@ export class S3StaticFileImpl implements FileServiceImpl {
     await this.s3.uploadMedia(key, buffer);
     return { key };
   }
-
-  async fetchFileFromFullUrl(url: string): Promise<{ buffer: Buffer; contentType: string }> {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch file from ${url}: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const contentType = response.headers.get('content-type') || 'application/octet-stream';
-
-      return { buffer, contentType };
-    } catch (error) {
-      throw new Error(
-        `Failed to fetch file from ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
-    }
-  }
 }

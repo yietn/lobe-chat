@@ -15,7 +15,6 @@ import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { keyVaults, serverDatabase } from '@/libs/trpc/lambda/middleware';
 import { createAsyncServerClient } from '@/server/routers/async';
 import { FileService } from '@/server/services/file';
-import { isLocalUrl } from '@/server/services/file/impls/utils';
 import {
   AsyncTaskError,
   AsyncTaskErrorType,
@@ -172,44 +171,6 @@ export const imageRouter = router({
 
     log('Database transaction completed successfully. Starting async task triggers.');
 
-    // 处理 localhost imageUrls，将它们转换为 data URLs，方便后序读取
-    let processedParams = { ...params };
-    if (Array.isArray(params.imageUrls) && params.imageUrls.length > 0) {
-      log('Processing imageUrls for localhost conversion: %O', params.imageUrls);
-      try {
-        const processedImageUrls = await Promise.all(
-          params.imageUrls.map(async (url) => {
-            // 检查是否为 localhost URL
-            if (isLocalUrl(url)) {
-              try {
-                // 使用新的 fetchFileFromFullUrl 方法获取文件内容和类型
-                const { buffer, contentType } = await fileService.fetchFileFromFullUrl(url);
-
-                // 转换为 data URL
-                return `data:${contentType};base64,${buffer.toString('base64')}`;
-              } catch (error) {
-                log('Error converting localhost URL %s to data URL: %O', url, error);
-                // 如果转换失败，保持原始 URL
-                return url;
-              }
-            } else {
-              // 非 localhost URL 保持不变
-              return url;
-            }
-          }),
-        );
-
-        processedParams = {
-          ...params,
-          imageUrls: processedImageUrls,
-        };
-      } catch (error) {
-        log('Error processing imageUrls: %O', error);
-        // 如果处理失败，使用原始 params
-        processedParams = params;
-      }
-    }
-
     // 步骤 2: 触发所有生图任务
     const asyncCaller = await createAsyncServerClient(userId, ctx.jwtPayload as JWTPayload);
     log('Async caller created, jwtPayload: %O', ctx.jwtPayload);
@@ -225,7 +186,7 @@ export const imageRouter = router({
           generationId: generation.id,
           provider,
           model,
-          params: processedParams, // 使用处理后的 params（localhost URLs 已转换为 data URLs）
+          params, // 使用原始参数
         });
       } catch (e) {
         console.error('[createImage] async task trigger error:', e);

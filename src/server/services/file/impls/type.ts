@@ -23,11 +23,6 @@ export interface FileServiceImpl {
   deleteFiles(keys: string[]): Promise<any>;
 
   /**
-   * 从完整URL获取文件内容和类型
-   */
-  fetchFileFromFullUrl(url: string): Promise<{ buffer: Buffer; contentType: string }>;
-
-  /**
    * 获取文件字节数组
    */
   getFileByteArray(key: string): Promise<Uint8Array>;
