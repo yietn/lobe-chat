@@ -18,7 +18,7 @@ import { GenerationBatchDispatch, generationBatchReducer } from './reducer';
 const n = setNamespace('generationBatch');
 
 // ====== SWR key ====== //
-const SWR_USE_FETCH_GENERATION_BATCHES = 'SWR_USE_FETCH_GENERATION_BATCHES';
+export const SWR_USE_FETCH_GENERATION_BATCHES = 'SWR_USE_FETCH_GENERATION_BATCHES';
 const SWR_USE_CHECK_GENERATION_STATUS = 'SWR_USE_CHECK_GENERATION_STATUS';
 
 // ====== action interface ====== //

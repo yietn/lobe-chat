@@ -15,6 +15,7 @@ import { merge } from '@/utils/merge';
 import { setNamespace } from '@/utils/storeDebug';
 
 import type { ImageStore } from '../../store';
+import { SWR_USE_FETCH_GENERATION_BATCHES } from '../generationBatch/action';
 import { GenerationTopicDispatch, generationTopicReducer } from './reducer';
 import { generationTopicSelectors } from './selectors';
 
@@ -55,6 +56,9 @@ export const createGenerationTopicSlice: StateCreator<
 
     // Create topic with default title
     const topicId = await internal_createGenerationTopic();
+
+    // Pre-populate SWR cache with empty array to avoid suspense
+    mutate([SWR_USE_FETCH_GENERATION_BATCHES, topicId], [], { revalidate: false });
 
     set({ activeGenerationTopicId: topicId }, false, n('createGenerationTopic'));
 

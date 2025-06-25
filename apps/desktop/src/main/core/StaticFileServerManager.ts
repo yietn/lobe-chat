@@ -197,7 +197,6 @@ export class StaticFileServerManager {
     }
 
     const serverDomain = `http://127.0.0.1:${this.serverPort}`;
-    logger.debug(`File server domain: ${serverDomain}`);
     return serverDomain;
   }
 

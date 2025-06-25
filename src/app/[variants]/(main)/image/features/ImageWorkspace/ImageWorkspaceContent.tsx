@@ -31,14 +31,14 @@ const ImageWorkspaceContent = () => {
           </Flexbox>
 
           {/* 底部输入框 */}
-          <Center style={{ marginBottom: 64 }}>
-            <PromptInput />
+          <Center>
+            <PromptInput showTitle={false} />
           </Center>
         </>
       ) : (
         // 当没有生成结果时，将输入框完整居中显示
         <Center flex={1}>
-          <PromptInput />
+          <PromptInput showTitle={true} />
         </Center>
       )}
     </Flexbox>
