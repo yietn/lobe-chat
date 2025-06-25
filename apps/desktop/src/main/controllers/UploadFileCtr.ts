@@ -22,6 +22,11 @@ export default class UploadFileCtr extends ControllerModule {
     return this.fileService.getFilePath(id);
   }
 
+  @ipcServerEvent('getFileHTTPURL')
+  async getFileHTTPURL(path: string) {
+    return this.fileService.getFileHTTPURL(path);
+  }
+
   @ipcServerEvent('deleteFiles')
   async deleteFiles(paths: string[]) {
     return this.fileService.deleteFiles(paths);

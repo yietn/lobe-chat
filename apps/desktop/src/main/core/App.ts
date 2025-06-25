@@ -9,7 +9,9 @@ import { buildDir, nextStandaloneDir } from '@/const/dir';
 import { isDev } from '@/const/env';
 import { IControlModule } from '@/controllers';
 import { IServiceModule } from '@/services';
+import FileService from '@/services/fileSrv';
 import { IpcClientEventSender } from '@/types/ipcClientEvent';
+import { createDesktopFileHandler } from '@/utils/desktopFileHandler';
 import { createLogger } from '@/utils/logger';
 import { CustomRequestHandler, createHandler } from '@/utils/next-electron-rsc';
 
@@ -345,6 +347,11 @@ export class App {
     if (handler.registerCustomHandler) {
       this.registerCustomHandlerFn = handler.registerCustomHandler;
       logger.debug('Custom request handler registration is available');
+
+      // 注册桌面文件处理器
+      const fileService = this.getService(FileService);
+      const desktopFileHandler = createDesktopFileHandler(fileService);
+      this.registerRequestHandler(desktopFileHandler);
     } else {
       logger.warn('Custom request handler registration is not available');
     }

@@ -1,6 +1,6 @@
 // copy from https://github.com/kirill-konshin/next-electron-rsc
 import { serialize as serializeCookie } from 'cookie';
-import type { Protocol, Session } from 'electron';
+import { type Protocol, type Session, protocol } from 'electron';
 import type { NextConfig } from 'next';
 import type NextNodeServer from 'next/dist/server/next-server';
 import assert from 'node:assert';
@@ -178,7 +178,9 @@ export function createHandler({
       }
     };
   }
+
   let registerProtocolHandle = false;
+  let interceptorCount = 0; // 追踪活跃的拦截器数量
 
   protocol.registerSchemesAsPrivileged([
     {
@@ -347,13 +349,14 @@ export function createHandler({
     );
 
     const socket = new Socket();
+    interceptorCount++; // 增加拦截器计数
 
     const closeSocket = () => socket.end();
 
     process.on('SIGTERM', () => closeSocket);
     process.on('SIGINT', () => closeSocket);
 
-    if (!isDev && !registerProtocolHandle) {
+    if (!registerProtocolHandle) {
       logger.debug(
         `Registering HTTP protocol handler in ${isDev ? 'development' : 'production'} mode`,
       );
@@ -367,12 +370,19 @@ export function createHandler({
       registerProtocolHandle = true;
     }
 
+    logger.debug(`Active interceptors count: ${interceptorCount}`);
+
     return function stopIntercept() {
-      if (registerProtocolHandle) {
-        logger.debug('Unregistering HTTP protocol handler');
+      interceptorCount--; // 减少拦截器计数
+      logger.debug(`Stopping interceptor, remaining count: ${interceptorCount}`);
+
+      // 只有当没有活跃的拦截器时才取消注册协议处理器
+      if (registerProtocolHandle && interceptorCount === 0) {
+        logger.debug('Unregistering HTTP protocol handler (no active interceptors)');
         protocol.unhandle('http');
         registerProtocolHandle = false;
       }
+
       process.off('SIGTERM', () => closeSocket);
       process.off('SIGINT', () => closeSocket);
       closeSocket();

@@ -4,11 +4,24 @@ import { writeFile } from 'node:fs/promises';
 import path, { join } from 'node:path';
 import { promisify } from 'node:util';
 
-import { FILE_STORAGE_DIR } from '@/const/dir';
+import { FILE_STORAGE_DIR, LOCAL_STORAGE_URL_PREFIX } from '@/const/dir';
 import { makeSureDirExist } from '@/utils/file-system';
 import { createLogger } from '@/utils/logger';
 
 import { ServiceModule } from './index';
+
+/**
+ * 文件未找到错误类
+ */
+export class FileNotFoundError extends Error {
+  constructor(
+    message: string,
+    public path: string,
+  ) {
+    super(message);
+    this.name = 'FileNotFoundError';
+  }
+}
 
 const readFilePromise = promisify(fs.readFile);
 const unlinkPromise = promisify(fs.unlink);
@@ -257,6 +270,12 @@ export default class FileService extends ServiceModule {
       };
     } catch (error) {
       logger.error(`File retrieval failed:`, error);
+
+      // 如果是文件不存在错误，抛出自定义的 FileNotFoundError
+      if (error instanceof Error && error.message.includes('ENOENT')) {
+        throw new FileNotFoundError(`File not found: ${path}`, path);
+      }
+
       throw new Error(`File retrieval failed: ${(error as Error).message}`);
     }
   }
@@ -437,5 +456,25 @@ export default class FileService extends ServiceModule {
     }
 
     return fullPath;
+  }
+
+  async getFileHTTPURL(path: string): Promise<string> {
+    logger.debug(`Getting file HTTP URL: ${path}`);
+    // 处理desktop://路径
+    if (!path.startsWith('desktop://')) {
+      logger.error(`Invalid desktop file path: ${path}`);
+      throw new Error(`Invalid desktop file path: ${path}`);
+    }
+
+    // 标准化路径格式
+    const normalizedPath = path.replace(/^desktop:\/+/, 'desktop://');
+
+    // 解析路径：从 desktop://path/to/file.png 中提取 path/to/file.png
+    const relativePath = normalizedPath.replace('desktop://', '');
+
+    // 构建HTTP URL：/desktop-file/path/to/file.png
+    const httpURL = `${this.app.nextServerUrl}${LOCAL_STORAGE_URL_PREFIX}/${relativePath}`;
+    logger.debug(`Generated HTTP URL: ${httpURL}`);
+    return httpURL;
   }
 }

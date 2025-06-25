@@ -53,6 +53,13 @@ export class FileService {
   }
 
   /**
+   * 获取文件Buffer
+   */
+  public async getFileBuffer(key: string): Promise<Buffer> {
+    return this.impl.getFileBuffer(key);
+  }
+
+  /**
    * 创建预签名上传URL
    */
   public async createPreSignedUrl(key: string): Promise<string> {
@@ -121,5 +128,12 @@ export class FileService {
 
     const filePath = await tempManager.writeTempFile(content, file.name);
     return { cleanup: () => tempManager.cleanup(), file, filePath };
+  }
+
+  /**
+   * 从完整URL获取文件内容和类型
+   */
+  public async fetchFileFromFullUrl(url: string): Promise<{ buffer: Buffer; contentType: string }> {
+    return this.impl.fetchFileFromFullUrl(url);
   }
 }

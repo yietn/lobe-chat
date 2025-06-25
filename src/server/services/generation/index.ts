@@ -7,7 +7,6 @@ import sharp from 'sharp';
 import { LobeChatDatabase } from '@/database/type';
 import { FileService } from '@/server/services/file';
 import { getYYYYmmddHHMMss } from '@/utils/time';
-import { inferContentTypeFromImageUrl } from '@/utils/url';
 
 const log = debug('lobe-image:generation-service');
 
@@ -52,14 +51,11 @@ export class GenerationService {
       originalMimeType = mimeTypePart.split(':')[1].split(';')[0];
       originalImageBuffer = Buffer.from(base64Data, 'base64');
     } else {
-      log('Fetching image from URL:', url);
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
-      }
-      originalImageBuffer = Buffer.from(await response.arrayBuffer());
-      originalMimeType = inferContentTypeFromImageUrl(url) || 'image/jpeg';
-      log('Successfully fetched image, buffer size:', originalImageBuffer.length);
+      log('Fetching image from URL via fileService:', url);
+      const { buffer, contentType } = await this.fileService.fetchFileFromFullUrl(url);
+      originalImageBuffer = buffer;
+      originalMimeType = contentType;
+      log('Successfully fetched image via fileService, buffer size:', originalImageBuffer.length);
     }
 
     // Calculate hash for original image
@@ -202,13 +198,13 @@ export class GenerationService {
       const [, base64Data] = coverUrl.split(',');
       originalImageBuffer = Buffer.from(base64Data, 'base64');
     } else {
-      log('Fetching cover image from URL:', coverUrl);
-      const response = await fetch(coverUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch cover image from ${coverUrl}: ${response.statusText}`);
-      }
-      originalImageBuffer = Buffer.from(await response.arrayBuffer());
-      log('Successfully fetched cover image, buffer size:', originalImageBuffer.length);
+      log('Fetching cover image from URL via fileService:', coverUrl);
+      const { buffer } = await this.fileService.fetchFileFromFullUrl(coverUrl);
+      originalImageBuffer = buffer;
+      log(
+        'Successfully fetched cover image via fileService, buffer size:',
+        originalImageBuffer.length,
+      );
     }
 
     // Process image to 256x256 cover with webp format
