@@ -54,8 +54,8 @@ export class StaticFileServerManager {
     try {
       // 使用 get-port-please 获取可用端口
       this.serverPort = await getPort({
-        port: 3025, // 首选端口
-        ports: [3026, 3027, 3028, 3029, 3030], // 备用端口
+        port: 33250, // 首选端口
+        ports: [33251, 33252, 33253, 33254, 33255], // 备用端口
         host: '127.0.0.1',
       });
 
